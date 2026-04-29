@@ -1,0 +1,135 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/luckkyboy/chinese-oil-price-data/schema/calendar.schema.json",
+  "title": "Chinese oil price adjustment calendar",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "year",
+    "timezone",
+    "rule",
+    "generated_at",
+    "anchor_previous_adjustment_date",
+    "adjustment_dates",
+    "sources"
+  ],
+  "properties": {
+    "year": {
+      "type": "integer",
+      "minimum": 2000,
+      "maximum": 2100
+    },
+    "timezone": {
+      "const": "Asia/Shanghai"
+    },
+    "rule": {
+      "oneOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "name"
+          ],
+          "properties": {
+            "name": {
+              "type": "string",
+              "minLength": 1
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        }
+      ]
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "anchor_previous_adjustment_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "adjustment_dates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/adjustmentDate"
+      }
+    },
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    }
+  },
+  "$defs": {
+    "adjustmentDate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "date",
+        "round"
+      ],
+      "properties": {
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "round": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "result": {
+          "type": "string",
+          "enum": [
+            "increase",
+            "decrease",
+            "no_change",
+            "unknown"
+          ]
+        },
+        "gasoline_change": {
+          "type": "number"
+        },
+        "diesel_change": {
+          "type": "number"
+        },
+        "change_unit": {
+          "type": "string",
+          "enum": [
+            "CNY/ton"
+          ]
+        },
+        "price_snapshot": {
+          "type": "string",
+          "pattern": "^/data/prices/[0-9]{4}/[0-9]{4}-[0-9]{2}-[0-9]{2}\\.json$"
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "url"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

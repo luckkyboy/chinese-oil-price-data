@@ -1,0 +1,100 @@
+{
+  "province_code": "630000",
+  "province_name": "青海省",
+  "zones": [
+    {
+      "zone_code": "qinghai-1",
+      "zone_name": "一价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "西宁市"
+        },
+        {
+          "level": "city",
+          "name": "海东市"
+        },
+        {
+          "level": "city",
+          "name": "格尔木市",
+          "excludes": [
+            {
+              "level": "county",
+              "name": "唐古拉山镇",
+              "parent": "格尔木市"
+            }
+          ]
+        }
+      ],
+      "note": "一价区包括西宁市、海东市、格尔木市（唐古拉山镇除外）。",
+      "sources": [
+        {
+          "name": "青海省发展和改革委员会",
+          "url": "http://fgw.qinghai.gov.cn/xwzx/tzgg/202604/t20260421_91497.html"
+        }
+      ]
+    },
+    {
+      "zone_code": "qinghai-2",
+      "zone_name": "二价区",
+      "areas": [
+        {
+          "level": "prefecture",
+          "name": "海西蒙古族藏族自治州",
+          "excludes": [
+            {
+              "level": "city",
+              "name": "格尔木市"
+            }
+          ]
+        },
+        {
+          "level": "prefecture",
+          "name": "海南藏族自治州"
+        },
+        {
+          "level": "prefecture",
+          "name": "海北藏族自治州"
+        },
+        {
+          "level": "prefecture",
+          "name": "黄南藏族自治州"
+        }
+      ],
+      "note": "二价区包括海西州（除格尔木市）、海南州、海北州、黄南州。",
+      "sources": [
+        {
+          "name": "青海省发展和改革委员会",
+          "url": "http://fgw.qinghai.gov.cn/xwzx/tzgg/202604/t20260421_91497.html"
+        }
+      ]
+    },
+    {
+      "zone_code": "qinghai-3",
+      "zone_name": "三价区",
+      "areas": [
+        {
+          "level": "prefecture",
+          "name": "玉树藏族自治州"
+        },
+        {
+          "level": "prefecture",
+          "name": "果洛藏族自治州"
+        },
+        {
+          "level": "county",
+          "name": "唐古拉山镇",
+          "parent": "格尔木市"
+        }
+      ],
+      "note": "三价区包括玉树州、果洛州；并将格尔木市辖唐古拉山镇由一价区调整为三价区。",
+      "sources": [
+        {
+          "name": "青海省发展和改革委员会",
+          "url": "http://fgw.qinghai.gov.cn/xwzx/tzgg/202604/t20260421_91497.html"
+        }
+      ]
+    }
+  ],
+  "updated_at": "2026-04-27T17:45:00+08:00"
+}

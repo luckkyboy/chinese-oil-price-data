@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/luckkyboy/chinese-oil-price-data/schema/price-latest.schema.json",
+  "title": "Latest Chinese oil price snapshot pointer",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "latest",
+    "latest_summary",
+    "adjustment_date",
+    "updated_at"
+  ],
+  "properties": {
+    "latest": {
+      "type": "string",
+      "pattern": "^[0-9]{4}/[0-9]{4}-[0-9]{2}-[0-9]{2}\\.json$"
+    },
+    "latest_summary": {
+      "type": "string",
+      "pattern": "^[0-9]{4}/[0-9]{4}-[0-9]{2}-[0-9]{2}\\.summary\\.json$"
+    },
+    "adjustment_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

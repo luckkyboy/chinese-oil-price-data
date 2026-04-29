@@ -1,0 +1,191 @@
+{
+  "province_code": "510000",
+  "province_name": "四川省",
+  "zones": [
+    {
+      "zone_code": "sichuan-1",
+      "zone_name": "一价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "成都市"
+        },
+        {
+          "level": "city",
+          "name": "自贡市"
+        },
+        {
+          "level": "city",
+          "name": "泸州市"
+        },
+        {
+          "level": "city",
+          "name": "德阳市"
+        },
+        {
+          "level": "city",
+          "name": "绵阳市"
+        },
+        {
+          "level": "city",
+          "name": "广元市"
+        },
+        {
+          "level": "city",
+          "name": "遂宁市"
+        },
+        {
+          "level": "city",
+          "name": "内江市"
+        },
+        {
+          "level": "city",
+          "name": "乐山市"
+        },
+        {
+          "level": "city",
+          "name": "南充市"
+        },
+        {
+          "level": "city",
+          "name": "眉山市"
+        },
+        {
+          "level": "city",
+          "name": "宜宾市"
+        },
+        {
+          "level": "city",
+          "name": "广安市"
+        },
+        {
+          "level": "city",
+          "name": "达州市"
+        },
+        {
+          "level": "city",
+          "name": "雅安市"
+        },
+        {
+          "level": "city",
+          "name": "巴中市"
+        },
+        {
+          "level": "city",
+          "name": "资阳市"
+        }
+      ],
+      "note": "二三价区以外的其他市行政区域为一价区。",
+      "sources": [
+        {
+          "name": "四川省发展和改革委员会",
+          "url": "https://fgw.sc.gov.cn/sfgw/tzgg/2026/4/21/f3b968f143664fe5b9055beca7178e6f.shtml"
+        }
+      ]
+    },
+    {
+      "zone_code": "sichuan-2",
+      "zone_name": "二价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "攀枝花市"
+        },
+        {
+          "level": "prefecture",
+          "name": "凉山彝族自治州"
+        },
+        {
+          "level": "county",
+          "name": "汶川县",
+          "parent": "阿坝藏族羌族自治州"
+        },
+        {
+          "level": "county",
+          "name": "理县",
+          "parent": "阿坝藏族羌族自治州"
+        },
+        {
+          "level": "county",
+          "name": "茂县",
+          "parent": "阿坝藏族羌族自治州"
+        }
+      ],
+      "note": "阿坝州所属汶川县、理县、茂县以及凉山州、攀枝花市行政区域为二价区。",
+      "sources": [
+        {
+          "name": "四川省发展和改革委员会",
+          "url": "https://fgw.sc.gov.cn/sfgw/tzgg/2026/4/21/f3b968f143664fe5b9055beca7178e6f.shtml"
+        }
+      ]
+    },
+    {
+      "zone_code": "sichuan-3",
+      "zone_name": "三价区",
+      "areas": [
+        {
+          "level": "prefecture",
+          "name": "甘孜藏族自治州"
+        },
+        {
+          "level": "county",
+          "name": "马尔康市",
+          "parent": "阿坝藏族羌族自治州"
+        },
+        {
+          "level": "county",
+          "name": "金川县",
+          "parent": "阿坝藏族羌族自治州"
+        },
+        {
+          "level": "county",
+          "name": "小金县",
+          "parent": "阿坝藏族羌族自治州"
+        },
+        {
+          "level": "county",
+          "name": "阿坝县",
+          "parent": "阿坝藏族羌族自治州"
+        },
+        {
+          "level": "county",
+          "name": "若尔盖县",
+          "parent": "阿坝藏族羌族自治州"
+        },
+        {
+          "level": "county",
+          "name": "红原县",
+          "parent": "阿坝藏族羌族自治州"
+        },
+        {
+          "level": "county",
+          "name": "壤塘县",
+          "parent": "阿坝藏族羌族自治州"
+        },
+        {
+          "level": "county",
+          "name": "松潘县",
+          "parent": "阿坝藏族羌族自治州"
+        },
+        {
+          "level": "county",
+          "name": "九寨沟县",
+          "parent": "阿坝藏族羌族自治州"
+        },
+        {
+          "level": "county",
+          "name": "黑水县",
+          "parent": "阿坝藏族羌族自治州"
+        }
+      ],
+      "note": "阿坝州除汶川县、理县、茂县以外的其余10个县以及甘孜州行政区域为三价区。",
+      "sources": [
+        {
+          "name": "四川省发展和改革委员会",
+          "url": "https://fgw.sc.gov.cn/sfgw/tzgg/2026/4/21/f3b968f143664fe5b9055beca7178e6f.shtml"
+        }
+      ]
+    }
+  ],
+  "updated_at": "2026-04-26T14:35:00+08:00"
+}

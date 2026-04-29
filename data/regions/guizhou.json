@@ -1,0 +1,128 @@
+{
+  "province_code": "520000",
+  "province_name": "贵州省",
+  "zones": [
+    {
+      "zone_code": "guizhou-1",
+      "zone_name": "一价区",
+      "areas": [
+        {
+          "level": "county",
+          "name": "云岩区",
+          "parent": "贵阳市"
+        },
+        {
+          "level": "county",
+          "name": "南明区",
+          "parent": "贵阳市"
+        },
+        {
+          "level": "county",
+          "name": "观山湖区",
+          "parent": "贵阳市"
+        },
+        {
+          "level": "county",
+          "name": "花溪区",
+          "parent": "贵阳市"
+        },
+        {
+          "level": "county",
+          "name": "白云区",
+          "parent": "贵阳市"
+        },
+        {
+          "level": "county",
+          "name": "乌当区",
+          "parent": "贵阳市"
+        }
+      ],
+      "note": "一价区为贵阳市云岩区、南明区、观山湖区、花溪区、白云区、乌当区。",
+      "sources": [
+        {
+          "name": "贵州省发展和改革委员会",
+          "url": "https://fgw.guizhou.gov.cn/fggz/tzgg/202604/t20260421_90029169.html"
+        }
+      ]
+    },
+    {
+      "zone_code": "guizhou-2",
+      "zone_name": "二价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "安顺市"
+        },
+        {
+          "level": "prefecture",
+          "name": "黔南布依族苗族自治州"
+        },
+        {
+          "level": "county",
+          "name": "修文县",
+          "parent": "贵阳市"
+        },
+        {
+          "level": "county",
+          "name": "开阳县",
+          "parent": "贵阳市"
+        },
+        {
+          "level": "county",
+          "name": "息烽县",
+          "parent": "贵阳市"
+        },
+        {
+          "level": "county",
+          "name": "清镇市",
+          "parent": "贵阳市"
+        }
+      ],
+      "note": "二价区为安顺市、黔南布依族苗族自治州，以及贵阳市所属修文县、开阳县、息烽县、清镇市。",
+      "sources": [
+        {
+          "name": "贵州省发展和改革委员会",
+          "url": "https://fgw.guizhou.gov.cn/fggz/tzgg/202604/t20260421_90029169.html"
+        }
+      ]
+    },
+    {
+      "zone_code": "guizhou-3",
+      "zone_name": "三价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "遵义市"
+        },
+        {
+          "level": "city",
+          "name": "六盘水市"
+        },
+        {
+          "level": "city",
+          "name": "铜仁市"
+        },
+        {
+          "level": "prefecture",
+          "name": "黔东南苗族侗族自治州"
+        },
+        {
+          "level": "prefecture",
+          "name": "黔西南布依族苗族自治州"
+        },
+        {
+          "level": "city",
+          "name": "毕节市"
+        }
+      ],
+      "note": "三价区为遵义市、六盘水市、铜仁市、黔东南苗族侗族自治州、黔西南布依族苗族自治州、毕节市。",
+      "sources": [
+        {
+          "name": "贵州省发展和改革委员会",
+          "url": "https://fgw.guizhou.gov.cn/fggz/tzgg/202604/t20260421_90029169.html"
+        }
+      ]
+    }
+  ],
+  "updated_at": "2026-04-27T16:40:00+08:00"
+}

@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/luckkyboy/chinese-oil-price-data/schema/region-zones.schema.json",
+  "title": "Chinese oil price region zones",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "province_code",
+    "province_name",
+    "zones",
+    "updated_at"
+  ],
+  "properties": {
+    "province_code": {
+      "type": "string",
+      "pattern": "^[0-9]{6}$"
+    },
+    "province_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "zones": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/zone"
+      }
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "zone": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "zone_code",
+        "zone_name"
+      ],
+      "properties": {
+        "zone_code": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "zone_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "cities": {
+          "deprecated": true,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "areas": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/area"
+          }
+        },
+        "note": {
+          "type": "string"
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        }
+      }
+    },
+    "area": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "name"
+      ],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": [
+            "city",
+            "prefecture",
+            "county",
+            "province_remainder"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parent": {
+          "type": "string",
+          "minLength": 1
+        },
+        "excludes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/areaRef"
+          }
+        }
+      }
+    },
+    "areaRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "level",
+        "name"
+      ],
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": [
+            "city",
+            "prefecture",
+            "county"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parent": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "url"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "format": "uri"
+        }
+      }
+    }
+  }
+}

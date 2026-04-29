@@ -1,0 +1,136 @@
+{
+  "province_code": "530000",
+  "province_name": "云南省",
+  "zones": [
+    {
+      "zone_code": "yunnan-1",
+      "zone_name": "一价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "昆明市"
+        }
+      ],
+      "note": "一价区：昆明市。",
+      "sources": [
+        {
+          "name": "云南省发展和改革委员会",
+          "url": "https://yndrc.yn.gov.cn/html/2026/jiageyushoufei_0421/26483.html"
+        }
+      ]
+    },
+    {
+      "zone_code": "yunnan-2",
+      "zone_name": "二价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "曲靖市"
+        },
+        {
+          "level": "city",
+          "name": "楚雄市"
+        },
+        {
+          "level": "city",
+          "name": "玉溪市"
+        }
+      ],
+      "note": "二价区：曲靖市、楚雄市、玉溪市。",
+      "sources": [
+        {
+          "name": "云南省发展和改革委员会",
+          "url": "https://yndrc.yn.gov.cn/html/2026/jiageyushoufei_0421/26483.html"
+        }
+      ]
+    },
+    {
+      "zone_code": "yunnan-3",
+      "zone_name": "三价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "昭通市"
+        },
+        {
+          "level": "prefecture",
+          "name": "红河哈尼族彝族自治州"
+        },
+        {
+          "level": "city",
+          "name": "文山市"
+        },
+        {
+          "level": "city",
+          "name": "大理市"
+        }
+      ],
+      "note": "三价区：昭通市、红河哈尼族彝族自治州、文山市、大理市。",
+      "sources": [
+        {
+          "name": "云南省发展和改革委员会",
+          "url": "https://yndrc.yn.gov.cn/html/2026/jiageyushoufei_0421/26483.html"
+        }
+      ]
+    },
+    {
+      "zone_code": "yunnan-4",
+      "zone_name": "四价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "普洱市"
+        },
+        {
+          "level": "city",
+          "name": "保山市"
+        },
+        {
+          "level": "city",
+          "name": "丽江市"
+        }
+      ],
+      "note": "四价区：普洱市、保山市、丽江市。",
+      "sources": [
+        {
+          "name": "云南省发展和改革委员会",
+          "url": "https://yndrc.yn.gov.cn/html/2026/jiageyushoufei_0421/26483.html"
+        }
+      ]
+    },
+    {
+      "zone_code": "yunnan-5",
+      "zone_name": "五价区",
+      "areas": [
+        {
+          "level": "prefecture",
+          "name": "西双版纳傣族自治州"
+        },
+        {
+          "level": "prefecture",
+          "name": "德宏傣族景颇族自治州"
+        },
+        {
+          "level": "prefecture",
+          "name": "迪庆藏族自治州"
+        },
+        {
+          "level": "prefecture",
+          "name": "怒江傈僳族自治州"
+        },
+        {
+          "level": "city",
+          "name": "临沧市"
+        }
+      ],
+      "note": "五价区：西双版纳傣族自治州、德宏傣族景颇族自治州、迪庆藏族自治州、怒江傈僳族自治州、临沧市。",
+      "sources": [
+        {
+          "name": "云南省发展和改革委员会",
+          "url": "https://yndrc.yn.gov.cn/html/2026/jiageyushoufei_0421/26483.html"
+        }
+      ]
+    }
+  ],
+  "updated_at": "2026-04-27T17:10:00+08:00"
+}

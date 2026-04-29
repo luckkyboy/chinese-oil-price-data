@@ -1,0 +1,101 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/luckkyboy/chinese-oil-price-data/schema/source-sites.schema.json",
+  "title": "Chinese oil price official source sites",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "updated_at",
+    "provinces"
+  ],
+  "properties": {
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "provinces": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/provinceSource"
+      }
+    }
+  },
+  "$defs": {
+    "provinceSource": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "province_code",
+        "province_name",
+        "slug",
+        "sources"
+      ],
+      "properties": {
+        "province_code": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$"
+        },
+        "province_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "slug": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/source"
+          }
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "base_url",
+        "list_urls"
+      ],
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "base_url": {
+          "type": "string",
+          "format": "uri"
+        },
+        "list_urls": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "notice_keywords": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "adapter": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "note": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

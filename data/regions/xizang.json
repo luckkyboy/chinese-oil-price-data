@@ -1,0 +1,74 @@
+{
+  "province_code": "540000",
+  "province_name": "西藏自治区",
+  "zones": [
+    {
+      "zone_code": "xizang-lasa",
+      "zone_name": "拉萨价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "拉萨市"
+        },
+        {
+          "level": "city",
+          "name": "日喀则市"
+        },
+        {
+          "level": "city",
+          "name": "山南市"
+        },
+        {
+          "level": "city",
+          "name": "林芝市"
+        },
+        {
+          "level": "city",
+          "name": "那曲市"
+        }
+      ],
+      "note": "拉萨价区包括拉萨市、日喀则市、山南市、林芝市、那曲市。",
+      "sources": [
+        {
+          "name": "西藏自治区发展和改革委员会",
+          "url": "https://drc.xizang.gov.cn/fgdt/jggl/202604/t20260421_536122.html"
+        }
+      ]
+    },
+    {
+      "zone_code": "xizang-changdu",
+      "zone_name": "昌都价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "昌都市"
+        }
+      ],
+      "note": "昌都价区对应昌都市。",
+      "sources": [
+        {
+          "name": "西藏自治区发展和改革委员会",
+          "url": "https://drc.xizang.gov.cn/fgdt/jggl/202604/t20260421_536122.html"
+        }
+      ]
+    },
+    {
+      "zone_code": "xizang-ali",
+      "zone_name": "阿里价区",
+      "areas": [
+        {
+          "level": "prefecture",
+          "name": "阿里地区"
+        }
+      ],
+      "note": "阿里价区对应阿里地区。",
+      "sources": [
+        {
+          "name": "西藏自治区发展和改革委员会",
+          "url": "https://drc.xizang.gov.cn/fgdt/jggl/202604/t20260421_536122.html"
+        }
+      ]
+    }
+  ],
+  "updated_at": "2026-04-28T16:00:00+08:00"
+}

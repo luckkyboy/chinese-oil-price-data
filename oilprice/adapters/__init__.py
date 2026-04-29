@@ -1,0 +1,1 @@
+"""Province source adapters."""

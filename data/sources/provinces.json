@@ -1,0 +1,612 @@
+{
+  "updated_at": "2026-04-27T00:00:00+08:00",
+  "provinces": [
+    {
+      "province_code": "110000",
+      "province_name": "北京市",
+      "slug": "beijing",
+      "sources": [
+        {
+          "name": "北京市发展和改革委员会",
+          "base_url": "https://fgw.beijing.gov.cn/",
+          "list_urls": [
+            "https://fgw.beijing.gov.cn/gzdt/tztg/"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "beijing",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "120000",
+      "province_name": "天津市",
+      "slug": "tianjin",
+      "sources": [
+        {
+          "name": "天津市发展和改革委员会",
+          "base_url": "https://fzgg.tj.gov.cn/",
+          "list_urls": [
+            "https://fzgg.tj.gov.cn/xxfb/tzggx/"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "generic",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "130000",
+      "province_name": "河北省",
+      "slug": "hebei",
+      "sources": [
+        {
+          "name": "河北省发展和改革委员会",
+          "base_url": "https://hbdrc.hebei.gov.cn/",
+          "list_urls": [
+            "https://hbdrc.hebei.gov.cn/jhlm/jhgggs/"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "hebei",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "140000",
+      "province_name": "山西省",
+      "slug": "shanxi",
+      "sources": [
+        {
+          "name": "山西省发展和改革委员会",
+          "base_url": "https://fgw.shanxi.gov.cn/",
+          "list_urls": [
+            "https://fgw.shanxi.gov.cn/tzgg/"
+          ],
+          "notice_keywords": [
+            "成品油零售价格",
+            "成品油"
+          ],
+          "adapter": "shanxi",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "150000",
+      "province_name": "内蒙古自治区",
+      "slug": "neimenggu",
+      "sources": [
+        {
+          "name": "内蒙古自治区发展和改革委员会",
+          "base_url": "https://fgw.nmg.gov.cn/",
+          "list_urls": [
+            "https://fgw.nmg.gov.cn/ywgz/jfgz/cpyjg/"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "neimenggu",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "210000",
+      "province_name": "辽宁省",
+      "slug": "liaoning",
+      "sources": [
+        {
+          "name": "辽宁省发展和改革委员会",
+          "base_url": "https://fgw.ln.gov.cn/",
+          "list_urls": [
+            "https://fgw.ln.gov.cn/fgw/index/tzgg/index.shtml"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "liaoning",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "220000",
+      "province_name": "吉林省",
+      "slug": "jilin",
+      "sources": [
+        {
+          "name": "吉林省发展和改革委员会",
+          "base_url": "https://jldrc.jl.gov.cn/",
+          "list_urls": [
+            "https://jldrc.jl.gov.cn/zl/zycpjg/"
+          ],
+          "notice_keywords": [
+            "成品油"
+          ],
+          "adapter": "generic",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "230000",
+      "province_name": "黑龙江省",
+      "slug": "heilongjiang",
+      "sources": [
+        {
+          "name": "黑龙江省发展和改革委员会",
+          "base_url": "https://drc.hlj.gov.cn/",
+          "list_urls": [
+            "https://drc.hlj.gov.cn/drc/c111450/common_zfxxgk_fgw.shtml?tab=zdgknr"
+          ],
+          "notice_keywords": [
+            "成品油价格",
+            "成品油"
+          ],
+          "adapter": "heilongjiang",
+          "discovery_enhancer": "govinfo_channel_search",
+          "website_code": "drc",
+          "channel_root_code": "c111450",
+          "channel_path": [
+            "收费项目",
+            "主要商品价格"
+          ],
+          "search_page_size": 30,
+          "search_page_limit": 2,
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "310000",
+      "province_name": "上海市",
+      "slug": "shanghai",
+      "sources": [
+        {
+          "name": "上海市发展和改革委员会",
+          "base_url": "https://fgw.sh.gov.cn/",
+          "list_urls": [
+            "https://fgw.sh.gov.cn/fgw_zxxxgk/index.html"
+          ],
+          "notice_keywords": [
+            "车用汽、柴油价格"
+          ],
+          "adapter": "generic",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "320000",
+      "province_name": "江苏省",
+      "slug": "jiangsu",
+      "sources": [
+        {
+          "name": "江苏省发展和改革委员会",
+          "base_url": "https://fzggw.jiangsu.gov.cn/",
+          "list_urls": [
+            "https://fzggw.jiangsu.gov.cn/col/col284/index.html"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "jiangsu",
+          "discovery_enhancer": "jpage_xml",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "330000",
+      "province_name": "浙江省",
+      "slug": "zhejiang",
+      "sources": [
+        {
+          "name": "浙江省发展和改革委员会",
+          "base_url": "https://fzggw.zj.gov.cn/",
+          "list_urls": [
+            "https://fzggw.zj.gov.cn/col/col1632199/cpyjg/index.html"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "zhejiang",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "340000",
+      "province_name": "安徽省",
+      "slug": "anhui",
+      "sources": [
+        {
+          "name": "安徽省发展和改革委员会",
+          "base_url": "https://fzggw.ah.gov.cn/",
+          "list_urls": [
+            "https://fzggw.ah.gov.cn/ywdt/tzgg/index.html"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "anhui",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "350000",
+      "province_name": "福建省",
+      "slug": "fujian",
+      "sources": [
+        {
+          "name": "福建省发展和改革委员会",
+          "base_url": "https://fgw.fujian.gov.cn/",
+          "list_urls": [
+            "https://fgw.fujian.gov.cn/zwgk/gsgg/"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "fujian",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "360000",
+      "province_name": "江西省",
+      "slug": "jiangxi",
+      "sources": [
+        {
+          "name": "江西省发展和改革委员会",
+          "base_url": "https://drc.jiangxi.gov.cn/jxsfzhggwyh/index.html",
+          "list_urls": [
+            "https://drc.jiangxi.gov.cn/jxsfzhggwyh/col/col14590/index.html"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "jiangxi",
+          "discovery_enhancer": "embedded_article_list",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "370000",
+      "province_name": "山东省",
+      "slug": "shandong",
+      "sources": [
+        {
+          "name": "山东省发展和改革委员会",
+          "base_url": "http://fgw.shandong.gov.cn/",
+          "list_urls": [
+            "http://fgw.shandong.gov.cn/col/col91082/index.html"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "shandong",
+          "enabled": true,
+          "discovery_enhancer": "jpage_xml"
+        }
+      ]
+    },
+    {
+      "province_code": "420000",
+      "province_name": "湖北省",
+      "slug": "hubei",
+      "sources": [
+        {
+          "name": "湖北省发展和改革委员会",
+          "base_url": "https://fgw.hubei.gov.cn/",
+          "list_urls": [
+            "https://fgw.hubei.gov.cn/fbjd/zc/zcwj/qtgk.json"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "generic",
+          "discovery_enhancer": "hubei_qtgk_json",
+          "detail_fetch": "playwright",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "430000",
+      "province_name": "湖南省",
+      "slug": "hunan",
+      "sources": [
+        {
+          "name": "湖南省发展和改革委员会",
+          "base_url": "https://fgw.hunan.gov.cn/",
+          "list_urls": [
+            "https://fgw.hunan.gov.cn/fgw/jggb11/newxxgklist.html"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "ningxia",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "410000",
+      "province_name": "河南省",
+      "slug": "henan",
+      "sources": [
+        {
+          "name": "河南省发展和改革委员会",
+          "base_url": "https://fgw.henan.gov.cn/",
+          "list_urls": [
+            "https://fgw.henan.gov.cn/xwzx/tzgg/cpydj/"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "henan",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "460000",
+      "province_name": "海南省",
+      "slug": "hainan",
+      "sources": [
+        {
+          "name": "海南省发展和改革委员会",
+          "base_url": "https://plan.hainan.gov.cn/",
+          "list_urls": [
+            "https://plan.hainan.gov.cn/sfgw/gzdt/list3.shtml"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "yunnan",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "500000",
+      "province_name": "重庆市",
+      "slug": "chongqing",
+      "sources": [
+        {
+          "name": "重庆市发展和改革委员会",
+          "base_url": "https://fzggw.cq.gov.cn/",
+          "list_urls": [
+            "https://fzggw.cq.gov.cn/zwgk/zfxxgkml/jgxx/"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "generic",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "440000",
+      "province_name": "广东省",
+      "slug": "guangdong",
+      "sources": [
+        {
+          "name": "广东省发展和改革委员会",
+          "base_url": "https://drc.gd.gov.cn/",
+          "list_urls": [
+            "https://drc.gd.gov.cn/ywgg/index.html"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "generic",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "450000",
+      "province_name": "广西壮族自治区",
+      "slug": "guangxi",
+      "sources": [
+        {
+          "name": "广西壮族自治区发展和改革委员会",
+          "base_url": "http://fgw.gxzf.gov.cn/",
+          "list_urls": [
+            "http://fgw.gxzf.gov.cn/xwzx/xwfb/"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "guangxi",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "640000",
+      "province_name": "宁夏回族自治区",
+      "slug": "ningxia",
+      "sources": [
+        {
+          "name": "宁夏回族自治区发展和改革委员会",
+          "base_url": "https://fzggw.nx.gov.cn/",
+          "list_urls": [
+            "https://fzggw.nx.gov.cn/tzgg/"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "ningxia",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "650000",
+      "province_name": "新疆维吾尔自治区",
+      "slug": "xinjiang",
+      "sources": [
+        {
+          "name": "新疆维吾尔自治区发展和改革委员会",
+          "base_url": "https://xjdrc.xinjiang.gov.cn/",
+          "list_urls": [
+            "https://xjdrc.xinjiang.gov.cn/xjfgw/c108396/common_list.shtml"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "xinjiang",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "620000",
+      "province_name": "甘肃省",
+      "slug": "gansu",
+      "sources": [
+        {
+          "name": "甘肃省发展和改革委员会",
+          "base_url": "https://fzgg.gansu.gov.cn/",
+          "list_urls": [
+            "https://fzgg.gansu.gov.cn/fzgg/zfdj/list.shtml"
+          ],
+          "notice_keywords": [
+            "成品油"
+          ],
+          "list_fetch": "playwright",
+          "adapter": "generic",
+          "detail_fetch": "playwright",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "510000",
+      "province_name": "四川省",
+      "slug": "sichuan",
+      "sources": [
+        {
+          "name": "四川省发展和改革委员会",
+          "base_url": "https://fgw.sc.gov.cn/",
+          "list_urls": [
+            "https://fgw.sc.gov.cn/sfgw/tzgg/olist.shtml"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "sichuan",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "520000",
+      "province_name": "贵州省",
+      "slug": "guizhou",
+      "sources": [
+        {
+          "name": "贵州省发展和改革委员会",
+          "base_url": "https://fgw.guizhou.gov.cn/",
+          "list_urls": [
+            "https://fgw.guizhou.gov.cn/fggz/tzgg/"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "guizhou",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "530000",
+      "province_name": "云南省",
+      "slug": "yunnan",
+      "sources": [
+        {
+          "name": "云南省发展和改革委员会",
+          "base_url": "https://yndrc.yn.gov.cn/",
+          "list_urls": [
+            "https://yndrc.yn.gov.cn/html/zhengwugongkai/fadingzhudonggongkaineirong/jiageyushoufei/"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "yunnan",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "610000",
+      "province_name": "陕西省",
+      "slug": "shaanxi",
+      "sources": [
+        {
+          "name": "陕西省发展和改革委员会",
+          "base_url": "https://sndrc.shaanxi.gov.cn/",
+          "list_urls": [
+            "https://sndrc.shaanxi.gov.cn/sy/xwxx/gggg/"
+          ],
+          "notice_keywords": [
+            "成品油价格"
+          ],
+          "adapter": "shaanxi",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "630000",
+      "province_name": "青海省",
+      "slug": "qinghai",
+      "sources": [
+        {
+          "name": "青海省发展和改革委员会",
+          "base_url": "http://fgw.qinghai.gov.cn/",
+          "list_urls": [
+            "http://fgw.qinghai.gov.cn/xwzx/tzgg/"
+          ],
+          "notice_keywords": [
+            "成品油"
+          ],
+          "adapter": "qinghai",
+          "enabled": true
+        }
+      ]
+    },
+    {
+      "province_code": "540000",
+      "province_name": "西藏自治区",
+      "slug": "xizang",
+      "sources": [
+        {
+          "name": "西藏自治区发展和改革委员会",
+          "base_url": "https://drc.xizang.gov.cn/",
+          "list_urls": [
+            "https://drc.xizang.gov.cn/fgdt/jggl/"
+          ],
+          "notice_keywords": [
+            "成品油销售价格"
+          ],
+          "adapter": "xizang",
+          "enabled": true
+        }
+      ]
+    }
+  ]
+}

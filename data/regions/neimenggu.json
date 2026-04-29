@@ -1,0 +1,69 @@
+{
+  "province_code": "150000",
+  "province_name": "内蒙古自治区",
+  "zones": [
+    {
+      "zone_code": "west",
+      "zone_name": "西部价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "呼和浩特市"
+        },
+        {
+          "level": "city",
+          "name": "包头市"
+        },
+        {
+          "level": "city",
+          "name": "乌兰察布市"
+        },
+        {
+          "level": "city",
+          "name": "鄂尔多斯市"
+        },
+        {
+          "level": "city",
+          "name": "巴彦淖尔市"
+        },
+        {
+          "level": "city",
+          "name": "乌海市"
+        },
+        {
+          "level": "prefecture",
+          "name": "阿拉善盟"
+        }
+      ],
+      "note": "西部价区包括呼和浩特市、包头市、乌兰察布市、鄂尔多斯市、巴彦淖尔市、乌海市和阿拉善盟。"
+    },
+    {
+      "zone_code": "east",
+      "zone_name": "东部价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "呼伦贝尔市"
+        },
+        {
+          "level": "prefecture",
+          "name": "兴安盟"
+        },
+        {
+          "level": "city",
+          "name": "通辽市"
+        },
+        {
+          "level": "city",
+          "name": "赤峰市"
+        },
+        {
+          "level": "prefecture",
+          "name": "锡林郭勒盟"
+        }
+      ],
+      "note": "东部价区包括呼伦贝尔市、兴安盟、通辽市、赤峰市和锡林郭勒盟。"
+    }
+  ],
+  "updated_at": "2026-04-27T15:20:00+08:00"
+}
