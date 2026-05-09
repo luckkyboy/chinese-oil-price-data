@@ -47,8 +47,8 @@ def _extract_table_row_prices(text: str) -> dict[str, float]:
         for product, pattern in PRODUCT_LINE_PATTERNS.items():
             if product in prices or not pattern.search(line):
                 continue
-            # Jiangsu table rows are split by line breaks: marker line, ton price line, liter price line.
-            scan_text = "\n".join(lines[index : index + 8])
+            # Jiangsu table rows include blank layout lines between product, ton price, and liter price.
+            scan_text = "\n".join(lines[index : index + 16])
             liter_price = _find_liter_price(scan_text)
             if liter_price is not None:
                 prices[product] = liter_price

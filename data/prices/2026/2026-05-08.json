@@ -1,6 +1,6 @@
 {
-  "adjustment_date": "2026-04-21",
-  "effective_from": "2026-04-22T00:00:00+08:00",
+  "adjustment_date": "2026-05-08",
+  "effective_from": "2026-05-09T00:00:00+08:00",
   "timezone": "Asia/Shanghai",
   "unit": "CNY/L",
   "currency": "CNY",
@@ -17,7 +17,7 @@
       "sources": [
         {
           "name": "北京市发展和改革委员会",
-          "url": "https://fgw.beijing.gov.cn/fgwzwgk/2024zcwj/bwqtwj/202604/t20260421_4600022.htm"
+          "url": "https://fgw.beijing.gov.cn/fgwzwgk/2024zcwj/bwqtwj/202605/t20260508_4641763.htm"
         }
       ],
       "zones": [
@@ -40,7 +40,7 @@
       "sources": [
         {
           "name": "天津市发展和改革委员会",
-          "url": "https://fzgg.tj.gov.cn/xxfb/tzggx/202604/t20260421_7285490.html"
+          "url": "https://fzgg.tj.gov.cn/xxfb/tzggx/202605/t20260508_7295426.html"
         }
       ],
       "zones": [
@@ -48,10 +48,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.84,
-            "92": 8.45,
-            "95": 8.93,
-            "0": 8.15
+            "89": 8.08,
+            "92": 8.71,
+            "95": 9.2,
+            "0": 8.42
           },
           "missing_products": []
         }
@@ -63,7 +63,7 @@
       "sources": [
         {
           "name": "河北省发展和改革委员会",
-          "url": "https://hbdrc.hebei.gov.cn/gggs_980/202604/t20260421_133791.html"
+          "url": "https://hbdrc.hebei.gov.cn/gggs_980/202605/t20260508_134409.html"
         }
       ],
       "zones": [
@@ -71,10 +71,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.84,
-            "92": 8.45,
-            "95": 8.93,
-            "0": 8.15
+            "89": 8.08,
+            "92": 8.71,
+            "95": 9.2,
+            "0": 8.42
           },
           "missing_products": []
         }
@@ -86,7 +86,7 @@
       "sources": [
         {
           "name": "山西省发展和改革委员会",
-          "url": "https://fgw.shanxi.gov.cn/tzgg/202604/t20260421_10108134.shtml"
+          "url": "https://fgw.shanxi.gov.cn/tzgg/202605/t20260508_10117798.shtml"
         }
       ],
       "zones": [
@@ -94,10 +94,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.86,
-            "92": 8.4,
-            "95": 9.07,
-            "0": 8.22
+            "89": 8.1,
+            "92": 8.65,
+            "95": 9.34,
+            "0": 8.49
           },
           "missing_products": []
         }
@@ -109,7 +109,7 @@
       "sources": [
         {
           "name": "内蒙古自治区发展和改革委员会",
-          "url": "https://fgw.nmg.gov.cn/ywgz/jfgz/cpyjg/202604/t20260421_2893153.html"
+          "url": "https://fgw.nmg.gov.cn/ywgz/jfgz/cpyjg/202605/t20260508_2899854.html"
         }
       ],
       "zones": [
@@ -117,9 +117,9 @@
           "zone_code": "west",
           "zone_name": "西部价区",
           "items": {
-            "92": 8.46,
-            "95": 8.99,
-            "0": 7.98
+            "92": 8.72,
+            "95": 9.26,
+            "0": 8.25
           },
           "missing_products": [
             "89"
@@ -129,9 +129,9 @@
           "zone_code": "east",
           "zone_name": "东部价区",
           "items": {
-            "92": 8.52,
-            "95": 9.07,
-            "0": 8.0
+            "92": 8.78,
+            "95": 9.35,
+            "0": 8.26
           },
           "missing_products": [
             "89"
@@ -145,7 +145,7 @@
       "sources": [
         {
           "name": "辽宁省发展和改革委员会",
-          "url": "https://fgw.ln.gov.cn/uiFramework/js/pdfjs/web/viewer.html?file=/fgw/articleFileDir/2026-04/21/82db0ce1c9d14a0ba7d64c9c8fe5319a/2026042116214574478.pdf"
+          "url": "https://fgw.ln.gov.cn/uiFramework/js/pdfjs/web/viewer.html?file=/fgw/articleFileDir/2026-05/08/959e4c0d85134c91a29e5e50c39b9729/2026050816433542426.pdf"
         }
       ],
       "zones": [
@@ -153,10 +153,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.84,
-            "92": 8.45,
-            "95": 8.93,
-            "0": 8.15
+            "89": 8.08,
+            "92": 8.71,
+            "95": 9.2,
+            "0": 8.42
           },
           "missing_products": []
         }
@@ -168,7 +168,7 @@
       "sources": [
         {
           "name": "吉林省发展和改革委员会",
-          "url": "https://jldrc.jl.gov.cn/zl/zycpjg/202604/t20260421_9533415.html"
+          "url": "https://jldrc.jl.gov.cn/zl/zycpjg/202605/t20260508_9587464.html"
         }
       ],
       "zones": [
@@ -176,9 +176,9 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "92": 8.42,
-            "95": 9.08,
-            "0": 8.05
+            "92": 8.68,
+            "95": 9.36,
+            "0": 8.32
           },
           "missing_products": [
             "89"
@@ -192,7 +192,7 @@
       "sources": [
         {
           "name": "黑龙江省发展和改革委员会",
-          "url": "https://drc.hlj.gov.cn/drc/c111486/202604/c00_31934669.shtml"
+          "url": "https://drc.hlj.gov.cn/drc/c111486/202605/c00_31938610.shtml"
         }
       ],
       "zones": [
@@ -200,10 +200,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 8.01,
-            "92": 8.49,
-            "95": 9.07,
-            "0": 7.97
+            "89": 8.25,
+            "92": 8.75,
+            "95": 9.35,
+            "0": 8.23
           },
           "missing_products": []
         }
@@ -215,7 +215,7 @@
       "sources": [
         {
           "name": "上海市发展和改革委员会",
-          "url": "https://fgw.sh.gov.cn/fgw_jggl/20260421/ae83e7e2a6664947a3c0f84d926a372b.html"
+          "url": "https://fgw.sh.gov.cn/fgw_jggl/20260508/7a750fc441d54aa588a4390e84341866.html"
         }
       ],
       "zones": [
@@ -223,12 +223,13 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.85,
-            "92": 8.42,
-            "95": 8.96,
-            "0": 8.12
+            "92": 8.67,
+            "95": 9.23
           },
-          "missing_products": []
+          "missing_products": [
+            "89",
+            "0"
+          ]
         }
       ]
     },
@@ -238,7 +239,7 @@
       "sources": [
         {
           "name": "江苏省发展和改革委员会",
-          "url": "https://fzggw.jiangsu.gov.cn/art/2026/4/21/art_284_11760576.html"
+          "url": "https://fzggw.jiangsu.gov.cn/art/2026/5/8/art_284_11767124.html"
         }
       ],
       "zones": [
@@ -246,10 +247,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.9,
-            "92": 8.42,
-            "95": 8.96,
-            "0": 8.1
+            "89": 8.13,
+            "92": 8.68,
+            "95": 9.23,
+            "0": 8.37
           },
           "missing_products": []
         }
@@ -261,7 +262,7 @@
       "sources": [
         {
           "name": "浙江省发展和改革委员会",
-          "url": "https://fzggw.zj.gov.cn/col/col1632199/cpyjg/art/2026/art_fb453a1e05104499a3b14f683d7b5657.html"
+          "url": "https://fzggw.zj.gov.cn/col/col1632199/cpyjg/art/2026/art_4b333cceb53c4535b74b7fe9baff2241.html"
         }
       ],
       "zones": [
@@ -269,10 +270,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.81,
-            "92": 8.42,
-            "95": 8.96,
-            "0": 8.12
+            "89": 8.05,
+            "92": 8.68,
+            "95": 9.23,
+            "0": 8.39
           },
           "missing_products": []
         }
@@ -284,7 +285,7 @@
       "sources": [
         {
           "name": "安徽省发展和改革委员会",
-          "url": "https://fzggw.ah.gov.cn/ywdt/tzgg/150511581.html"
+          "url": "https://fzggw.ah.gov.cn/ywdt/tzgg/150528881.html"
         }
       ],
       "zones": [
@@ -292,10 +293,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.88,
-            "92": 8.4,
-            "95": 8.98,
-            "0": 8.18
+            "89": 8.12,
+            "92": 8.66,
+            "95": 9.25,
+            "0": 8.45
           },
           "missing_products": []
         }
@@ -307,7 +308,7 @@
       "sources": [
         {
           "name": "福建省发展和改革委员会",
-          "url": "https://fgw.fujian.gov.cn/zfxxgkzl/zfxxgkml/yzdgkdqtxx/202604/t20260421_7129786.htm"
+          "url": "https://fgw.fujian.gov.cn/zfxxgkzl/zfxxgkml/yzdgkdqtxx/202605/t20260508_7145697.htm"
         }
       ],
       "zones": [
@@ -315,10 +316,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.83,
-            "92": 8.42,
-            "95": 8.99,
-            "0": 8.13
+            "89": 8.07,
+            "92": 8.67,
+            "95": 9.26,
+            "0": 8.4
           },
           "missing_products": []
         }
@@ -330,7 +331,7 @@
       "sources": [
         {
           "name": "江西省发展和改革委员会",
-          "url": "https://drc.jiangxi.gov.cn/jxsfzhggwyh/col/col14590/content/content_2046501532294246400.html"
+          "url": "https://drc.jiangxi.gov.cn/jxsfzhggwyh/col/col14590/content/content_2052654267040317440.html"
         }
       ],
       "zones": [
@@ -338,10 +339,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.82,
-            "92": 8.41,
-            "95": 9.03,
-            "0": 8.19
+            "89": 8.06,
+            "92": 8.67,
+            "95": 9.31,
+            "0": 8.46
           },
           "missing_products": []
         }
@@ -353,7 +354,7 @@
       "sources": [
         {
           "name": "山东省发展和改革委员会",
-          "url": "http://fgw.shandong.gov.cn/art/2026/4/21/art_91082_10487750.html"
+          "url": "http://fgw.shandong.gov.cn/art/2026/5/8/art_91082_10488747.html"
         }
       ],
       "zones": [
@@ -361,10 +362,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.82,
-            "92": 8.42,
-            "95": 9.03,
-            "0": 8.05
+            "89": 8.06,
+            "92": 8.68,
+            "95": 9.31,
+            "0": 8.32
           },
           "missing_products": []
         }
@@ -376,7 +377,7 @@
       "sources": [
         {
           "name": "河南省发展和改革委员会",
-          "url": "https://fgw.henan.gov.cn/2026/04-21/3344571.html"
+          "url": "https://fgw.henan.gov.cn/2026/05-08/3349410.html"
         }
       ],
       "zones": [
@@ -384,9 +385,9 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "92": 8.47,
-            "95": 9.04,
-            "0": 8.13
+            "92": 8.72,
+            "95": 9.32,
+            "0": 8.4
           },
           "missing_products": [
             "89"
@@ -400,7 +401,7 @@
       "sources": [
         {
           "name": "湖北省发展和改革委员会",
-          "url": "https://fgw.hubei.gov.cn/fbjd/zc/zcwj/gg/202604/t20260421_5919209.shtml"
+          "url": "https://fgw.hubei.gov.cn/fbjd/zc/zcwj/gg/202605/t20260508_5930305.shtml"
         }
       ],
       "zones": [
@@ -408,9 +409,9 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "92": 8.47,
-            "95": 9.07,
-            "0": 8.13
+            "92": 8.73,
+            "95": 9.34,
+            "0": 8.4
           },
           "missing_products": [
             "89"
@@ -424,7 +425,7 @@
       "sources": [
         {
           "name": "湖南省发展和改革委员会",
-          "url": "https://fgw.hunan.gov.cn/fgw/jggb11/202604/t20260421_33960488.html"
+          "url": "https://fgw.hunan.gov.cn/fgw/jggb11/202605/t20260508_33972412.html"
         }
       ],
       "zones": [
@@ -432,10 +433,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.87,
-            "92": 8.4,
-            "95": 8.93,
-            "0": 8.21
+            "89": 8.11,
+            "92": 8.66,
+            "95": 9.2,
+            "0": 8.48
           },
           "missing_products": []
         }
@@ -447,7 +448,7 @@
       "sources": [
         {
           "name": "广东省发展和改革委员会",
-          "url": "https://drc.gd.gov.cn/ywgg/content/post_4887426.html"
+          "url": "https://drc.gd.gov.cn/ywgg/content/post_4893989.html"
         }
       ],
       "zones": [
@@ -455,10 +456,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.87,
-            "92": 8.48,
-            "95": 9.18,
-            "0": 8.15
+            "89": 8.11,
+            "92": 8.73,
+            "95": 9.46,
+            "0": 8.41
           },
           "missing_products": []
         }
@@ -470,7 +471,7 @@
       "sources": [
         {
           "name": "广西壮族自治区发展和改革委员会",
-          "url": "http://fgw.gxzf.gov.cn/xwzx/xwfb/t27486573.shtml"
+          "url": "http://fgw.gxzf.gov.cn/xwzx/xwfb/t27539901.shtml"
         }
       ],
       "zones": [
@@ -478,10 +479,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.93,
-            "92": 8.51,
-            "95": 9.2,
-            "0": 8.2
+            "89": 8.17,
+            "92": 8.77,
+            "95": 9.47,
+            "0": 8.46
           },
           "missing_products": []
         }
@@ -493,7 +494,7 @@
       "sources": [
         {
           "name": "海南省发展和改革委员会",
-          "url": "https://plan.hainan.gov.cn/sfgw/gzdt/202604/df2b711e968344f1ad5af1a5b880a8c1.shtml?ddtab=true"
+          "url": "https://plan.hainan.gov.cn/sfgw/gzdt/202605/5e4a5e62e7ac4f7884a44d1760a4f45b.shtml?ddtab=true"
         }
       ],
       "zones": [
@@ -501,10 +502,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 8.82,
-            "92": 9.57,
-            "95": 10.17,
-            "0": 8.23
+            "89": 9.05,
+            "92": 9.83,
+            "95": 10.44,
+            "0": 8.5
           },
           "missing_products": []
         }
@@ -516,7 +517,7 @@
       "sources": [
         {
           "name": "重庆市发展和改革委员会",
-          "url": "https://fzggw.cq.gov.cn/zwgk/zfxxgkml/jgxx/jgzc/202604/t20260422_15629291.html"
+          "url": "https://fzggw.cq.gov.cn/zwgk/zfxxgkml/jgxx/jgzc/202605/t20260508_15660804.html"
         }
       ],
       "zones": [
@@ -524,10 +525,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 8.05,
-            "92": 8.51,
-            "95": 9.0,
-            "0": 8.2
+            "89": 8.29,
+            "92": 8.77,
+            "95": 9.26,
+            "0": 8.47
           },
           "missing_products": []
         }
@@ -539,7 +540,7 @@
       "sources": [
         {
           "name": "四川省发展和改革委员会",
-          "url": "https://fgw.sc.gov.cn/sfgw/tzgg/2026/4/21/f3b968f143664fe5b9055beca7178e6f.shtml"
+          "url": "https://fgw.sc.gov.cn/sfgw/tzgg/2026/5/8/937b78d954d24e4bb37e963cf748cde0.shtml"
         }
       ],
       "zones": [
@@ -547,10 +548,10 @@
           "zone_code": "sichuan-1",
           "zone_name": "一价区",
           "items": {
-            "89": 7.93,
-            "92": 8.55,
-            "95": 9.14,
-            "0": 8.18
+            "89": 8.17,
+            "92": 8.81,
+            "95": 9.41,
+            "0": 8.44
           },
           "missing_products": []
         },
@@ -558,10 +559,10 @@
           "zone_code": "sichuan-2",
           "zone_name": "二价区",
           "items": {
-            "89": 8.01,
-            "92": 8.63,
-            "95": 9.21,
-            "0": 8.27
+            "89": 8.25,
+            "92": 8.88,
+            "95": 9.49,
+            "0": 8.53
           },
           "missing_products": []
         },
@@ -569,10 +570,10 @@
           "zone_code": "sichuan-3",
           "zone_name": "三价区",
           "items": {
-            "89": 8.08,
-            "92": 8.7,
-            "95": 9.29,
-            "0": 8.35
+            "89": 8.32,
+            "92": 8.96,
+            "95": 9.56,
+            "0": 8.61
           },
           "missing_products": []
         }
@@ -584,7 +585,7 @@
       "sources": [
         {
           "name": "贵州省发展和改革委员会",
-          "url": "https://fgw.guizhou.gov.cn/fggz/tzgg/202604/t20260421_90029169.html"
+          "url": "https://fgw.guizhou.gov.cn/fggz/tzgg/202605/t20260508_90151700.html"
         }
       ],
       "zones": [
@@ -592,10 +593,10 @@
           "zone_code": "guizhou-1",
           "zone_name": "一价区",
           "items": {
-            "89": 8.1,
-            "92": 8.59,
-            "95": 9.08,
-            "0": 8.24
+            "89": 8.35,
+            "92": 8.85,
+            "95": 9.35,
+            "0": 8.51
           },
           "missing_products": []
         },
@@ -603,10 +604,10 @@
           "zone_code": "guizhou-2",
           "zone_name": "二价区",
           "items": {
-            "89": 8.13,
-            "92": 8.62,
-            "95": 9.11,
-            "0": 8.27
+            "89": 8.38,
+            "92": 8.88,
+            "95": 9.38,
+            "0": 8.54
           },
           "missing_products": []
         },
@@ -614,10 +615,10 @@
           "zone_code": "guizhou-3",
           "zone_name": "三价区",
           "items": {
-            "89": 8.16,
-            "92": 8.65,
-            "95": 9.14,
-            "0": 8.3
+            "89": 8.41,
+            "92": 8.91,
+            "95": 9.41,
+            "0": 8.57
           },
           "missing_products": []
         }
@@ -629,7 +630,7 @@
       "sources": [
         {
           "name": "云南省发展和改革委员会",
-          "url": "https://yndrc.yn.gov.cn/html/2026/jiageyushoufei_0421/26483.html"
+          "url": "https://yndrc.yn.gov.cn/html/2026/jiageyushoufei_0508/26664.html"
         }
       ],
       "zones": [
@@ -637,10 +638,10 @@
           "zone_code": "yunnan-1",
           "zone_name": "一价区",
           "items": {
-            "89": 7.93,
-            "92": 8.61,
-            "95": 9.24,
-            "0": 8.21
+            "89": 8.16,
+            "92": 8.86,
+            "95": 9.51,
+            "0": 8.47
           },
           "missing_products": []
         },
@@ -648,10 +649,10 @@
           "zone_code": "yunnan-2",
           "zone_name": "二价区",
           "items": {
-            "89": 8.0,
-            "92": 8.68,
-            "95": 9.31,
-            "0": 8.3
+            "89": 8.24,
+            "92": 8.94,
+            "95": 9.59,
+            "0": 8.56
           },
           "missing_products": []
         },
@@ -659,10 +660,10 @@
           "zone_code": "yunnan-3",
           "zone_name": "三价区",
           "items": {
-            "89": 8.07,
-            "92": 8.76,
-            "95": 9.39,
-            "0": 8.38
+            "89": 8.31,
+            "92": 9.01,
+            "95": 9.67,
+            "0": 8.65
           },
           "missing_products": []
         },
@@ -670,10 +671,10 @@
           "zone_code": "yunnan-4",
           "zone_name": "四价区",
           "items": {
-            "89": 8.15,
-            "92": 8.83,
-            "95": 9.47,
-            "0": 8.47
+            "89": 8.38,
+            "92": 9.09,
+            "95": 9.74,
+            "0": 8.73
           },
           "missing_products": []
         },
@@ -681,10 +682,10 @@
           "zone_code": "yunnan-5",
           "zone_name": "五价区",
           "items": {
-            "89": 8.21,
-            "92": 8.89,
-            "95": 9.53,
-            "0": 8.53
+            "89": 8.44,
+            "92": 9.15,
+            "95": 9.8,
+            "0": 8.8
           },
           "missing_products": []
         }
@@ -696,7 +697,7 @@
       "sources": [
         {
           "name": "西藏自治区发展和改革委员会",
-          "url": "https://drc.xizang.gov.cn/fgdt/jggl/202604/t20260421_536122.html"
+          "url": "https://drc.xizang.gov.cn/fgdt/jggl/202605/t20260508_539059.html"
         }
       ],
       "zones": [
@@ -704,10 +705,10 @@
           "zone_code": "xizang-lasa",
           "zone_name": "拉萨价区",
           "items": {
-            "89": 8.8,
-            "92": 9.33,
-            "95": 9.87,
-            "0": 8.67
+            "89": 9.04,
+            "92": 9.58,
+            "95": 10.14,
+            "0": 8.94
           },
           "missing_products": []
         },
@@ -715,10 +716,10 @@
           "zone_code": "xizang-changdu",
           "zone_name": "昌都价区",
           "items": {
-            "89": 8.96,
-            "92": 9.51,
-            "95": 10.05,
-            "0": 8.88
+            "89": 9.2,
+            "92": 9.77,
+            "95": 10.31,
+            "0": 9.14
           },
           "missing_products": []
         },
@@ -726,10 +727,10 @@
           "zone_code": "xizang-ali",
           "zone_name": "阿里价区",
           "items": {
-            "89": 9.15,
-            "92": 9.71,
-            "95": 10.26,
-            "0": 9.08
+            "89": 9.39,
+            "92": 9.97,
+            "95": 10.53,
+            "0": 9.34
           },
           "missing_products": []
         }
@@ -741,7 +742,7 @@
       "sources": [
         {
           "name": "陕西省发展和改革委员会",
-          "url": "https://sndrc.shaanxi.gov.cn/sy/xwxx/gggg/202604/t20260421_3631845.html"
+          "url": "https://sndrc.shaanxi.gov.cn/sy/xwxx/gggg/202605/t20260508_3636350.html"
         }
       ],
       "zones": [
@@ -749,10 +750,10 @@
           "zone_code": "shaanxi-1",
           "zone_name": "中北部价区",
           "items": {
-            "89": 7.86,
-            "92": 8.34,
-            "95": 8.81,
-            "0": 8.03
+            "89": 8.1,
+            "92": 8.59,
+            "95": 9.08,
+            "0": 8.29
           },
           "missing_products": []
         },
@@ -760,10 +761,10 @@
           "zone_code": "shaanxi-2",
           "zone_name": "陕南价区",
           "items": {
-            "89": 7.94,
-            "92": 8.42,
-            "95": 8.89,
-            "0": 8.2
+            "89": 8.18,
+            "92": 8.67,
+            "95": 9.16,
+            "0": 8.46
           },
           "missing_products": []
         }
@@ -775,7 +776,7 @@
       "sources": [
         {
           "name": "甘肃省发展和改革委员会",
-          "url": "https://fzgg.gansu.gov.cn/fzgg/zfdj/202604/174321122.shtml"
+          "url": "https://fzgg.gansu.gov.cn/fzgg/zfdj/202605/174328961.shtml"
         }
       ],
       "zones": [
@@ -783,10 +784,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.82,
-            "92": 8.46,
-            "95": 9.03,
-            "0": 8.04
+            "89": 8.06,
+            "92": 8.72,
+            "95": 9.31,
+            "0": 8.3
           },
           "missing_products": []
         }
@@ -798,29 +799,18 @@
       "sources": [
         {
           "name": "青海省发展和改革委员会",
-          "url": "http://fgw.qinghai.gov.cn/xwzx/tzgg/202604/t20260421_91497.html"
+          "url": "http://fgw.qinghai.gov.cn/xwzx/tzgg/202605/t20260508_91620.html"
         }
       ],
       "zones": [
         {
-          "zone_code": "qinghai-1",
-          "zone_name": "一价区",
-          "items": {
-            "89": 7.9,
-            "92": 8.42,
-            "95": 9.02,
-            "0": 8.06
-          },
-          "missing_products": []
-        },
-        {
           "zone_code": "qinghai-2",
           "zone_name": "二价区",
           "items": {
-            "89": 7.98,
-            "92": 8.5,
-            "95": 9.12,
-            "0": 8.15
+            "89": 8.23,
+            "92": 8.76,
+            "95": 9.39,
+            "0": 8.42
           },
           "missing_products": []
         },
@@ -828,10 +818,10 @@
           "zone_code": "qinghai-3",
           "zone_name": "三价区",
           "items": {
-            "89": 8.08,
-            "92": 8.61,
-            "95": 9.23,
-            "0": 8.26
+            "89": 8.32,
+            "92": 8.87,
+            "95": 9.51,
+            "0": 8.53
           },
           "missing_products": []
         }
@@ -843,7 +833,7 @@
       "sources": [
         {
           "name": "宁夏回族自治区发展和改革委员会",
-          "url": "https://fzggw.nx.gov.cn/tzgg/202604/t20260421_5222490.html"
+          "url": "https://fzggw.nx.gov.cn/tzgg/202605/t20260508_5234574.html"
         }
       ],
       "zones": [
@@ -851,10 +841,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.88,
-            "92": 8.35,
-            "95": 8.82,
-            "0": 8.02
+            "89": 8.12,
+            "92": 8.61,
+            "95": 9.09,
+            "0": 8.28
           },
           "missing_products": []
         }
@@ -866,7 +856,7 @@
       "sources": [
         {
           "name": "新疆维吾尔自治区发展和改革委员会",
-          "url": "https://xjdrc.xinjiang.gov.cn/xjfgw/c108396/202604/a4c5fc6463e540d596c63f2e8ad13a79.shtml"
+          "url": "https://xjdrc.xinjiang.gov.cn/xjfgw/c108396/202605/f0bd957883e84652a6d51d722f21a76f.shtml"
         }
       ],
       "zones": [
@@ -874,15 +864,15 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.61,
-            "92": 8.07,
-            "95": 8.52,
-            "0": 7.93
+            "89": 7.85,
+            "92": 8.32,
+            "95": 8.79,
+            "0": 8.2
           },
           "missing_products": []
         }
       ]
     }
   ],
-  "updated_at": "2026-04-28T15:43:17+08:00"
+  "updated_at": "2026-05-09T09:37:42+08:00"
 }

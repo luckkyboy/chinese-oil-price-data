@@ -16,12 +16,11 @@ LITER_PRICE_RE = re.compile(r"[0-9]+\.[0-9]+")
 
 
 def parse_notice(text: str) -> dict[str, object]:
-    result = parse_generic_notice(text)
-    if result.get("extracted_prices"):
-        return result
-
-    prices = extract_prices(text) or _extract_table_row_prices(text)
+    prices = _extract_table_row_prices(text) or extract_prices(text)
     if not prices:
+        result = parse_generic_notice(text)
+        if result.get("extracted_prices"):
+            return result
         return {"confidence": "manual_required"}
 
     return {

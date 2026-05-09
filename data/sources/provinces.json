@@ -373,7 +373,7 @@
           "notice_keywords": [
             "成品油价格"
           ],
-          "adapter": "yunnan",
+          "adapter": "generic",
           "enabled": true
         }
       ]
