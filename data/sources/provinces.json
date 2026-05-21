@@ -336,6 +336,8 @@
             "成品油价格"
           ],
           "adapter": "ningxia",
+          "list_fetch": "playwright",
+          "detail_fetch": "playwright",
           "enabled": true
         }
       ]

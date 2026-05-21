@@ -5,14 +5,17 @@ from decimal import Decimal, InvalidOperation
 
 
 PRODUCT_ORDER = ["89", "92", "95", "0"]
+_VIB_SUFFIX = r"(?:VIB\b|VI\b|(?:乙醇)?汽油)"
+_DIESEL_SUFFIX = r"(?:VI\b|(?:车用)?柴油)"
 PRODUCT_MARKERS = {
-    "89": re.compile(r"(?<![0-9])89\s*[#﹟号]?\s*(?:乙醇)?汽油", re.MULTILINE),
-    "92": re.compile(r"(?<![0-9])92\s*[#﹟号]?\s*(?:乙醇)?汽油", re.MULTILINE),
-    "95": re.compile(r"(?<![0-9])95\s*[#﹟号]?\s*(?:乙醇)?汽油", re.MULTILINE),
-    "0": re.compile(r"(?<![0-9+-])0\s*[#﹟号]?\s*(?:车用)?柴油", re.MULTILINE),
+    "89": re.compile(rf"(?<![0-9])89\s*[#﹟号]?\s*{_VIB_SUFFIX}", re.MULTILINE),
+    "92": re.compile(rf"(?<![0-9])92\s*[#﹟号]?\s*{_VIB_SUFFIX}", re.MULTILINE),
+    "95": re.compile(rf"(?<![0-9])95\s*[#﹟号]?\s*{_VIB_SUFFIX}", re.MULTILINE),
+    "0": re.compile(rf"(?<![0-9+-])0\s*[#﹟号]?\s*{_DIESEL_SUFFIX}", re.MULTILINE),
 }
 ANY_PRODUCT_MARKER = re.compile(
-    r"(?<![0-9])(?:89|92|95|0|﹣\s*10|-\s*10|﹣\s*20|-\s*20|﹣\s*35|-\s*35)\s*[#﹟号]?\s*(?:(?:乙醇)?汽油|(?:车用)?柴油)",
+    r"(?<![0-9])(?:89|92|95|0|﹣\s*10|-\s*10|﹣\s*20|-\s*20|﹣\s*35|-\s*35)"
+    r"\s*[#﹟号]?\s*(?:(?:乙醇)?汽油|(?:车用)?柴油|VIB\b|VI\b)",
     re.MULTILINE,
 )
 NUMBER_RE = re.compile(r"[0-9]+(?:\.[0-9]+)?")

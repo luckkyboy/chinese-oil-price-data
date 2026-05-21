@@ -85,6 +85,49 @@ def fetch_page_html(
         raise RuntimeError(str(exc)) from exc
 
 
+def fetch_bytes_with_playwright(
+    source_url: str,
+    *,
+    timeout_seconds: int = 30,
+) -> bytes:
+    """Fetch binary content using Playwright, bypassing SSL/TLS issues.
+
+    Uses Chromium's JS fetch to download content that Python's SSL stack
+    cannot handle (e.g. servers with broken EC points).
+    """
+    from playwright.sync_api import sync_playwright
+
+    timeout_ms = max(timeout_seconds, 1) * 1000
+    with sync_playwright() as playwright:
+        browser = playwright.chromium.launch(
+            headless=True,
+            channel="chromium",
+        )
+        context = browser.new_context(ignore_https_errors=True)
+        page = context.new_page()
+        page.goto("about:blank")
+        result = page.evaluate(
+            """async (url) => {
+                const resp = await fetch(url);
+                const blob = await resp.blob();
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
+            }""",
+            source_url,
+        )
+        context.close()
+        browser.close()
+
+    import base64
+
+    _, encoded = result.split(",", 1)
+    return base64.b64decode(encoded)
+
+
 def _capture_settled_html(page, *, timeout_ms: int) -> str:
     deadline = time.monotonic() + max(timeout_ms, 1000) / 1000.0
     best = ""

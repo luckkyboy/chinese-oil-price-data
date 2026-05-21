@@ -6,12 +6,13 @@ import json
 from pathlib import Path
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from datetime import date, timedelta
+from urllib.error import HTTPError
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
 from .adapters.discovery_enhancers import discover_with_enhancer
 from .adapters.generic import discover_from_html
 from .crawl.http import build_discovery_headers, fetch_bytes, fetch_bytes_with_headers, save_raw
-from .crawl.playwright_client import fetch_page_html
+from .crawl.playwright_client import fetch_bytes_with_playwright, fetch_page_html
 from .extract.attachments import attachment_suffix, find_attachment_links
 from .extract.docx import docx_to_text
 from .extract.html import html_to_text
@@ -52,38 +53,62 @@ def command_discover(args: argparse.Namespace) -> None:
         enhancer = str(source.get("discovery_enhancer") or "")
         for list_url in source["list_urls"]:
             if enhancer:
-                refs = discover_with_enhancer(
-                    enhancer,
-                    source=source,
-                    list_url=list_url,
-                    province_code=item["province_code"],
-                    province_name=item["province_name"],
-                    province_slug=item["slug"],
-                    keywords=keywords,
-                    timeout=args.timeout,
-                )
+                try:
+                    refs = discover_with_enhancer(
+                        enhancer,
+                        source=source,
+                        list_url=list_url,
+                        province_code=item["province_code"],
+                        province_name=item["province_name"],
+                        province_slug=item["slug"],
+                        keywords=keywords,
+                        timeout=args.timeout,
+                    )
+                except Exception as exc:
+                    print(
+                        f"[skip] {item['province_name']}: enhancer error {exc} for {list_url}"
+                    )
+                    continue
             else:
                 if str(source.get("list_fetch") or "").strip().lower() == "playwright":
-                    html = _fetch_page_html_with_playwright(list_url, timeout=args.timeout)
+                    try:
+                        html = _fetch_page_html_with_playwright(list_url, timeout=args.timeout)
+                    except Exception as exc:
+                        print(
+                            f"[skip] {item['province_name']}: Playwright error {exc} for {list_url}"
+                        )
+                        continue
                 else:
-                    content, _ = fetch_bytes_with_headers(
-                        list_url,
-                        timeout=args.timeout,
-                        headers=build_discovery_headers(
-                            str(source.get("base_url") or ""),
+                    try:
+                        content, _ = fetch_bytes_with_headers(
                             list_url,
-                            str(source.get("cookie") or "") or None,
-                        ),
-                    )
+                            timeout=args.timeout,
+                            headers=build_discovery_headers(
+                                str(source.get("base_url") or ""),
+                                list_url,
+                                str(source.get("cookie") or "") or None,
+                            ),
+                        )
+                    except Exception as exc:
+                        print(
+                            f"[skip] {item['province_name']}: {exc} for {list_url}"
+                        )
+                        continue
                     html = content.decode("utf-8", errors="replace")
-                refs = discover_from_html(
-                    html=html,
-                    list_url=list_url,
-                    province_code=item["province_code"],
-                    province_name=item["province_name"],
-                    province_slug=item["slug"],
-                    keywords=keywords,
-                )
+                try:
+                    refs = discover_from_html(
+                        html=html,
+                        list_url=list_url,
+                        province_code=item["province_code"],
+                        province_name=item["province_name"],
+                        province_slug=item["slug"],
+                        keywords=keywords,
+                    )
+                except Exception as exc:
+                    print(
+                        f"[skip] {item['province_name']}: parse error {exc} for {list_url}"
+                    )
+                    continue
             for ref in refs:
                 notice = {
                     "notice_id": ref.notice_id,
@@ -130,28 +155,19 @@ def command_fetch(args: argparse.Namespace) -> None:
         attachments = []
         embedded_pdf = _pdf_attachment_from_viewer_url(str(notice["source_url"]))
         if embedded_pdf:
+            url = embedded_pdf["url"]
             attachment_path = (
                 notice_root
                 / "raw"
                 / province_slug
-                / f"{notice_id}_attachment_1{attachment_suffix(embedded_pdf['url'])}"
+                / f"{notice_id}_attachment_1{attachment_suffix(url)}"
             )
-            try:
-                attachment_sha256, _ = save_raw(
-                    embedded_pdf["url"],
-                    attachment_path,
-                    timeout=args.timeout,
-                    headers=headers,
-                )
-            except Exception as exc:
-                print(
-                    f"[warn] Attachment fetch failed for {notice['source_url']}: "
-                    f"{embedded_pdf['url']} ({exc})"
-                )
-            else:
+            result = _save_attachment_raw(url, attachment_path, timeout=args.timeout, headers=headers)
+            if result:
+                attachment_sha256, content_type = result
                 attachments.append(
                     {
-                        "url": embedded_pdf["url"],
+                        "url": url,
                         "name": embedded_pdf.get("name"),
                         "type": "document",
                         "path": repo_relative(attachment_path, ROOT),
@@ -169,19 +185,12 @@ def command_fetch(args: argparse.Namespace) -> None:
                 / province_slug
                 / f"{notice_id}_attachment_{index_number}{suffix}"
             )
-            try:
-                attachment_sha256, _ = save_raw(
-                    attachment["url"],
-                    attachment_path,
-                    timeout=args.timeout,
-                    headers=headers,
-                )
-            except Exception as exc:
-                print(
-                    f"[warn] Attachment fetch failed for {notice['source_url']}: "
-                    f"{attachment['url']} ({exc})"
-                )
+            result = _save_attachment_raw(
+                attachment["url"], attachment_path, timeout=args.timeout, headers=headers
+            )
+            if not result:
                 continue
+            attachment_sha256, content_type = result
             attachment_payload = {
                 "url": attachment["url"],
                 "name": attachment.get("name"),
@@ -254,10 +263,16 @@ def command_extract(args: argparse.Namespace) -> None:
                             notice_root
                             / "extracted"
                             / province_slug
-                            / f"{notice['notice_id']}_{absolute_attachment_path.stem}.ocr.txt"
+                            / f"{notice['notice_id'][:64]}_{absolute_attachment_path.stem}.ocr.txt"
                         )
                         ocr_text_path.parent.mkdir(parents=True, exist_ok=True)
-                        ocr_text_path.write_text(attachment_text, encoding="utf-8")
+                        try:
+                            ocr_text_path.write_text(attachment_text, encoding="utf-8")
+                        except OSError as exc:
+                            # Fallback: shorter name if path exceeds OS limits
+                            short_name = f"{notice['notice_id'][:32]}_{absolute_attachment_path.stem[-32:]}.ocr.txt"
+                            ocr_text_path = ocr_text_path.with_name(short_name)
+                            ocr_text_path.write_text(attachment_text, encoding="utf-8")
                         updated_attachment["ocr_text_path"] = repo_relative(ocr_text_path, ROOT)
                         attachment_texts.append(attachment_text)
             updated_attachments.append(updated_attachment)
@@ -595,6 +610,48 @@ def build_parser() -> argparse.ArgumentParser:
     run_pipeline.set_defaults(func=command_run_pipeline)
 
     return parser
+
+
+def _save_attachment_raw(
+    url: str,
+    path: Path,
+    *,
+    timeout: int,
+    headers: dict[str, str] | None,
+) -> tuple[str, str | None] | None:
+    """Download an attachment, falling back to Playwright on SSL errors."""
+    try:
+        return save_raw(url, path, timeout=timeout, headers=headers)
+    except Exception as exc:
+        err_str = str(exc).lower()
+        if "bad ecpoint" in err_str or "ssl" in err_str or "handshake" in err_str:
+            try:
+                data = fetch_bytes_with_playwright(url, timeout_seconds=timeout)
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(data)
+                import hashlib
+                sha256 = hashlib.sha256(data).hexdigest()
+                content_type = _guess_content_type(url)
+                return sha256, content_type
+            except Exception as pw_exc:
+                print(f"[warn] Attachment fetch (playwright fallback) failed for {url}: {pw_exc}")
+                return None
+        print(f"[warn] Attachment fetch failed for {url}: {exc}")
+        return None
+
+
+def _guess_content_type(url: str) -> str | None:
+    from urllib.parse import urlparse
+    path = urlparse(url).path.lower()
+    if path.endswith(".xls"):
+        return "application/vnd.ms-excel"
+    if path.endswith(".xlsx"):
+        return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    if path.endswith(".pdf"):
+        return "application/pdf"
+    if path.endswith((".png", ".jpg", ".jpeg", ".gif", ".webp")):
+        return "image/" + path.rsplit(".", 1)[1]
+    return None
 
 
 def _slug_from_notice(notice: dict[str, object]) -> str:

@@ -25,3 +25,9 @@ tmp/
 
 # Node modules
 node_modules/
+
+# claude
+.claude/
+
+# codegraph
+.codegraph/
