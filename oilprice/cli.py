@@ -139,8 +139,21 @@ def command_fetch(args: argparse.Namespace) -> None:
     notice_root = index_path.parent
     index = read_json(index_path)
     fetched: list[dict[str, object]] = []
+    force = bool(getattr(args, "force", False))
+    adjustment_date = getattr(args, "date", None) or getattr(args, "adjustment_date", None)
+    pending_province_codes: set[str] | None = None
+    if adjustment_date and not force:
+        pending_province_codes = _pending_province_codes_from_summary(adjustment_date)
 
     for notice in index.get("notices", []):
+        province_code = str(notice.get("province_code", "") or "")
+        if pending_province_codes is not None and province_code not in pending_province_codes:
+            print(
+                f"[skip] {notice.get('province_name', province_code)} ({province_code}) "
+                f"is not pending for {adjustment_date}"
+            )
+            continue
+
         province_slug = _slug_from_notice(notice)
         notice_id = notice["notice_id"]
         headers = _notice_request_headers(notice)
@@ -217,8 +230,21 @@ def command_extract(args: argparse.Namespace) -> None:
     notice_root = index_path.parent
     index = read_json(index_path)
     updated_notices: list[dict[str, object]] = []
+    force = bool(getattr(args, "force", False))
+    adjustment_date = getattr(args, "date", None) or getattr(args, "adjustment_date", None)
+    pending_province_codes: set[str] | None = None
+    if adjustment_date and not force:
+        pending_province_codes = _pending_province_codes_from_summary(adjustment_date)
 
     for notice in index.get("notices", []):
+        province_code = str(notice.get("province_code", "") or "")
+        if pending_province_codes is not None and province_code not in pending_province_codes:
+            print(
+                f"[skip] {notice.get('province_name', province_code)} ({province_code}) "
+                f"is not pending for {adjustment_date}"
+            )
+            continue
+
         raw_path = notice.get("raw_path")
         if not raw_path:
             updated_notices.append(notice)
@@ -230,9 +256,9 @@ def command_extract(args: argparse.Namespace) -> None:
             continue
 
         text = html_to_text(absolute_raw_path.read_bytes())
+        province_slug = _slug_from_notice(notice)
         attachment_texts = []
         updated_attachments = []
-        province_slug = _slug_from_notice(notice)
         for attachment in notice.get("attachments", []):
             updated_attachment = dict(attachment)
             attachment_path = attachment.get("path")
@@ -279,7 +305,6 @@ def command_extract(args: argparse.Namespace) -> None:
         combined_text = "\n\n".join([text, *attachment_texts])
         parsed = parse_notice(str(notice.get("adapter", "generic")), combined_text)
         parsed = _normalize_parsed_prices(parsed)
-        extracted_path = notice_root / "extracted" / province_slug / f"{notice['notice_id']}.json"
         extracted_payload = {
             "notice_id": notice["notice_id"],
             "province_code": notice["province_code"],
@@ -299,6 +324,7 @@ def command_extract(args: argparse.Namespace) -> None:
             "extracted_at": now_china_iso(),
         }
         extracted_payload = {key: value for key, value in extracted_payload.items() if value is not None}
+        extracted_path = notice_root / "extracted" / province_slug / f"{notice['notice_id']}.json"
         write_json(extracted_path, extracted_payload)
 
         updated = dict(notice)
@@ -404,10 +430,12 @@ def command_run_pipeline(args: argparse.Namespace) -> None:
         date=args.adjustment_date,
         index=args.index,
         timeout=args.timeout,
+        force=args.force,
     )
     extract_args = argparse.Namespace(
         date=args.adjustment_date,
         index=args.index,
+        force=args.force,
     )
     build_prices_args = argparse.Namespace(
         adjustment_date=args.adjustment_date,
@@ -499,6 +527,11 @@ def build_parser() -> argparse.ArgumentParser:
         default=20,
         help="HTTP timeout in seconds. Default: %(default)s",
     )
+    fetch.add_argument(
+        "--force",
+        action="store_true",
+        help="Ignore summary incremental skip and re-fetch all.",
+    )
     fetch.set_defaults(func=command_fetch)
 
     extract = subparsers.add_parser(
@@ -518,6 +551,11 @@ def build_parser() -> argparse.ArgumentParser:
     extract.add_argument(
         "--index",
         help="Explicit index path. If omitted, derive from --date.",
+    )
+    extract.add_argument(
+        "--force",
+        action="store_true",
+        help="Ignore summary incremental skip and re-extract all.",
     )
     extract.set_defaults(func=command_extract)
 
@@ -581,7 +619,7 @@ def build_parser() -> argparse.ArgumentParser:
             "  python -m oilprice.cli fetch <date>\n"
             "  python -m oilprice.cli extract <date>\n"
             "  python -m oilprice.cli price <date>\n\n"
-            "Debug mode (ignore summary skip):\n"
+            "Debug mode (ignore all incremental skips):\n"
             "  python -m oilprice.cli pipeline <date> --force"
         ),
         formatter_class=argparse.RawTextHelpFormatter,
