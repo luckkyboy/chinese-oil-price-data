@@ -1,0 +1,169 @@
+name: daily-fetch
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+on:
+  schedule:
+    - cron: "30 16,20,0,4 * * *"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Target date in YYYY-MM-DD. Defaults to yesterday in Asia/Shanghai."
+        required: false
+        type: string
+
+jobs:
+  fetch:
+    runs-on: [self-hosted, oilprice]
+    permissions:
+      contents: write
+    env:
+      DISABLE_MODEL_SOURCE_CHECK: "True"
+      PYTHONUNBUFFERED: "1"
+      CLOAKBROWSER_BINARY_PATH: /runner-data/binary/cloakbrowser/chrome
+      PADDLE_PDX_CACHE_HOME: /runner-data/binary/paddlex-models
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Decide fetch mode
+        id: decide
+        env:
+          DATE_INPUT: ${{ github.event.inputs.date }}
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from datetime import datetime, timedelta
+          from pathlib import Path
+          from zoneinfo import ZoneInfo
+
+          root = Path.cwd()
+          date_input = os.environ.get("DATE_INPUT", "").strip()
+          if date_input:
+              target_date = date_input
+          else:
+              target_date = (
+                  datetime.now(ZoneInfo("Asia/Shanghai")).date() - timedelta(days=1)
+              ).isoformat()
+
+          def repo_path(raw_path: str, base: Path = root) -> Path:
+              value = raw_path.strip()
+              if value.startswith("/"):
+                  value = value[1:]
+              return base / value
+
+          calendar_latest = json.loads((root / "data/calendar/latest.json").read_text())
+          calendar_path = repo_path(calendar_latest["path"])
+          calendar = json.loads(calendar_path.read_text())
+          adjustment_dates = {
+              item["date"]
+              for item in calendar.get("adjustment_dates", [])
+              if isinstance(item, dict) and "date" in item
+          }
+
+          mode = "skip"
+          reason = "not_adjustment_date"
+          provinces_missing = []
+          summary_path = ""
+
+          if target_date in adjustment_dates:
+              mode = "force"
+              reason = "first_run_for_adjustment_date"
+              prices_latest_path = root / "data/prices/latest.json"
+              if prices_latest_path.exists():
+                  prices_latest = json.loads(prices_latest_path.read_text())
+                  if prices_latest.get("adjustment_date") == target_date:
+                      latest_summary = prices_latest.get("latest_summary")
+                      if latest_summary:
+                          candidate = root / "data/prices" / str(latest_summary)
+                          summary_path = str(candidate)
+                          if candidate.exists():
+                              summary = json.loads(candidate.read_text())
+                              provinces_missing = summary.get("provinces_missing", [])
+                              if provinces_missing:
+                                  mode = "missing"
+                                  reason = "summary_has_missing_provinces"
+                              else:
+                                  mode = "skip"
+                                  reason = "already_complete"
+
+          output_path = Path(os.environ["GITHUB_OUTPUT"])
+          with output_path.open("a", encoding="utf-8") as output:
+              print(f"target_date={target_date}", file=output)
+              print(f"mode={mode}", file=output)
+              print(f"reason={reason}", file=output)
+              print(f"summary_path={summary_path}", file=output)
+              print(
+                  "provinces_missing=" + ",".join(str(item) for item in provinces_missing),
+                  file=output,
+              )
+
+          print(f"target_date={target_date}")
+          print(f"mode={mode}")
+          print(f"reason={reason}")
+          if summary_path:
+              print(f"summary_path={summary_path}")
+          if provinces_missing:
+              print("provinces_missing=" + ",".join(str(item) for item in provinces_missing))
+          PY
+
+      - name: Warm up PaddleOCR
+        if: steps.decide.outputs.mode != 'skip'
+        run: |
+          python - <<'PY'
+          from paddleocr import PaddleOCR
+
+          PaddleOCR(
+              lang="ch",
+              ocr_version="PP-OCRv5",
+              use_doc_orientation_classify=False,
+              use_doc_unwarping=False,
+              use_textline_orientation=False,
+          )
+          PY
+
+      - name: Run full extract
+        if: steps.decide.outputs.mode == 'force'
+        timeout-minutes: 30
+        run: |
+          python -m oilprice.cli extract "${{ steps.decide.outputs.target_date }}" --force --timeout 90
+
+      - name: Retry missing provinces
+        if: steps.decide.outputs.mode == 'missing'
+        timeout-minutes: 30
+        run: |
+          python -m oilprice.cli extract "${{ steps.decide.outputs.target_date }}" --timeout 90
+
+      - name: Commit and push price data
+        if: steps.decide.outputs.mode != 'skip'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add data/prices
+          if ! git diff --cached --quiet; then
+            git commit -m "actions:oilprice:update ${{ steps.decide.outputs.target_date }} prices"
+            git push
+          else
+            echo "No changes to publish"
+          fi
+
+      - name: Write workflow summary
+        if: always()
+        run: |
+          echo "### Daily Oil Price Workflow" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- target_date: ${{ steps.decide.outputs.target_date || 'unknown' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- mode: ${{ steps.decide.outputs.mode || 'failed' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- reason: ${{ steps.decide.outputs.reason || 'unknown' }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- provinces_missing: ${{ steps.decide.outputs.provinces_missing || '' }}" >> "$GITHUB_STEP_SUMMARY"

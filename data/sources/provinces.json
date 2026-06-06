@@ -316,7 +316,6 @@
           ],
           "adapter": "generic",
           "discovery_enhancer": "hubei_qtgk_json",
-          "detail_fetch": "playwright",
           "enabled": true
         }
       ]
@@ -336,8 +335,6 @@
             "成品油价格"
           ],
           "adapter": "ningxia",
-          "list_fetch": "playwright",
-          "detail_fetch": "playwright",
           "enabled": true
         }
       ]
@@ -489,9 +486,7 @@
           "notice_keywords": [
             "成品油"
           ],
-          "list_fetch": "playwright",
           "adapter": "generic",
-          "detail_fetch": "playwright",
           "enabled": true
         }
       ]

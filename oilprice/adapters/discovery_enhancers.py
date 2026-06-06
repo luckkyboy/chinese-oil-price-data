@@ -5,7 +5,11 @@ import re
 from urllib.parse import urlencode, urljoin, urlparse
 
 from oilprice.adapters.generic import LinkParser, build_notice_id, strip_tags
-from oilprice.crawl.http import build_discovery_headers, fetch_bytes_with_headers
+from oilprice.crawl.browser_client import (
+    BrowserSession,
+    fetch_json_with_browser,
+    fetch_text_with_browser,
+)
 from oilprice.models import NoticeRef
 
 
@@ -19,6 +23,7 @@ def discover_with_enhancer(
     province_slug: str,
     keywords: list[str],
     timeout: int,
+    browser_session: BrowserSession | None = None,
 ) -> list[NoticeRef]:
     if enhancer == "govinfo_channel_search":
         return discover_from_govinfo_channel_search(
@@ -29,6 +34,7 @@ def discover_with_enhancer(
             province_slug=province_slug,
             keywords=keywords,
             timeout=timeout,
+            browser_session=browser_session,
         )
     if enhancer == "jpage_xml":
         return discover_from_jpage_xml(
@@ -39,6 +45,7 @@ def discover_with_enhancer(
             province_slug=province_slug,
             keywords=keywords,
             timeout=timeout,
+            browser_session=browser_session,
         )
     if enhancer == "embedded_article_list":
         return discover_from_embedded_article_list(
@@ -49,6 +56,7 @@ def discover_with_enhancer(
             province_slug=province_slug,
             keywords=keywords,
             timeout=timeout,
+            browser_session=browser_session,
         )
     if enhancer == "hubei_qtgk_json":
         return discover_from_hubei_qtgk_json(
@@ -59,6 +67,7 @@ def discover_with_enhancer(
             province_slug=province_slug,
             keywords=keywords,
             timeout=timeout,
+            browser_session=browser_session,
         )
     return []
 
@@ -72,21 +81,14 @@ def discover_from_govinfo_channel_search(
     province_slug: str,
     keywords: list[str],
     timeout: int,
+    browser_session: BrowserSession | None = None,
 ) -> list[NoticeRef]:
     parsed = urlparse(list_url)
     origin = f"{parsed.scheme}://{parsed.netloc}"
     website_code = str(source.get("website_code") or _website_code_from_path(parsed.path) or "")
     if not website_code:
         return []
-    headers = build_discovery_headers(
-        str(source.get("base_url") or ""),
-        list_url,
-        str(source.get("cookie") or "") or None,
-    )
-    referer = headers["Referer"]
-    host = headers.get("Host", "")
-    if not host:
-        host = urlparse(list_url).netloc
+    referer = list_url
 
     channel_id = str(source.get("channel_id") or "")
     if not channel_id:
@@ -98,14 +100,13 @@ def discover_from_govinfo_channel_search(
             return []
         channel_id = _resolve_channel_id(
             origin=origin,
-                website_code=website_code,
-                root_code=root_code,
-                channel_path=[str(item) for item in channel_path],
-                timeout=timeout,
-                referer=referer,
-                user_agent=headers["User-Agent"],
-                host=host,
-            )
+            website_code=website_code,
+            root_code=root_code,
+            channel_path=[str(item) for item in channel_path],
+            timeout=timeout,
+            referer=referer,
+            browser_session=browser_session,
+        )
     if not channel_id:
         return []
 
@@ -119,8 +120,7 @@ def discover_from_govinfo_channel_search(
             search_url,
             timeout=timeout,
             referer=referer,
-            user_agent=headers["User-Agent"],
-            host=host,
+            browser_session=browser_session,
         )
         for item in payload.get("data", {}).get("results", []):
             title = str(item.get("title") or "").strip()
@@ -153,22 +153,14 @@ def discover_from_jpage_xml(
     province_slug: str,
     keywords: list[str],
     timeout: int,
+    browser_session: BrowserSession | None = None,
 ) -> list[NoticeRef]:
-    headers = build_discovery_headers(
-        str(source.get("base_url") or ""),
-        list_url,
-        str(source.get("cookie") or "") or None,
-    )
-    referer = headers["Referer"]
-    host = headers.get("Host", "")
-    if not host:
-        host = urlparse(list_url).netloc
+    referer = list_url
     html = _fetch_text(
         list_url,
         timeout=timeout,
         referer=referer,
-        user_agent=headers["User-Agent"],
-        host=host,
+        browser_session=browser_session,
     )
 
     refs: list[NoticeRef] = []
@@ -217,22 +209,14 @@ def discover_from_embedded_article_list(
     province_slug: str,
     keywords: list[str],
     timeout: int,
+    browser_session: BrowserSession | None = None,
 ) -> list[NoticeRef]:
-    headers = build_discovery_headers(
-        str(source.get("base_url") or ""),
-        list_url,
-        str(source.get("cookie") or "") or None,
-    )
-    referer = headers["Referer"]
-    host = headers.get("Host", "")
-    if not host:
-        host = urlparse(list_url).netloc
+    referer = list_url
     html = _fetch_text(
         list_url,
         timeout=timeout,
         referer=referer,
-        user_agent=headers["User-Agent"],
-        host=host,
+        browser_session=browser_session,
     )
     article_list = _extract_article_list_items(html)
     refs: list[NoticeRef] = []
@@ -268,23 +252,15 @@ def discover_from_hubei_qtgk_json(
     province_slug: str,
     keywords: list[str],
     timeout: int,
+    browser_session: BrowserSession | None = None,
 ) -> list[NoticeRef]:
-    headers = build_discovery_headers(
-        str(source.get("base_url") or ""),
-        list_url,
-        str(source.get("cookie") or "") or None,
-    )
-    referer = headers["Referer"]
-    host = headers.get("Host", "")
-    if not host:
-        host = urlparse(list_url).netloc
+    referer = list_url
 
     payload = _fetch_json(
         list_url,
         timeout=timeout,
         referer=referer,
-        user_agent=headers["User-Agent"],
-        host=host,
+        browser_session=browser_session,
     )
     refs: list[NoticeRef] = []
     seen: set[str] = set()
@@ -327,8 +303,7 @@ def _resolve_channel_id(
     channel_path: list[str],
     timeout: int,
     referer: str,
-    user_agent: str,
-    host: str,
+    browser_session: BrowserSession | None = None,
 ) -> str:
     current_code = root_code
     current_node = _fetch_channel_list(
@@ -337,8 +312,7 @@ def _resolve_channel_id(
         channel_code=current_code,
         timeout=timeout,
         referer=referer,
-        user_agent=user_agent,
-        host=host,
+        browser_session=browser_session,
     )
 
     for segment in channel_path:
@@ -355,8 +329,7 @@ def _resolve_channel_id(
             channel_code=current_code,
             timeout=timeout,
             referer=referer,
-            user_agent=user_agent,
-            host=host,
+            browser_session=browser_session,
         )
 
     return str(current_node.get("results", {}).get("channelId") or "")
@@ -381,16 +354,14 @@ def _fetch_channel_list(
     channel_code: str,
     timeout: int,
     referer: str,
-    user_agent: str,
-    host: str,
+    browser_session: BrowserSession | None = None,
 ) -> dict[str, object]:
     params = urlencode({"channelCode": channel_code, "websiteCodeName": website_code})
     return _fetch_json(
         f"{origin}/common/getChannelList?{params}",
         timeout=timeout,
         referer=referer,
-        user_agent=user_agent,
-        host=host,
+        browser_session=browser_session,
     )
 
 
@@ -414,14 +385,14 @@ def _fetch_json(
     *,
     timeout: int,
     referer: str,
-    user_agent: str,
-    host: str,
+    browser_session: BrowserSession | None = None,
 ) -> dict[str, object]:
-    headers = {"Referer": referer, "User-Agent": user_agent or DEFAULT_USER_AGENT}
-    if host:
-        headers["Host"] = host
-    content, _ = fetch_bytes_with_headers(url, timeout=timeout, headers=headers)
-    return json.loads(content.decode("utf-8", errors="replace"))
+    return fetch_json_with_browser(
+        url,
+        timeout_seconds=timeout,
+        referer=referer,
+        browser_session=browser_session,
+    )
 
 
 def _fetch_text(
@@ -429,14 +400,14 @@ def _fetch_text(
     *,
     timeout: int,
     referer: str,
-    user_agent: str,
-    host: str,
+    browser_session: BrowserSession | None = None,
 ) -> str:
-    headers = {"Referer": referer, "User-Agent": user_agent or DEFAULT_USER_AGENT}
-    if host:
-        headers["Host"] = host
-    content, _ = fetch_bytes_with_headers(url, timeout=timeout, headers=headers)
-    return content.decode("utf-8", errors="replace")
+    return fetch_text_with_browser(
+        url,
+        timeout_seconds=timeout,
+        referer=referer,
+        browser_session=browser_session,
+    )
 
 
 def _website_code_from_path(path: str) -> str | None:

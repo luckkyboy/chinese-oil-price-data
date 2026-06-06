@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -9,13 +10,12 @@ class OcrUnavailableError(RuntimeError):
     pass
 
 
-def image_to_text(path: Path) -> str:
-    try:
-        from paddleocr import PaddleOCR
-    except ImportError as exc:
-        raise OcrUnavailableError("paddleocr is not installed") from exc
+_OCR_INSTANCE: Any | None = None
+_OCR_ERROR: OcrUnavailableError | None = None
 
-    ocr = _build_ocr(PaddleOCR)
+
+def image_to_text(path: Path) -> str:
+    ocr = _get_ocr()
     prepared_path = path
     cleanup_path: Path | None = None
     try:
@@ -27,6 +27,29 @@ def image_to_text(path: Path) -> str:
     finally:
         if cleanup_path:
             cleanup_path.unlink(missing_ok=True)
+
+
+def _get_ocr() -> Any:
+    global _OCR_INSTANCE, _OCR_ERROR
+
+    if _OCR_INSTANCE is not None:
+        return _OCR_INSTANCE
+    if _OCR_ERROR is not None:
+        raise _OCR_ERROR
+
+    os.environ.setdefault("DISABLE_MODEL_SOURCE_CHECK", "True")
+    try:
+        from paddleocr import PaddleOCR
+    except ImportError as exc:
+        _OCR_ERROR = OcrUnavailableError("paddleocr is not installed")
+        raise _OCR_ERROR from exc
+
+    try:
+        _OCR_INSTANCE = _build_ocr(PaddleOCR)
+    except Exception as exc:
+        _OCR_ERROR = OcrUnavailableError(f"paddleocr initialization failed: {exc}")
+        raise _OCR_ERROR from exc
+    return _OCR_INSTANCE
 
 
 def _build_ocr(paddle_ocr_class: Any) -> Any:

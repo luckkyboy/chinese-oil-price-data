@@ -14,11 +14,12 @@ PRODUCT_MARKERS = {
     "0": re.compile(rf"(?<![0-9+-])0\s*[#﹟号]?\s*{_DIESEL_SUFFIX}", re.MULTILINE),
 }
 ANY_PRODUCT_MARKER = re.compile(
-    r"(?<![0-9])(?:89|92|95|0|﹣\s*10|-\s*10|﹣\s*20|-\s*20|﹣\s*35|-\s*35)"
-    r"\s*[#﹟号]?\s*(?:(?:乙醇)?汽油|(?:车用)?柴油|VIB\b|VI\b)",
+    r"(?<![0-9])(?:(?:89|92|95)\s*[#﹟号]?\s*(?:(?:乙醇)?汽油|VIB\b)|"
+    r"(?:0|﹣\s*10|-\s*10|﹣\s*20|-\s*20|﹣\s*35|-\s*35)\s*[#﹟号]?\s*(?:(?:车用)?柴油|VI\b))",
     re.MULTILINE,
 )
 NUMBER_RE = re.compile(r"[0-9]+(?:\.[0-9]+)?")
+ADJUSTED_TO_PRICE_RE = re.compile(r"调整为\s*(?:每升)?\s*([0-9]+(?:\.[0-9]+)?)\s*元")
 
 
 def extract_prices(text: str) -> dict[str, float]:
@@ -41,13 +42,26 @@ def _product_segment(text: str, start: int, marker_end: int) -> str:
 
 
 def _first_liter_price(segment: str) -> Decimal | None:
-    for raw_value in NUMBER_RE.findall(segment):
-        if "." not in raw_value:
-            continue
-        try:
-            value = Decimal(raw_value)
-        except InvalidOperation:
-            continue
-        if Decimal("0") < value < Decimal("30"):
+    adjusted_to = ADJUSTED_TO_PRICE_RE.search(segment)
+    if adjusted_to:
+        value = _decimal_liter_price(adjusted_to.group(1))
+        if value is not None:
             return value
+
+    for raw_value in NUMBER_RE.findall(segment):
+        value = _decimal_liter_price(raw_value)
+        if value is not None:
+            return value
+    return None
+
+
+def _decimal_liter_price(raw_value: str) -> Decimal | None:
+    if "." not in raw_value:
+        return None
+    try:
+        value = Decimal(raw_value)
+    except InvalidOperation:
+        return None
+    if Decimal("0") < value < Decimal("30"):
+        return value
     return None

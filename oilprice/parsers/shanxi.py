@@ -46,7 +46,7 @@ def _extract_table_row_prices(text: str) -> dict[str, float]:
         for product, pattern in PRODUCT_LINE_PATTERNS.items():
             if product in prices or not pattern.search(line):
                 continue
-            scan_text = "\n".join(lines[index : index + 6])
+            scan_text = "\n".join(lines[index : index + 8])
             liter_price = _find_liter_price(scan_text)
             if liter_price is not None:
                 prices[product] = liter_price

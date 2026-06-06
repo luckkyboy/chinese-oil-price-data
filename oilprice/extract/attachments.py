@@ -54,6 +54,8 @@ def find_attachment_links(html: str, base_url: str) -> list[dict[str, str]]:
         path = unquote(urlparse(url).path).lower()
         if not _looks_like_image_url(url):
             continue
+        if _is_ignored_image_url(url):
+            continue
         if not _is_content_image(path, raw_tag):
             continue
         if url in seen:
@@ -100,6 +102,16 @@ def _looks_like_image_url(url: str) -> bool:
     return _image_format_from_query(parsed.query) is not None
 
 
+def _is_ignored_image_url(url: str) -> bool:
+    parsed = urlparse(url)
+    path = unquote(parsed.path).lower()
+    host = parsed.netloc.lower()
+    name = path.rsplit("/", 1)[-1]
+    if host == "zfwzgl.www.gov.cn" and "/exposure/images/" in path:
+        return True
+    return name in {"jiucuo.png", "red.png", "blue.png"}
+
+
 def _image_format_from_query(query: str) -> str | None:
     match = re.search(r"(?:^|[&?])wx_fmt=(png|jpg|jpeg|webp)(?:&|$)", query, re.IGNORECASE)
     if not match:
@@ -138,6 +150,8 @@ def _collect_body_images(html: str, base_url: str) -> list[dict[str, str]]:
                 continue
             url = urljoin(base_url, src)
             if not _looks_like_image_url(url) or url in seen:
+                continue
+            if _is_ignored_image_url(url):
                 continue
             seen.add(url)
             path = unquote(urlparse(url).path)

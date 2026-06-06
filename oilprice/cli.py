@@ -3,16 +3,19 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import time
 from pathlib import Path
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from datetime import date, timedelta
-from urllib.error import HTTPError
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
 from .adapters.discovery_enhancers import discover_with_enhancer
 from .adapters.generic import discover_from_html
-from .crawl.http import build_discovery_headers, fetch_bytes, fetch_bytes_with_headers, save_raw
-from .crawl.playwright_client import fetch_bytes_with_playwright, fetch_page_html
+from .crawl.browser_client import (
+    BrowserSession,
+    fetch_bytes_with_browser,
+    fetch_text_with_browser,
+)
 from .extract.attachments import attachment_suffix, find_attachment_links
 from .extract.docx import docx_to_text
 from .extract.html import html_to_text
@@ -34,14 +37,18 @@ def command_discover(args: argparse.Namespace) -> None:
     index_path = _notice_index_path(args)
     adjustment_date = getattr(args, "date", None) or getattr(args, "adjustment_date", None)
     enabled_sources = load_enabled_sources(source_path)
+    selected_province_codes = _selected_province_codes(args)
     force = bool(getattr(args, "force", False))
     pending_province_codes: set[str] | None = None
     if adjustment_date and not force:
         pending_province_codes = _pending_province_codes_from_summary(adjustment_date)
     notices: list[dict[str, object]] = []
+    browser_session = getattr(args, "browser_session", None)
 
     for item in enabled_sources:
         province_code = str(item["province_code"])
+        if selected_province_codes is not None and province_code not in selected_province_codes:
+            continue
         if pending_province_codes is not None and province_code not in pending_province_codes:
             print(
                 f"[skip] {item['province_name']} ({province_code}) is not pending for "
@@ -63,6 +70,7 @@ def command_discover(args: argparse.Namespace) -> None:
                         province_slug=item["slug"],
                         keywords=keywords,
                         timeout=args.timeout,
+                        browser_session=browser_session,
                     )
                 except Exception as exc:
                     print(
@@ -70,31 +78,26 @@ def command_discover(args: argparse.Namespace) -> None:
                     )
                     continue
             else:
-                if str(source.get("list_fetch") or "").strip().lower() == "playwright":
+                try:
                     try:
-                        html = _fetch_page_html_with_playwright(list_url, timeout=args.timeout)
-                    except Exception as exc:
-                        print(
-                            f"[skip] {item['province_name']}: Playwright error {exc} for {list_url}"
-                        )
-                        continue
-                else:
-                    try:
-                        content, _ = fetch_bytes_with_headers(
+                        html = _fetch_list_html_with_browser(
                             list_url,
                             timeout=args.timeout,
-                            headers=build_discovery_headers(
-                                str(source.get("base_url") or ""),
-                                list_url,
-                                str(source.get("cookie") or "") or None,
-                            ),
+                            browser_session=browser_session,
                         )
-                    except Exception as exc:
-                        print(
-                            f"[skip] {item['province_name']}: {exc} for {list_url}"
+                    except Exception:
+                        if province_code != "620000":
+                            raise
+                        html = _fetch_rendered_list_html_with_browser(
+                            list_url,
+                            timeout=args.timeout,
+                            browser_session=browser_session,
                         )
-                        continue
-                    html = content.decode("utf-8", errors="replace")
+                except Exception as exc:
+                    print(
+                        f"[skip] {item['province_name']}: browser error {exc} for {list_url}"
+                    )
+                    continue
                 try:
                     refs = discover_from_html(
                         html=html,
@@ -104,6 +107,20 @@ def command_discover(args: argparse.Namespace) -> None:
                         province_slug=item["slug"],
                         keywords=keywords,
                     )
+                    if not refs and province_code == "620000":
+                        rendered_html = _fetch_rendered_list_html_with_browser(
+                            list_url,
+                            timeout=args.timeout,
+                            browser_session=browser_session,
+                        )
+                        refs = discover_from_html(
+                            html=rendered_html,
+                            list_url=list_url,
+                            province_code=item["province_code"],
+                            province_name=item["province_name"],
+                            province_slug=item["slug"],
+                            keywords=keywords,
+                        )
                 except Exception as exc:
                     print(
                         f"[skip] {item['province_name']}: parse error {exc} for {list_url}"
@@ -121,8 +138,6 @@ def command_discover(args: argparse.Namespace) -> None:
                 }
                 if source.get("cookie"):
                     notice["cookie"] = source["cookie"]
-                if source.get("detail_fetch"):
-                    notice["detail_fetch"] = source["detail_fetch"]
                 if ref.published_at:
                     notice["published_at"] = ref.published_at
                 notices.append(notice)
@@ -141,28 +156,39 @@ def command_fetch(args: argparse.Namespace) -> None:
     fetched: list[dict[str, object]] = []
     force = bool(getattr(args, "force", False))
     adjustment_date = getattr(args, "date", None) or getattr(args, "adjustment_date", None)
+    selected_province_codes = _selected_province_codes(args)
     pending_province_codes: set[str] | None = None
     if adjustment_date and not force:
         pending_province_codes = _pending_province_codes_from_summary(adjustment_date)
+    browser_session = getattr(args, "browser_session", None)
 
     for notice in index.get("notices", []):
         province_code = str(notice.get("province_code", "") or "")
+        if selected_province_codes is not None and province_code not in selected_province_codes:
+            fetched.append(notice)
+            continue
         if pending_province_codes is not None and province_code not in pending_province_codes:
             print(
                 f"[skip] {notice.get('province_name', province_code)} ({province_code}) "
                 f"is not pending for {adjustment_date}"
             )
+            fetched.append(notice)
             continue
 
         province_slug = _slug_from_notice(notice)
         notice_id = notice["notice_id"]
-        headers = _notice_request_headers(notice)
         raw_path = notice_root / "raw" / province_slug / f"{notice_id}.html"
+        notice_start = time.perf_counter()
         sha256, _ = _save_notice_html(
             notice=notice,
             raw_path=raw_path,
             timeout=args.timeout,
-            headers=headers,
+            browser_session=browser_session,
+        )
+        print(
+            f"[fetch] {notice.get('province_name', province_code)} ({province_code}) "
+            f"notice_html elapsed={_elapsed(notice_start)} url={notice.get('source_url')}",
+            flush=True,
         )
         raw_html = raw_path.read_text(encoding="utf-8", errors="replace")
         attachments = []
@@ -175,7 +201,13 @@ def command_fetch(args: argparse.Namespace) -> None:
                 / province_slug
                 / f"{notice_id}_attachment_1{attachment_suffix(url)}"
             )
-            result = _save_attachment_raw(url, attachment_path, timeout=args.timeout, headers=headers)
+            result = _save_attachment_raw(
+                url,
+                attachment_path,
+                timeout=args.timeout,
+                referer=str(notice["source_url"]),
+                browser_session=browser_session,
+            )
             if result:
                 attachment_sha256, content_type = result
                 attachments.append(
@@ -187,8 +219,15 @@ def command_fetch(args: argparse.Namespace) -> None:
                         "sha256": attachment_sha256,
                     }
                 )
+        discovered_attachments = find_attachment_links(raw_html, notice["source_url"])
+        skipped_attachments = 0
+        print(
+            f"[fetch] {notice.get('province_name', province_code)} ({province_code}) "
+            f"attachments discovered={len(discovered_attachments)}",
+            flush=True,
+        )
         for index_number, attachment in enumerate(
-            find_attachment_links(raw_html, notice["source_url"]),
+            discovered_attachments,
             start=len(attachments) + 1,
         ):
             suffix = attachment_suffix(attachment["url"])
@@ -198,11 +237,24 @@ def command_fetch(args: argparse.Namespace) -> None:
                 / province_slug
                 / f"{notice_id}_attachment_{index_number}{suffix}"
             )
+            if not _should_fetch_attachment(notice, attachment, attachment_path):
+                skipped_attachments += 1
+                continue
+            attachment_start = time.perf_counter()
             result = _save_attachment_raw(
-                attachment["url"], attachment_path, timeout=args.timeout, headers=headers
+                attachment["url"],
+                attachment_path,
+                timeout=args.timeout,
+                referer=str(notice["source_url"]),
+                browser_session=browser_session,
             )
             if not result:
                 continue
+            print(
+                f"[fetch] {notice.get('province_name', province_code)} ({province_code}) "
+                f"attachment elapsed={_elapsed(attachment_start)} url={attachment['url']}",
+                flush=True,
+            )
             attachment_sha256, content_type = result
             attachment_payload = {
                 "url": attachment["url"],
@@ -219,30 +271,41 @@ def command_fetch(args: argparse.Namespace) -> None:
         updated["sha256"] = sha256
         if attachments:
             updated["attachments"] = attachments
+        if skipped_attachments:
+            print(
+                f"[fetch] {notice.get('province_name', province_code)} ({province_code}) "
+                f"attachments skipped={skipped_attachments}",
+                flush=True,
+            )
         fetched.append(updated)
 
     write_json(index_path, {"updated_at": now_china_iso(), "notices": fetched})
     print(index_path)
 
 
-def command_extract(args: argparse.Namespace) -> None:
+def command_extract_files(args: argparse.Namespace) -> None:
     index_path = _notice_index_path(args)
     notice_root = index_path.parent
     index = read_json(index_path)
     updated_notices: list[dict[str, object]] = []
     force = bool(getattr(args, "force", False))
     adjustment_date = getattr(args, "date", None) or getattr(args, "adjustment_date", None)
+    selected_province_codes = _selected_province_codes(args)
     pending_province_codes: set[str] | None = None
     if adjustment_date and not force:
         pending_province_codes = _pending_province_codes_from_summary(adjustment_date)
 
     for notice in index.get("notices", []):
         province_code = str(notice.get("province_code", "") or "")
+        if selected_province_codes is not None and province_code not in selected_province_codes:
+            updated_notices.append(notice)
+            continue
         if pending_province_codes is not None and province_code not in pending_province_codes:
             print(
                 f"[skip] {notice.get('province_name', province_code)} ({province_code}) "
                 f"is not pending for {adjustment_date}"
             )
+            updated_notices.append(notice)
             continue
 
         raw_path = notice.get("raw_path")
@@ -255,7 +318,18 @@ def command_extract(args: argparse.Namespace) -> None:
             updated_notices.append(notice)
             continue
 
+        notice_extract_start = time.perf_counter()
+        print(
+            f"[extract-file] {notice.get('province_name', province_code)} ({province_code}) "
+            f"html_to_text start path={raw_path}",
+            flush=True,
+        )
         text = html_to_text(absolute_raw_path.read_bytes())
+        print(
+            f"[extract-file] {notice.get('province_name', province_code)} ({province_code}) "
+            f"html_to_text elapsed={_elapsed(notice_extract_start)} chars={len(text)}",
+            flush=True,
+        )
         province_slug = _slug_from_notice(notice)
         attachment_texts = []
         updated_attachments = []
@@ -266,6 +340,13 @@ def command_extract(args: argparse.Namespace) -> None:
                 updated_attachments.append(updated_attachment)
                 continue
             absolute_attachment_path = ROOT / str(attachment_path).lstrip("/")
+            attachment_extract_start = time.perf_counter()
+            print(
+                f"[extract-file] {notice.get('province_name', province_code)} ({province_code}) "
+                f"attachment_text start suffix={absolute_attachment_path.suffix.lower()} "
+                f"path={attachment_path}",
+                flush=True,
+            )
             if absolute_attachment_path.suffix.lower() == ".docx":
                 attachment_text = docx_to_text(absolute_attachment_path)
                 if attachment_text:
@@ -281,7 +362,7 @@ def command_extract(args: argparse.Namespace) -> None:
             elif _should_ocr_attachment(notice, attachment, absolute_attachment_path):
                 try:
                     attachment_text = image_to_text(absolute_attachment_path)
-                except OcrUnavailableError as exc:
+                except (OcrUnavailableError, Exception) as exc:
                     updated_attachment["ocr_error"] = str(exc)
                 else:
                     if attachment_text:
@@ -301,10 +382,27 @@ def command_extract(args: argparse.Namespace) -> None:
                             ocr_text_path.write_text(attachment_text, encoding="utf-8")
                         updated_attachment["ocr_text_path"] = repo_relative(ocr_text_path, ROOT)
                         attachment_texts.append(attachment_text)
+            print(
+                f"[extract-file] {notice.get('province_name', province_code)} ({province_code}) "
+                f"attachment_text elapsed={_elapsed(attachment_extract_start)} "
+                f"path={attachment_path}",
+                flush=True,
+            )
             updated_attachments.append(updated_attachment)
         combined_text = "\n\n".join([text, *attachment_texts])
+        parse_start = time.perf_counter()
+        print(
+            f"[extract-file] {notice.get('province_name', province_code)} ({province_code}) "
+            f"parse_notice start chars={len(combined_text)}",
+            flush=True,
+        )
         parsed = parse_notice(str(notice.get("adapter", "generic")), combined_text)
         parsed = _normalize_parsed_prices(parsed)
+        print(
+            f"[extract-file] {notice.get('province_name', province_code)} ({province_code}) "
+            f"parse_notice elapsed={_elapsed(parse_start)}",
+            flush=True,
+        )
         extracted_payload = {
             "notice_id": notice["notice_id"],
             "province_code": notice["province_code"],
@@ -325,7 +423,13 @@ def command_extract(args: argparse.Namespace) -> None:
         }
         extracted_payload = {key: value for key, value in extracted_payload.items() if value is not None}
         extracted_path = notice_root / "extracted" / province_slug / f"{notice['notice_id']}.json"
+        write_start = time.perf_counter()
         write_json(extracted_path, extracted_payload)
+        print(
+            f"[extract-file] {notice.get('province_name', province_code)} ({province_code}) "
+            f"write_extracted elapsed={_elapsed(write_start)} path={repo_relative(extracted_path, ROOT)}",
+            flush=True,
+        )
 
         updated = dict(notice)
         updated["extracted_path"] = repo_relative(extracted_path, ROOT)
@@ -337,10 +441,128 @@ def command_extract(args: argparse.Namespace) -> None:
     print(index_path)
 
 
+def command_extract(args: argparse.Namespace) -> None:
+    source_path = ROOT / args.sources
+    index_path = _notice_index_path(args)
+    adjustment_date = getattr(args, "date", None) or getattr(args, "adjustment_date", None)
+    if not adjustment_date:
+        raise SystemExit("extract requires an adjustment date")
+
+    enabled_sources = load_enabled_sources(source_path)
+    selected_province_codes = _selected_province_codes(args)
+    force = bool(getattr(args, "force", False))
+    pending_province_codes: set[str] | None = None
+    if not force:
+        pending_province_codes = _pending_province_codes_from_summary(adjustment_date)
+
+    notices_by_id = _read_notice_map(index_path)
+    index_path.parent.mkdir(parents=True, exist_ok=True)
+
+    print(
+        f"[extract] shared CloakBrowser session start index={repo_relative(index_path, ROOT)}",
+        flush=True,
+    )
+    with BrowserSession(headless=True) as browser_session:
+        for item in enabled_sources:
+            province_code = str(item["province_code"])
+            province_name = str(item["province_name"])
+            if selected_province_codes is not None and province_code not in selected_province_codes:
+                continue
+            if pending_province_codes is not None and province_code not in pending_province_codes:
+                print(
+                    f"[skip] {province_name} ({province_code}) is not pending for "
+                    f"{adjustment_date}"
+                )
+                continue
+
+            province_start = time.perf_counter()
+            province_index = index_path.with_name(f"{province_code}.discover.json")
+            discover_args = argparse.Namespace(
+                sources=args.sources,
+                date=adjustment_date,
+                output=_cli_relative(province_index),
+                timeout=args.timeout,
+                force=True,
+                province_code=province_code,
+                browser_session=browser_session,
+            )
+            command_discover(discover_args)
+            discovered_index = read_json(province_index)
+            discovered_notices = [
+                notice
+                for notice in discovered_index.get("notices", [])
+                if isinstance(notice, dict)
+            ]
+            notices_by_id = {
+                notice_id: notice
+                for notice_id, notice in notices_by_id.items()
+                if str(notice.get("province_code", "") or "") != province_code
+            }
+            for notice in discovered_notices:
+                notices_by_id[str(notice["notice_id"])] = notice
+            _write_notice_index(index_path, notices_by_id)
+            print(
+                f"[extract] {province_name} ({province_code}) discover "
+                f"notices={len(discovered_notices)} elapsed={_elapsed(province_start)}",
+                flush=True,
+            )
+
+            fetch_start = time.perf_counter()
+            fetch_args = argparse.Namespace(
+                date=adjustment_date,
+                index=_cli_relative(index_path),
+                timeout=args.timeout,
+                force=True,
+                province_code=province_code,
+                browser_session=browser_session,
+            )
+            command_fetch(fetch_args)
+            notices_by_id = _read_notice_map(index_path)
+            print(
+                f"[extract] {province_name} ({province_code}) fetch "
+                f"elapsed={_elapsed(fetch_start)}",
+                flush=True,
+            )
+
+            extract_start = time.perf_counter()
+            extract_args = argparse.Namespace(
+                date=adjustment_date,
+                index=_cli_relative(index_path),
+                force=True,
+                province_code=province_code,
+            )
+            command_extract_files(extract_args)
+            notices_by_id = _read_notice_map(index_path)
+            print(
+                f"[extract] {province_name} ({province_code}) extract "
+                f"elapsed={_elapsed(extract_start)}",
+                flush=True,
+            )
+
+            price_start = time.perf_counter()
+            price_args = argparse.Namespace(
+                adjustment_date=adjustment_date,
+                index=_cli_relative(index_path),
+                province_code=province_code,
+            )
+            command_build_prices(price_args)
+            print(
+                f"[price] {province_name} ({province_code}) price "
+                f"elapsed={_elapsed(price_start)} total={_elapsed(province_start)}",
+                flush=True,
+            )
+
+    print(index_path)
+
+
 def command_build_prices(args: argparse.Namespace) -> None:
     index = read_json(_notice_index_path(args))
+    selected_province_codes = _selected_province_codes(args)
     notice_paths = []
     for notice in index.get("notices", []):
+        province_code = str(notice.get("province_code", "") or "")
+        if selected_province_codes is not None and province_code not in selected_province_codes:
+            continue
         if not notice.get("extracted_path"):
             continue
         path = ROOT / str(notice["extracted_path"]).lstrip("/")
@@ -419,37 +641,16 @@ def command_lookup_price(args: argparse.Namespace) -> None:
 
 
 def command_run_pipeline(args: argparse.Namespace) -> None:
-    discover_args = argparse.Namespace(
-        sources=args.sources,
-        adjustment_date=args.adjustment_date,
-        output=args.index,
-        timeout=args.timeout,
-        force=args.force,
-    )
-    fetch_args = argparse.Namespace(
-        date=args.adjustment_date,
-        index=args.index,
-        timeout=args.timeout,
-        force=args.force,
-    )
     extract_args = argparse.Namespace(
+        sources=args.sources,
         date=args.adjustment_date,
         index=args.index,
+        timeout=args.timeout,
         force=args.force,
+        province_code=args.province_code,
     )
-    build_prices_args = argparse.Namespace(
-        adjustment_date=args.adjustment_date,
-        index=args.index,
-    )
-
-    print("[pipeline] discover")
-    command_discover(discover_args)
-    print("[pipeline] fetch")
-    command_fetch(fetch_args)
     print("[pipeline] extract")
     command_extract(extract_args)
-    print("[pipeline] price")
-    command_build_prices(build_prices_args)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -494,12 +695,18 @@ def build_parser() -> argparse.ArgumentParser:
         "--timeout",
         type=int,
         default=20,
-        help="HTTP timeout in seconds. Default: %(default)s",
+        help="Browser timeout in seconds. Default: %(default)s",
     )
     discover.add_argument(
         "--force",
         action="store_true",
         help="Ignore summary incremental skip and force discover for configured sources.",
+    )
+    discover.add_argument(
+        "--province-code",
+        "--provinceCode",
+        dest="province_code",
+        help="Optional province code filter, e.g. 620000. Comma-separated values are allowed.",
     )
     discover.set_defaults(func=command_discover)
 
@@ -525,24 +732,36 @@ def build_parser() -> argparse.ArgumentParser:
         "--timeout",
         type=int,
         default=20,
-        help="HTTP timeout in seconds. Default: %(default)s",
+        help="Browser timeout in seconds. Default: %(default)s",
     )
     fetch.add_argument(
         "--force",
         action="store_true",
         help="Ignore summary incremental skip and re-fetch all.",
     )
+    fetch.add_argument(
+        "--province-code",
+        "--provinceCode",
+        dest="province_code",
+        help="Optional province code filter, e.g. 620000. Comma-separated values are allowed.",
+    )
     fetch.set_defaults(func=command_fetch)
 
     extract = subparsers.add_parser(
         "extract",
-        help="Extract text and structured prices from fetched files.",
+        help="Run discover/fetch/extract/price per province with CloakBrowser.",
         description=(
-            "Read fetched raw files and parse structured prices into extracted JSON.\n\n"
+            "Run the full per-province action with one shared CloakBrowser session.\n"
+            "For each province: discover -> fetch -> extract -> price.\n\n"
             "Input index defaults to:\n"
             "  tmp/notices/{date}/index.json"
         ),
         formatter_class=argparse.RawTextHelpFormatter,
+    )
+    extract.add_argument(
+        "--sources",
+        default="data/sources/provinces.json",
+        help="Path to source registry JSON. Default: %(default)s",
     )
     extract.add_argument(
         "date",
@@ -555,7 +774,19 @@ def build_parser() -> argparse.ArgumentParser:
     extract.add_argument(
         "--force",
         action="store_true",
-        help="Ignore summary incremental skip and re-extract all.",
+        help="Ignore summary incremental skip and run all selected provinces.",
+    )
+    extract.add_argument(
+        "--timeout",
+        type=int,
+        default=20,
+        help="Browser timeout in seconds for discover/fetch. Default: %(default)s",
+    )
+    extract.add_argument(
+        "--province-code",
+        "--provinceCode",
+        dest="province_code",
+        help="Optional province code filter, e.g. 620000. Comma-separated values are allowed.",
     )
     extract.set_defaults(func=command_extract)
 
@@ -575,6 +806,12 @@ def build_parser() -> argparse.ArgumentParser:
     build_prices_cmd.add_argument(
         "--index",
         help="Explicit index path. If omitted, derive from adjustment_date.",
+    )
+    build_prices_cmd.add_argument(
+        "--province-code",
+        "--provinceCode",
+        dest="province_code",
+        help="Optional province code filter, e.g. 620000. Comma-separated values are allowed.",
     )
     build_prices_cmd.set_defaults(func=command_build_prices)
 
@@ -638,12 +875,18 @@ def build_parser() -> argparse.ArgumentParser:
         "--timeout",
         type=int,
         default=20,
-        help="HTTP timeout in seconds for discover/fetch. Default: %(default)s",
+        help="Browser timeout in seconds for discover/fetch. Default: %(default)s",
     )
     run_pipeline.add_argument(
         "--force",
         action="store_true",
         help="Pass through to discover: ignore summary incremental skip.",
+    )
+    run_pipeline.add_argument(
+        "--province-code",
+        "--provinceCode",
+        dest="province_code",
+        help="Optional province code filter, e.g. 620000. Comma-separated values are allowed.",
     )
     run_pipeline.set_defaults(func=command_run_pipeline)
 
@@ -655,26 +898,24 @@ def _save_attachment_raw(
     path: Path,
     *,
     timeout: int,
-    headers: dict[str, str] | None,
+    referer: str | None = None,
+    browser_session: BrowserSession | None = None,
 ) -> tuple[str, str | None] | None:
-    """Download an attachment, falling back to Playwright on SSL errors."""
+    """Download an attachment with CloakBrowser."""
     try:
-        return save_raw(url, path, timeout=timeout, headers=headers)
+        data = fetch_bytes_with_browser(
+            url,
+            timeout_seconds=timeout,
+            referer=referer,
+            browser_session=browser_session,
+        )
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(data)
+        sha256 = hashlib.sha256(data).hexdigest()
+        content_type = _guess_content_type(url)
+        return sha256, content_type
     except Exception as exc:
-        err_str = str(exc).lower()
-        if "bad ecpoint" in err_str or "ssl" in err_str or "handshake" in err_str:
-            try:
-                data = fetch_bytes_with_playwright(url, timeout_seconds=timeout)
-                path.parent.mkdir(parents=True, exist_ok=True)
-                path.write_bytes(data)
-                import hashlib
-                sha256 = hashlib.sha256(data).hexdigest()
-                content_type = _guess_content_type(url)
-                return sha256, content_type
-            except Exception as pw_exc:
-                print(f"[warn] Attachment fetch (playwright fallback) failed for {url}: {pw_exc}")
-                return None
-        print(f"[warn] Attachment fetch failed for {url}: {exc}")
+        print(f"[warn] Attachment browser fetch failed for {url}: {exc}")
         return None
 
 
@@ -698,6 +939,19 @@ def _slug_from_notice(notice: dict[str, object]) -> str:
     return notice_id.split("-", 1)[0] or digest
 
 
+def _selected_province_codes(args: argparse.Namespace) -> set[str] | None:
+    raw_value = getattr(args, "province_code", None)
+    if raw_value is None:
+        return None
+    values: list[str]
+    if isinstance(raw_value, (list, tuple, set)):
+        values = [str(item) for item in raw_value]
+    else:
+        values = str(raw_value).split(",")
+    selected = {value.strip() for value in values if value and value.strip()}
+    return selected or None
+
+
 def _notice_index_path(args: argparse.Namespace) -> Path:
     explicit_index = getattr(args, "index", None)
     if explicit_index:
@@ -714,13 +968,51 @@ def _notice_index_path(args: argparse.Namespace) -> Path:
     return ROOT / "tmp/notices/index.json"
 
 
+def _read_notice_map(index_path: Path) -> dict[str, dict[str, object]]:
+    if not index_path.exists():
+        return {}
+    index = read_json(index_path)
+    notices = index.get("notices", [])
+    if not isinstance(notices, list):
+        return {}
+    return {
+        str(notice.get("notice_id")): notice
+        for notice in notices
+        if isinstance(notice, dict) and notice.get("notice_id")
+    }
+
+
+def _write_notice_index(index_path: Path, notices_by_id: dict[str, dict[str, object]]) -> None:
+    write_json(
+        index_path,
+        {
+            "updated_at": now_china_iso(),
+            "notices": list(notices_by_id.values()),
+        },
+    )
+
+
+def _elapsed(start: float) -> str:
+    return f"{time.perf_counter() - start:.1f}s"
+
+
+def _cli_relative(path: Path) -> str:
+    return path.resolve().relative_to(ROOT.resolve()).as_posix()
+
+
 def _filter_notices_for_adjustment_date(
     notices: list[dict[str, object]],
     adjustment_date: str,
 ) -> list[dict[str, object]]:
     markers = _date_markers_for_adjustment_window(adjustment_date)
+    exact_dates = {adjustment_date, (date.fromisoformat(adjustment_date) + timedelta(days=1)).isoformat()}
     filtered = []
     for notice in notices:
+        published_at = str(notice.get("published_at") or "").strip()
+        if _is_iso_date(published_at):
+            if published_at in exact_dates:
+                filtered.append(notice)
+            continue
         haystack = " ".join(
             str(notice.get(key, ""))
             for key in ("title", "source_url", "notice_id", "published_at")
@@ -728,6 +1020,16 @@ def _filter_notices_for_adjustment_date(
         if any(marker in haystack for marker in markers):
             filtered.append(notice)
     return filtered
+
+
+def _is_iso_date(value: str) -> bool:
+    if len(value) != 10:
+        return False
+    try:
+        date.fromisoformat(value)
+    except ValueError:
+        return False
+    return True
 
 
 def _non_padded_date_path(adjustment_date: str) -> str:
@@ -869,13 +1171,6 @@ def _pdf_attachment_from_viewer_url(source_url: str) -> dict[str, str] | None:
     return {"url": pdf_url, "name": name}
 
 
-def _notice_request_headers(notice: dict[str, object]) -> dict[str, str] | None:
-    cookie = str(notice.get("cookie") or "").strip()
-    if not cookie:
-        return None
-    return {"Cookie": cookie}
-
-
 def _normalize_parsed_prices(parsed: dict[str, object]) -> dict[str, object]:
     normalized = dict(parsed)
 
@@ -922,48 +1217,80 @@ def _save_notice_html(
     raw_path: Path,
     *,
     timeout: int,
-    headers: dict[str, str] | None,
+    browser_session: BrowserSession | None = None,
 ) -> tuple[str, str | None]:
     source_url = str(notice["source_url"])
-    if _should_fetch_notice_with_playwright(notice):
-        try:
-            return _fetch_hubei_notice_with_playwright(source_url, raw_path, timeout=timeout)
-        except Exception as exc:
-            print(f"[warn] Playwright fetch failed for {source_url}; fallback to direct HTTP: {exc}")
-    return save_raw(
+    return _fetch_notice_with_browser(
         source_url,
         raw_path,
         timeout=timeout,
-        headers=headers,
+        browser_session=browser_session,
+        province_code=str(notice.get("province_code", "") or ""),
     )
 
 
-def _should_fetch_notice_with_playwright(notice: dict[str, object]) -> bool:
-    if str(notice.get("detail_fetch") or "").strip().lower() != "playwright":
-        return False
-    source_url = str(notice.get("source_url") or "").strip()
-    if not source_url:
-        return False
-    parsed = urlparse(source_url)
-    return parsed.scheme in {"http", "https"} and bool(parsed.netloc)
-
-
-def _fetch_page_html_with_playwright(
+def _fetch_list_html_with_browser(
     source_url: str,
     *,
     timeout: int,
+    browser_session: BrowserSession | None = None,
 ) -> str:
-    result = fetch_page_html(source_url, timeout_seconds=timeout)
-    return result.html
+    return fetch_text_with_browser(
+        source_url,
+        timeout_seconds=timeout,
+        browser_session=browser_session,
+    )
 
 
-def _fetch_notice_with_playwright(
+def _fetch_rendered_list_html_with_browser(
+    source_url: str,
+    *,
+    timeout: int,
+    browser_session: BrowserSession | None = None,
+) -> str:
+    timeout_ms = max(timeout, 1) * 1000
+    if browser_session is None:
+        with BrowserSession(headless=True) as session:
+            return _fetch_fast_rendered_html(source_url, timeout_ms=timeout_ms, browser_session=session)
+    return _fetch_fast_rendered_html(
+        source_url,
+        timeout_ms=timeout_ms,
+        browser_session=browser_session,
+    )
+
+
+def _fetch_fast_rendered_html(
+    source_url: str,
+    *,
+    timeout_ms: int,
+    browser_session: BrowserSession,
+) -> str:
+    page = browser_session.new_page()
+    try:
+        page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)
+        page.wait_for_timeout(800)
+        return page.content()
+    finally:
+        try:
+            page.close()
+        except Exception:
+            pass
+
+
+def _fetch_notice_with_browser(
     source_url: str,
     raw_path: Path,
     *,
     timeout: int,
+    browser_session: BrowserSession | None = None,
+    province_code: str = "",
 ) -> tuple[str, str | None]:
-    html = _fetch_page_html_with_playwright(source_url, timeout=timeout)
+    html = _fetch_notice_html_with_browser(
+        source_url,
+        timeout=timeout,
+        browser_session=browser_session,
+        province_code=province_code,
+    )
     raw_path.parent.mkdir(parents=True, exist_ok=True)
     raw_path.write_text(html, encoding="utf-8")
 
@@ -971,13 +1298,35 @@ def _fetch_notice_with_playwright(
     return hashlib.sha256(content).hexdigest(), "text/html"
 
 
-def _fetch_hubei_notice_with_playwright(
+def _fetch_notice_html_with_browser(
     source_url: str,
-    raw_path: Path,
     *,
     timeout: int,
-) -> tuple[str, str | None]:
-    return _fetch_notice_with_playwright(source_url, raw_path, timeout=timeout)
+    browser_session: BrowserSession | None = None,
+    province_code: str = "",
+) -> str:
+    try:
+        return fetch_text_with_browser(
+            source_url,
+            timeout_seconds=timeout,
+            browser_session=browser_session,
+        )
+    except Exception:
+        if province_code != "420000":
+            raise
+        timeout_ms = max(timeout, 1) * 1000
+        if browser_session is None:
+            with BrowserSession(headless=True) as session:
+                return _fetch_fast_rendered_html(
+                    source_url,
+                    timeout_ms=timeout_ms,
+                    browser_session=session,
+                )
+        return _fetch_fast_rendered_html(
+            source_url,
+            timeout_ms=timeout_ms,
+            browser_session=browser_session,
+        )
 
 
 def _should_ocr_attachment(
@@ -990,6 +1339,16 @@ def _should_ocr_attachment(
     if attachment.get("type") == "image":
         return True
     return attachment_path.suffix.lower() in {".png", ".jpg", ".jpeg", ".webp"}
+
+
+def _should_fetch_attachment(
+    notice: dict[str, object],
+    attachment: dict[str, object],
+    attachment_path: Path,
+) -> bool:
+    if attachment.get("type") != "image":
+        return True
+    return _should_ocr_attachment(notice, attachment, attachment_path)
 
 
 def main() -> None:
