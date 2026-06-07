@@ -27,3 +27,13 @@ def write_json(path: Path, payload: Any) -> None:
 
 def repo_relative(path: Path, root: Path) -> str:
     return "/" + path.resolve().relative_to(root.resolve()).as_posix()
+
+
+def emit_result(value: Any) -> None:
+    if isinstance(value, Path):
+        print(value)
+        return
+    if isinstance(value, str):
+        print(value)
+        return
+    print(json.dumps(value, ensure_ascii=False, indent=2))

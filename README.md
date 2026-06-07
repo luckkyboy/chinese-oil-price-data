@@ -69,6 +69,5 @@ python -m pip install -r requirements.txt
 python -m oilprice.cli validate-json
 python -m oilprice.cli extract 2026-04-21
 python -m oilprice.cli price 2026-04-21
-python -m oilprice.cli pipeline 2026-04-21
 python -m oilprice.cli extract 2026-06-04 --province-code 620000 --force
 ```

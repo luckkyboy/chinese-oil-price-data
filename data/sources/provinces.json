@@ -54,6 +54,7 @@
             "成品油价格"
           ],
           "adapter": "hebei",
+          "ocr_attachments": true,
           "enabled": true
         }
       ]
@@ -160,6 +161,7 @@
           ],
           "search_page_size": 30,
           "search_page_limit": 2,
+          "ocr_attachments": true,
           "enabled": true
         }
       ]
@@ -316,6 +318,7 @@
           ],
           "adapter": "generic",
           "discovery_enhancer": "hubei_qtgk_json",
+          "rendered_notice_fallback": true,
           "enabled": true
         }
       ]
@@ -373,6 +376,7 @@
             "成品油价格"
           ],
           "adapter": "generic",
+          "rendered_list_fallback": true,
           "enabled": true
         }
       ]
@@ -525,6 +529,7 @@
             "成品油价格"
           ],
           "adapter": "guizhou",
+          "ocr_attachments": true,
           "enabled": true
         }
       ]
@@ -563,6 +568,7 @@
             "成品油价格"
           ],
           "adapter": "shaanxi",
+          "ocr_attachments": true,
           "enabled": true
         }
       ]
@@ -582,6 +588,7 @@
             "成品油"
           ],
           "adapter": "qinghai",
+          "ocr_attachments": true,
           "enabled": true
         }
       ]

@@ -11,7 +11,6 @@ RUNNER_VERSION="${RUNNER_VERSION:-2.334.0}"
 
 if [ -z "${GH_RUNNER_TOKEN}" ]; then
   echo "Usage: $0 <github-runner-token>" >&2
-  echo "Or set GH_RUNNER_TOKEN in the environment." >&2
   exit 1
 fi
 

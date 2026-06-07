@@ -4,6 +4,8 @@ import re
 from html import unescape
 from urllib.parse import unquote, urljoin, urlparse
 
+from oilprice.payloads import AttachmentPayload
+
 
 ATTACHMENT_EXTENSIONS = (".doc", ".docx", ".pdf", ".xls", ".xlsx")
 IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".webp")
@@ -25,8 +27,8 @@ MAIN_CONTENT_END_RE = re.compile(
 )
 
 
-def find_attachment_links(html: str, base_url: str) -> list[dict[str, str]]:
-    attachments: list[dict[str, str]] = []
+def find_attachment_links(html: str, base_url: str) -> list[AttachmentPayload]:
+    attachments: list[AttachmentPayload] = []
     seen: set[str] = set()
 
     for href, raw_name in HREF_RE.findall(html):
@@ -132,12 +134,12 @@ def _is_content_image(path: str, raw_tag: str) -> bool:
     return False
 
 
-def _collect_body_images(html: str, base_url: str) -> list[dict[str, str]]:
+def _collect_body_images(html: str, base_url: str) -> list[AttachmentPayload]:
     matches = list(MAIN_CONTENT_START_RE.finditer(html))
     if not matches:
         return []
 
-    images: list[dict[str, str]] = []
+    images: list[AttachmentPayload] = []
     seen: set[str] = set()
     for match in matches:
         start = match.end()

@@ -25,32 +25,17 @@ Inside that volume:
 
 2. Copy the registration token.
 
-3. Create `.env` from the example:
+3. Start the runner with the registration token:
 
    ```bash
    cd ops/github-runner
-   cp .env.example .env
+   ./github-runner.sh <token from GitHub>
    ```
 
-4. Edit `.env`:
+4. Check logs:
 
    ```bash
-   GH_REPOSITORY_URL=https://github.com/<owner>/chinese-oil-price-data
-   GH_RUNNER_TOKEN=<token from GitHub>
-   GH_RUNNER_NAME=oilprice-runner-1
-   GH_RUNNER_LABELS=oilprice
-   ```
-
-5. Build and start:
-
-   ```bash
-   docker compose up -d --build
-   ```
-
-6. Check logs:
-
-   ```bash
-   docker compose logs -f oilprice-runner
+   docker logs -f oilprice-github-runner
    ```
 
 The first run downloads the GitHub runner, installs Python dependencies, installs CloakBrowser, and warms PaddleOCR models. Later runs reuse Docker volumes and should be much faster.
@@ -58,18 +43,18 @@ The first run downloads the GitHub runner, installs Python dependencies, install
 ## Stop
 
 ```bash
-docker compose stop
+docker stop oilprice-github-runner
 ```
 
 ## Upgrade runner version
 
-Edit `RUNNER_VERSION` in `.env`, then recreate:
+Edit `RUNNER_VERSION` in `github-runner.sh`, then recreate:
 
 ```bash
-docker compose up -d --build --force-recreate
+./github-runner.sh <token from GitHub>
 ```
 
-If you remove the `runner-data` volume, you need a fresh `GH_RUNNER_TOKEN` because GitHub registration tokens expire quickly.
+If you remove the runner data directory, you need a fresh registration token because GitHub registration tokens expire quickly.
 
 ## Security
 

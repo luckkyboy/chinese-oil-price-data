@@ -5,14 +5,15 @@ from pathlib import Path
 from typing import Any
 
 from oilprice.io import now_china_iso, read_json
+from oilprice.payloads import NoticePayload, PriceProvincePayload, PriceSnapshotPayload, ZonePayload
+from oilprice.paths import ROOT
 
 
 PRODUCT_ORDER = ["89", "92", "95", "0"]
-ROOT = Path(__file__).resolve().parents[2]
 
 
-def build_snapshot(adjustment_date: str, notice_paths: list[Path]) -> dict[str, Any]:
-    provinces: list[dict[str, Any]] = []
+def build_snapshot(adjustment_date: str, notice_paths: list[Path]) -> PriceSnapshotPayload:
+    provinces: list[PriceProvincePayload] = []
     products: set[str] = set()
 
     for path in notice_paths:
@@ -64,7 +65,7 @@ def build_snapshot(adjustment_date: str, notice_paths: list[Path]) -> dict[str, 
     }
 
 
-def _default_zone(notice: dict[str, Any]) -> list[dict[str, Any]]:
+def _default_zone(notice: NoticePayload) -> list[ZonePayload]:
     prices = notice.get("extracted_prices") or {}
     if not prices:
         return []
@@ -77,7 +78,7 @@ def _default_zone(notice: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
-def _source_name(notice: dict[str, Any]) -> str:
+def _source_name(notice: NoticePayload) -> str:
     if notice.get("source_name"):
         return str(notice["source_name"])
 

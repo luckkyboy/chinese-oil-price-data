@@ -25,6 +25,7 @@ from .xinjiang import parse_notice as parse_xinjiang_notice
 from .xizang import parse_notice as parse_xizang_notice
 from .yunnan import parse_notice as parse_yunnan_notice
 from .zhejiang import parse_notice as parse_zhejiang_notice
+from ..payloads import ParsedNoticePayload
 
 
 DATE_PATTERNS = [
@@ -36,7 +37,7 @@ DATE_PATTERNS = [
 ]
 
 
-def parse_notice(adapter: str, text: str) -> dict[str, object]:
+def parse_notice(adapter: str, text: str) -> ParsedNoticePayload:
     if adapter == "anhui":
         result = parse_anhui_notice(text)
     elif adapter == "sichuan":
