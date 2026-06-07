@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sys
 import tempfile
 from pathlib import Path
 from typing import Any
@@ -12,6 +13,7 @@ class OcrUnavailableError(RuntimeError):
 
 _OCR_INSTANCE: Any | None = None
 _OCR_ERROR: OcrUnavailableError | None = None
+_DEFAULT_PADDLEX_CACHE_HOME = Path(sys.prefix) / ".paddlex"
 
 
 def image_to_text(path: Path) -> str:
@@ -38,6 +40,8 @@ def _get_ocr() -> Any:
         raise _OCR_ERROR
 
     os.environ.setdefault("DISABLE_MODEL_SOURCE_CHECK", "True")
+    os.environ.setdefault("PADDLE_PDX_CACHE_HOME", str(_DEFAULT_PADDLEX_CACHE_HOME))
+    _DEFAULT_PADDLEX_CACHE_HOME.mkdir(parents=True, exist_ok=True)
     try:
         from paddleocr import PaddleOCR
     except ImportError as exc:
