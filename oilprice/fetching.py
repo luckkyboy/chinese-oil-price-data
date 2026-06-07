@@ -5,7 +5,12 @@ import logging
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
-from .crawl.browser_client import BrowserSession, fetch_bytes_with_browser, fetch_text_with_browser
+from .crawl.browser_client import (
+    BrowserSession,
+    fetch_bytes_with_browser,
+    fetch_page_html,
+    fetch_text_with_browser,
+)
 from .errors import AttachmentFetchError
 from .payloads import AttachmentPayload, NoticePayload
 
@@ -120,6 +125,12 @@ def fetch_notice_html_with_browser(
     browser_session: BrowserSession | None = None,
     rendered_fallback: bool = False,
 ) -> str:
+    if rendered_fallback:
+        return fetch_page_html(
+            source_url,
+            timeout_seconds=timeout,
+            browser_session=browser_session,
+        ).html
     try:
         return fetch_text_with_browser(
             source_url,
