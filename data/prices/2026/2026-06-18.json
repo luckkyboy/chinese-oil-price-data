@@ -140,6 +140,29 @@
       ]
     },
     {
+      "province_code": "210000",
+      "province_name": "辽宁省",
+      "sources": [
+        {
+          "name": "辽宁省发展和改革委员会",
+          "url": "https://fgw.ln.gov.cn/uiFramework/js/pdfjs/web/viewer.html?file=/fgw/articleFileDir/2026-06/18/df34c48219724fe7ad28beac3f8d4dd9/2026061817073485877.pdf"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.36,
+            "92": 7.93,
+            "95": 8.38,
+            "0": 7.61
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "220000",
       "province_name": "吉林省",
       "sources": [
@@ -229,6 +252,29 @@
             "92": 7.91,
             "95": 8.41,
             "0": 7.57
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "330000",
+      "province_name": "浙江省",
+      "sources": [
+        {
+          "name": "浙江省发展和改革委员会",
+          "url": "https://fzggw.zj.gov.cn/col/col1632199/cpyjg/art/2026/art_274905738b2945e98289f869286f6eea.html"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.33,
+            "92": 7.91,
+            "95": 8.41,
+            "0": 7.59
           },
           "missing_products": []
         }
@@ -421,6 +467,29 @@
       ]
     },
     {
+      "province_code": "450000",
+      "province_name": "广西壮族自治区",
+      "sources": [
+        {
+          "name": "广西壮族自治区发展和改革委员会",
+          "url": "http://fgw.gxzf.gov.cn/xwzx/xwfb/t27806270.shtml"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.45,
+            "92": 8.0,
+            "95": 8.64,
+            "0": 7.67
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "460000",
       "province_name": "海南省",
       "sources": [
@@ -556,6 +625,40 @@
       ]
     },
     {
+      "province_code": "610000",
+      "province_name": "陕西省",
+      "sources": [
+        {
+          "name": "陕西省发展和改革委员会",
+          "url": "https://sndrc.shaanxi.gov.cn/sy/xwxx/gggg/202606/t20260618_3648869.html"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "shaanxi-1",
+          "zone_name": "中北部价区",
+          "items": {
+            "89": 7.38,
+            "92": 7.82,
+            "95": 8.27,
+            "0": 7.5
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "shaanxi-2",
+          "zone_name": "陕南价区",
+          "items": {
+            "89": 7.46,
+            "92": 7.9,
+            "95": 8.35,
+            "0": 7.67
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "620000",
       "province_name": "甘肃省",
       "sources": [
@@ -670,5 +773,5 @@
       ]
     }
   ],
-  "updated_at": "2026-06-19T02:52:44+08:00"
+  "updated_at": "2026-06-19T06:33:46+08:00"
 }
