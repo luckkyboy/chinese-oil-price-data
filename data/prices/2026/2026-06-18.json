@@ -693,6 +693,51 @@
       ]
     },
     {
+      "province_code": "540000",
+      "province_name": "西藏自治区",
+      "sources": [
+        {
+          "name": "西藏自治区发展和改革委员会",
+          "url": "https://drc.xizang.gov.cn/fgdt/jggl/202606/t20260622_546499.html"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "xizang-lasa",
+          "zone_name": "拉萨价区",
+          "items": {
+            "89": 8.32,
+            "92": 8.82,
+            "95": 9.32,
+            "0": 8.15
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "xizang-changdu",
+          "zone_name": "昌都价区",
+          "items": {
+            "89": 8.48,
+            "92": 9.0,
+            "95": 9.51,
+            "0": 8.35
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "xizang-ali",
+          "zone_name": "阿里价区",
+          "items": {
+            "89": 8.67,
+            "92": 9.2,
+            "95": 9.72,
+            "0": 8.56
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "610000",
       "province_name": "陕西省",
       "sources": [
@@ -841,5 +886,5 @@
       ]
     }
   ],
-  "updated_at": "2026-06-19T13:34:21+08:00"
+  "updated_at": "2026-06-26T10:11:06+08:00"
 }

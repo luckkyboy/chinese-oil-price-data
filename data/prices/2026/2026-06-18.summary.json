@@ -2,8 +2,6 @@
   "adjustment_date": "2026-06-18",
   "price_file": "/data/prices/2026/2026-06-18.json",
   "provinces_total": 31,
-  "provinces_success": 30,
-  "provinces_missing": [
-    "540000"
-  ]
+  "provinces_success": 31,
+  "provinces_missing": []
 }
