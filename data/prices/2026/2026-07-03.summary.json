@@ -2,14 +2,11 @@
   "adjustment_date": "2026-07-03",
   "price_file": "/data/prices/2026/2026-07-03.json",
   "provinces_total": 31,
-  "provinces_success": 24,
+  "provinces_success": 27,
   "provinces_missing": [
-    "110000",
-    "120000",
     "310000",
     "440000",
     "500000",
-    "630000",
-    "640000"
+    "630000"
   ]
 }

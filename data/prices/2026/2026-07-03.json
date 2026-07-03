@@ -12,6 +12,52 @@
   ],
   "provinces": [
     {
+      "province_code": "110000",
+      "province_name": "北京市",
+      "sources": [
+        {
+          "name": "北京市发展和改革委员会",
+          "url": "https://fgw.beijing.gov.cn/fgwzwgk/2024zcwj/bwqtwj/202607/t20260703_4745916.htm"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 6.72,
+            "92": 7.18,
+            "95": 7.64,
+            "0": 6.87
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "120000",
+      "province_name": "天津市",
+      "sources": [
+        {
+          "name": "天津市发展和改革委员会",
+          "url": "https://fzgg.tj.gov.cn/xxfb/tzggx/202607/t20260703_7329914.html"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 6.65,
+            "92": 7.17,
+            "95": 7.57,
+            "0": 6.82
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "130000",
       "province_name": "河北省",
       "sources": [
@@ -679,6 +725,29 @@
       ]
     },
     {
+      "province_code": "640000",
+      "province_name": "宁夏回族自治区",
+      "sources": [
+        {
+          "name": "宁夏回族自治区发展和改革委员会",
+          "url": "https://fzggw.nx.gov.cn/tzgg/202607/t20260703_5281341.html"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 6.68,
+            "92": 7.08,
+            "95": 7.48,
+            "0": 6.72
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "650000",
       "province_name": "新疆维吾尔自治区",
       "sources": [
@@ -702,5 +771,5 @@
       ]
     }
   ],
-  "updated_at": "2026-07-04T02:06:35+08:00"
+  "updated_at": "2026-07-04T05:43:28+08:00"
 }
