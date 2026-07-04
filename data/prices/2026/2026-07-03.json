@@ -420,6 +420,29 @@
       ]
     },
     {
+      "province_code": "440000",
+      "province_name": "广东省",
+      "sources": [
+        {
+          "name": "广东省发展和改革委员会",
+          "url": "https://drc.gd.gov.cn/ywgg/content/post_4919965.html"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 6.68,
+            "92": 7.2,
+            "95": 7.8,
+            "0": 6.83
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "450000",
       "province_name": "广西壮族自治区",
       "sources": [
@@ -771,5 +794,5 @@
       ]
     }
   ],
-  "updated_at": "2026-07-04T05:43:28+08:00"
+  "updated_at": "2026-07-04T12:14:25+08:00"
 }
