@@ -211,6 +211,30 @@
       ]
     },
     {
+      "province_code": "310000",
+      "province_name": "上海市",
+      "sources": [
+        {
+          "name": "上海市发展和改革委员会",
+          "url": "https://fgw.sh.gov.cn/fgw_jggl/20260703/c3e03b387c96456c8d7c6328ff957a86.html"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "92": 7.14,
+            "95": 7.6
+          },
+          "missing_products": [
+            "89",
+            "0"
+          ]
+        }
+      ]
+    },
+    {
       "province_code": "320000",
       "province_name": "江苏省",
       "sources": [
@@ -483,6 +507,29 @@
             "92": 8.29,
             "95": 8.8,
             "0": 6.91
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "500000",
+      "province_name": "重庆市",
+      "sources": [
+        {
+          "name": "重庆市发展和改革委员会",
+          "url": "https://fzggw.cq.gov.cn/zwgk/zfxxgkml/jgxx/jgzc/202607/t20260704_15799337.html"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 6.85,
+            "92": 7.25,
+            "95": 7.66,
+            "0": 6.9
           },
           "missing_products": []
         }
@@ -794,5 +841,5 @@
       ]
     }
   ],
-  "updated_at": "2026-07-04T15:25:18+08:00"
+  "updated_at": "2026-07-14T11:25:48+08:00"
 }

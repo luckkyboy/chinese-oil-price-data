@@ -5,7 +5,7 @@ from pathlib import Path
 
 from .io import emit_result, now_china_iso, read_json, repo_relative, write_json
 from .normalize.price_snapshot import PRODUCT_ORDER, build_snapshot
-from .notices import SkipReason, province_skip_reason
+from .notices import SkipReason, filter_notices_for_adjustment_date, province_skip_reason
 from .options import PriceOptions
 from .payloads import PriceProvincePayload, PriceSnapshotPayload
 from .paths import ROOT
@@ -27,7 +27,7 @@ def run_build_prices(options: PriceOptions) -> str:
             continue
         path = ROOT / str(notice["extracted_path"]).lstrip("/")
         extracted_notice = read_json(path)
-        if extracted_notice.get("published_at") != options.adjustment_date:
+        if not filter_notices_for_adjustment_date([extracted_notice], options.adjustment_date):
             continue
         notice_paths.append(path)
     snapshot = build_snapshot(options.adjustment_date, notice_paths)
