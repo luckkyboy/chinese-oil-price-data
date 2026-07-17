@@ -443,6 +443,29 @@
       ]
     },
     {
+      "province_code": "500000",
+      "province_name": "重庆市",
+      "sources": [
+        {
+          "name": "重庆市发展和改革委员会",
+          "url": "https://fzggw.cq.gov.cn/zwgk/zfxxgkml/jgxx/jgzc/202607/t20260717_15831693.html"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.08,
+            "92": 7.49,
+            "95": 7.91,
+            "0": 7.14
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "530000",
       "province_name": "云南省",
       "sources": [
@@ -549,6 +572,40 @@
             "92": 8.69,
             "95": 9.17,
             "0": 8.03
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "610000",
+      "province_name": "陕西省",
+      "sources": [
+        {
+          "name": "陕西省发展和改革委员会",
+          "url": "https://sndrc.shaanxi.gov.cn/sy/xwxx/gggg/202607/t20260717_3657928.html"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "shaanxi-1",
+          "zone_name": "中北部价区",
+          "items": {
+            "89": 6.89,
+            "92": 7.31,
+            "95": 7.72,
+            "0": 6.97
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "shaanxi-2",
+          "zone_name": "陕南价区",
+          "items": {
+            "89": 6.97,
+            "92": 7.39,
+            "95": 7.8,
+            "0": 7.14
           },
           "missing_products": []
         }
@@ -669,5 +726,5 @@
       ]
     }
   ],
-  "updated_at": "2026-07-18T01:49:03+08:00"
+  "updated_at": "2026-07-18T05:27:31+08:00"
 }
