@@ -8,6 +8,7 @@
     "latest",
     "latest_summary",
     "adjustment_date",
+    "status",
     "updated_at"
   ],
   "properties": {
@@ -22,6 +23,13 @@
     "adjustment_date": {
       "type": "string",
       "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "complete",
+        "partial"
+      ]
     },
     "updated_at": {
       "type": "string",

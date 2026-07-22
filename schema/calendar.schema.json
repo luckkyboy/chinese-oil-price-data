@@ -127,7 +127,7 @@
         },
         "url": {
           "type": "string",
-          "format": "uri"
+          "format": "http-uri"
         }
       }
     }

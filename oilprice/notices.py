@@ -48,13 +48,14 @@ def read_notice_map(index_path: Path) -> dict[str, NoticePayload]:
 
 
 def write_notice_index(index_path: Path, notices_by_id: dict[str, NoticePayload]) -> None:
-    write_json(
-        index_path,
-        {
-            "updated_at": now_china_iso(),
-            "notices": list(notices_by_id.values()),
-        },
-    )
+    write_json(index_path, notice_index_payload(notices_by_id))
+
+
+def notice_index_payload(notices_by_id: dict[str, NoticePayload]) -> dict[str, object]:
+    return {
+        "updated_at": now_china_iso(),
+        "notices": list(notices_by_id.values()),
+    }
 
 
 def cli_relative(path: Path) -> str:
@@ -72,6 +73,12 @@ def filter_notices_for_adjustment_date(
     }
     filtered = []
     for notice in notices:
+        explicit_adjustment_date = str(notice.get("adjustment_date") or "").strip()
+        if is_iso_date(explicit_adjustment_date):
+            if explicit_adjustment_date == adjustment_date:
+                filtered.append(notice)
+            continue
+
         published_at = str(notice.get("published_at") or "").strip()
         if is_iso_date(published_at):
             if published_at in exact_dates:
@@ -79,7 +86,13 @@ def filter_notices_for_adjustment_date(
             continue
         haystack = " ".join(
             str(notice.get(key, ""))
-            for key in ("title", "source_url", "notice_id", "published_at")
+            for key in (
+                "title",
+                "source_url",
+                "notice_id",
+                "published_at",
+                "adjustment_date",
+            )
         )
         if any(marker in haystack for marker in markers):
             filtered.append(notice)

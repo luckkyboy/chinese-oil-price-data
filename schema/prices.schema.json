@@ -69,19 +69,23 @@
       "properties": {
         "89": {
           "type": "number",
-          "minimum": 0
+          "exclusiveMinimum": 0,
+          "maximum": 100
         },
         "92": {
           "type": "number",
-          "minimum": 0
+          "exclusiveMinimum": 0,
+          "maximum": 100
         },
         "95": {
           "type": "number",
-          "minimum": 0
+          "exclusiveMinimum": 0,
+          "maximum": 100
         },
         "0": {
           "type": "number",
-          "minimum": 0
+          "exclusiveMinimum": 0,
+          "maximum": 100
         }
       }
     },
@@ -125,7 +129,8 @@
       "required": [
         "zone_code",
         "zone_name",
-        "items"
+        "items",
+        "missing_products"
       ],
       "properties": {
         "zone_code": {
@@ -162,7 +167,47 @@
         },
         "url": {
           "type": "string",
-          "format": "uri"
+          "format": "http-uri"
+        },
+        "notice_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string"
+        },
+        "raw_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-fA-F]{64}$"
+        },
+        "adapter": {
+          "type": "string",
+          "minLength": 1
+        },
+        "parser_version": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+-v[1-9][0-9]*$"
+        },
+        "extracted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "published_at": {
+          "type": "string",
+          "format": "date"
+        },
+        "adjustment_date": {
+          "type": "string",
+          "format": "date"
+        },
+        "confidence": {
+          "type": "string",
+          "enum": [
+            "high",
+            "medium",
+            "low",
+            "manual_required"
+          ]
         }
       }
     }

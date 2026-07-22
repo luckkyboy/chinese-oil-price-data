@@ -9,8 +9,17 @@ class AttachmentPayload(TypedDict, total=False):
     type: str
     path: str
     sha256: str
+    extraction_error: str
     ocr_error: str
     ocr_text_path: str
+
+
+class AttachmentErrorPayload(TypedDict, total=False):
+    url: str
+    name: str
+    type: str
+    message: str
+    cause_type: str
 
 
 class NoticePayload(TypedDict, total=False):
@@ -22,17 +31,21 @@ class NoticePayload(TypedDict, total=False):
     title: str
     source_url: str
     published_at: str
+    adjustment_date: str
     cookie: str
     rendered_notice_fallback: bool
     ocr_attachments: bool
     raw_path: str
     sha256: str
+    raw_sha256: str
     attachments: list[AttachmentPayload]
+    attachment_errors: list[AttachmentErrorPayload]
     extracted_path: str
     content_text: str
     extracted_prices: dict[str, float]
     extracted_zones: list["ZonePayload"]
     confidence: str
+    parser_version: str
     extracted_at: str
 
 
@@ -82,6 +95,13 @@ class PriceSourcePayload(TypedDict, total=False):
     title: str
     name: str
     url: str
+    raw_sha256: str
+    adapter: str
+    parser_version: str
+    extracted_at: str
+    published_at: str
+    adjustment_date: str
+    confidence: str
 
 
 class PriceProvincePayload(TypedDict):

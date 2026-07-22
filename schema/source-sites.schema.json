@@ -68,14 +68,14 @@
         },
         "base_url": {
           "type": "string",
-          "format": "uri"
+          "format": "http-uri"
         },
         "list_urls": {
           "type": "array",
           "minItems": 1,
           "items": {
             "type": "string",
-            "format": "uri"
+            "format": "http-uri"
           }
         },
         "notice_keywords": {
@@ -91,6 +91,49 @@
         },
         "enabled": {
           "type": "boolean"
+        },
+        "cookie": {
+          "type": "string"
+        },
+        "discovery_enhancer": {
+          "type": "string",
+          "pattern": "^[a-z0-9_]+$"
+        },
+        "rendered_list_fallback": {
+          "type": "boolean"
+        },
+        "rendered_notice_fallback": {
+          "type": "boolean"
+        },
+        "ocr_attachments": {
+          "type": "boolean"
+        },
+        "website_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "channel_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "channel_root_code": {
+          "type": "string",
+          "minLength": 1
+        },
+        "channel_path": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "search_page_size": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "search_page_limit": {
+          "type": "integer",
+          "minimum": 1
         },
         "note": {
           "type": "string"

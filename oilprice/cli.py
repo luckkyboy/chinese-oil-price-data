@@ -138,13 +138,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     validate = subparsers.add_parser(
         "validate-json",
-        help="Validate JSON syntax.",
+        help="Validate JSON data contracts.",
         description=(
-            "Validate JSON syntax for selected files.\n"
-            "If no path is provided, scan all *.json under repository."
+            "Validate JSON Schema and cross-file semantic invariants.\n"
+            "If no path is provided, validate controlled JSON under data/ and schema/."
         ),
     )
-    validate.add_argument("paths", nargs="*", help="Optional JSON file paths.")
+    validate.add_argument(
+        "paths",
+        nargs="*",
+        help="Optional controlled JSON files or directories.",
+    )
     validate.set_defaults(func=command_validate_json)
 
     lookup = subparsers.add_parser(

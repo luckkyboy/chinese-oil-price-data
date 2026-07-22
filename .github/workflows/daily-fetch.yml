@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
     inputs:
       date:
-        description: "Target date in YYYY-MM-DD. Defaults to yesterday in Asia/Shanghai."
+        description: "Optional YYYY-MM-DD. If omitted, catch up the latest incomplete window due by yesterday in Asia/Shanghai."
         required: false
         type: string
 
@@ -42,80 +42,23 @@ jobs:
           DATE_INPUT: ${{ github.event.inputs.date }}
         run: |
           python - <<'PY'
-          import json
           import os
-          from datetime import datetime, timedelta
           from pathlib import Path
-          from zoneinfo import ZoneInfo
 
-          root = Path.cwd()
-          date_input = os.environ.get("DATE_INPUT", "").strip()
-          if date_input:
-              target_date = date_input
-          else:
-              target_date = (
-                  datetime.now(ZoneInfo("Asia/Shanghai")).date() - timedelta(days=1)
-              ).isoformat()
+          from oilprice.workflow_decision import decide_fetch_for_repository
 
-          def repo_path(raw_path: str, base: Path = root) -> Path:
-              value = raw_path.strip()
-              if value.startswith("/"):
-                  value = value[1:]
-              return base / value
-
-          calendar_latest = json.loads((root / "data/calendar/latest.json").read_text())
-          calendar_path = repo_path(calendar_latest["path"])
-          calendar = json.loads(calendar_path.read_text())
-          adjustment_dates = {
-              item["date"]
-              for item in calendar.get("adjustment_dates", [])
-              if isinstance(item, dict) and "date" in item
-          }
-
-          mode = "skip"
-          reason = "not_adjustment_date"
-          provinces_missing = []
-          summary_path = ""
-
-          if target_date in adjustment_dates:
-              mode = "force"
-              reason = "first_run_for_adjustment_date"
-              prices_latest_path = root / "data/prices/latest.json"
-              if prices_latest_path.exists():
-                  prices_latest = json.loads(prices_latest_path.read_text())
-                  if prices_latest.get("adjustment_date") == target_date:
-                      latest_summary = prices_latest.get("latest_summary")
-                      if latest_summary:
-                          candidate = root / "data/prices" / str(latest_summary)
-                          summary_path = str(candidate)
-                          if candidate.exists():
-                              summary = json.loads(candidate.read_text())
-                              provinces_missing = summary.get("provinces_missing", [])
-                              if provinces_missing:
-                                  mode = "missing"
-                                  reason = "summary_has_missing_provinces"
-                              else:
-                                  mode = "skip"
-                                  reason = "already_complete"
+          # Canonical dispatch validation is performed with date.fromisoformat
+          # inside the imported decision module.
+          decision = decide_fetch_for_repository(
+              Path.cwd(),
+              requested_date=os.environ.get("DATE_INPUT", ""),
+          )
+          outputs = decision.as_outputs()
 
           output_path = Path(os.environ["GITHUB_OUTPUT"])
           with output_path.open("a", encoding="utf-8") as output:
-              print(f"target_date={target_date}", file=output)
-              print(f"mode={mode}", file=output)
-              print(f"reason={reason}", file=output)
-              print(f"summary_path={summary_path}", file=output)
-              print(
-                  "provinces_missing=" + ",".join(str(item) for item in provinces_missing),
-                  file=output,
-              )
-
-          print(f"target_date={target_date}")
-          print(f"mode={mode}")
-          print(f"reason={reason}")
-          if summary_path:
-              print(f"summary_path={summary_path}")
-          if provinces_missing:
-              print("provinces_missing=" + ",".join(str(item) for item in provinces_missing))
+              for key, value in outputs.items():
+                  print(f"{key}={value}", file=output)
           PY
 
       - name: Warm up PaddleOCR
@@ -136,23 +79,33 @@ jobs:
       - name: Run full extract
         if: steps.decide.outputs.mode == 'force'
         timeout-minutes: 30
+        env:
+          TARGET_DATE: ${{ steps.decide.outputs.target_date }}
         run: |
-          python -m oilprice.cli extract "${{ steps.decide.outputs.target_date }}" --force --timeout 90
+          python -m oilprice.cli extract "$TARGET_DATE" --force --timeout 90
 
       - name: Retry missing provinces
         if: steps.decide.outputs.mode == 'missing'
         timeout-minutes: 30
+        env:
+          TARGET_DATE: ${{ steps.decide.outputs.target_date }}
         run: |
-          python -m oilprice.cli extract "${{ steps.decide.outputs.target_date }}" --timeout 90
+          python -m oilprice.cli extract "$TARGET_DATE" --timeout 90
+
+      - name: Validate generated data contracts
+        if: steps.decide.outputs.mode != 'skip'
+        run: python -m oilprice.cli validate-json
 
       - name: Commit and push price data
         if: steps.decide.outputs.mode != 'skip'
+        env:
+          TARGET_DATE: ${{ steps.decide.outputs.target_date }}
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/prices
           if ! git diff --cached --quiet; then
-            git commit -m "actions:oilprice:update ${{ steps.decide.outputs.target_date }} prices"
+            git commit -m "actions:oilprice:update ${TARGET_DATE} prices"
             git push
           else
             echo "No changes to publish"
@@ -160,10 +113,15 @@ jobs:
 
       - name: Write workflow summary
         if: always()
+        env:
+          TARGET_DATE: ${{ steps.decide.outputs.target_date || 'unknown' }}
+          FETCH_MODE: ${{ steps.decide.outputs.mode || 'failed' }}
+          FETCH_REASON: ${{ steps.decide.outputs.reason || 'unknown' }}
+          PROVINCES_MISSING: ${{ steps.decide.outputs.provinces_missing || '' }}
         run: |
-          echo "### Daily Oil Price Workflow" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "- target_date: ${{ steps.decide.outputs.target_date || 'unknown' }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- mode: ${{ steps.decide.outputs.mode || 'failed' }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- reason: ${{ steps.decide.outputs.reason || 'unknown' }}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- provinces_missing: ${{ steps.decide.outputs.provinces_missing || '' }}" >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "### Daily Oil Price Workflow" >> "$GITHUB_STEP_SUMMARY"
+          printf '\n' >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "- target_date: ${TARGET_DATE}" >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "- mode: ${FETCH_MODE}" >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "- reason: ${FETCH_REASON}" >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "- provinces_missing: ${PROVINCES_MISSING}" >> "$GITHUB_STEP_SUMMARY"

@@ -6,8 +6,21 @@ from oilprice.extract.price_parser import PRODUCT_ORDER
 from oilprice.parsers.generic import parse_notice as parse_generic_notice
 
 
-GAS_ZONE_NAME_RE = re.compile(r"(中北部价区|陕南价区)")
-DIESEL_ZONE_NAME_RE = re.compile(r"(西安市区|其他价区)")
+GAS_ZONE_NAMES = ("中北部价区", "陕南价区")
+DIESEL_ZONE_NAMES = ("西安市区", "其他价区")
+GAS_ZONE_BLOCK_RE = re.compile(
+    r"(中北部价区|陕南价区)(.*?)(?=中北部价区|陕南价区|$)",
+    re.DOTALL,
+)
+DIESEL_ZONE_BLOCK_RE = re.compile(
+    r"(西安市区|其他价区)(.*?)(?=西安市区|其他价区|$)",
+    re.DOTALL,
+)
+ZONE_COMBINATIONS = (
+    ("shaanxi-1", "中北部价区（西安市区）", "中北部价区", "西安市区"),
+    ("shaanxi-2", "陕南价区", "陕南价区", "其他价区"),
+    ("shaanxi-3", "中北部价区（西安市区外）", "中北部价区", "其他价区"),
+)
 NUMBER_RE = re.compile(r"[0-9]+\.[0-9]+")
 
 
@@ -33,32 +46,46 @@ def _extract_zones(text: str) -> list[dict[str, object]]:
     if not gas_section or not diesel_section:
         return []
 
-    gas_zone_names = GAS_ZONE_NAME_RE.findall(gas_section)
-    diesel_zone_names = DIESEL_ZONE_NAME_RE.findall(diesel_section)
-    gas_values = _decimal_values(gas_section)
-    diesel_values = _decimal_values(diesel_section)
-
-    if len(gas_zone_names) < 2 or len(gas_values) < 6 or len(diesel_values) < 8:
+    gas_prices = _extract_zone_rows(gas_section, GAS_ZONE_BLOCK_RE, value_count=3)
+    diesel_prices = _extract_zone_rows(diesel_section, DIESEL_ZONE_BLOCK_RE, value_count=4)
+    if any(zone_name not in gas_prices for zone_name in GAS_ZONE_NAMES) or any(
+        zone_name not in diesel_prices for zone_name in DIESEL_ZONE_NAMES
+    ):
         return []
 
     zones: list[dict[str, object]] = []
-    for index in range(2):
+    for zone_code, zone_name, gas_zone_name, diesel_zone_name in ZONE_COMBINATIONS:
+        gas_values = gas_prices[gas_zone_name]
+        diesel_values = diesel_prices[diesel_zone_name]
         items = {
-            "89": gas_values[index * 3],
-            "92": gas_values[index * 3 + 1],
-            "95": gas_values[index * 3 + 2],
-            "0": diesel_values[index * 4],
+            "89": gas_values[0],
+            "92": gas_values[1],
+            "95": gas_values[2],
+            "0": diesel_values[0],
         }
-        diesel_zone = diesel_zone_names[index] if index < len(diesel_zone_names) else f"柴油区{index + 1}"
         zones.append(
             {
-                "zone_code": f"shaanxi-{index + 1}",
-                "zone_name": gas_zone_names[index],
+                "zone_code": zone_code,
+                "zone_name": zone_name,
                 "items": items,
-                "note": f"柴油对应：{diesel_zone}",
+                "note": f"汽油对应：{gas_zone_name}；柴油对应：{diesel_zone_name}",
             }
         )
     return zones
+
+
+def _extract_zone_rows(
+    section: str,
+    pattern: re.Pattern[str],
+    *,
+    value_count: int,
+) -> dict[str, list[float]]:
+    rows: dict[str, list[float]] = {}
+    for zone_name, block in pattern.findall(section):
+        values = _decimal_values(block)
+        if len(values) >= value_count and zone_name not in rows:
+            rows[zone_name] = values[:value_count]
+    return rows
 
 
 def _split_sections(text: str) -> tuple[str, str]:

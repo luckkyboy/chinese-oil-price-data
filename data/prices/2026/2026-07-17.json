@@ -140,6 +140,38 @@
       ]
     },
     {
+      "province_code": "210000",
+      "province_name": "辽宁省",
+      "sources": [
+        {
+          "name": "辽宁省发展和改革委员会",
+          "url": "https://fgw.ln.gov.cn/uiFramework/js/pdfjs/web/viewer.html?file=/fgw/articleFileDir/2026-07/17/5d0270e099c849a1ae72e568c743b8f7/2026071716581646791.pdf",
+          "notice_id": "liaoning-ticlefiledir-2026-07-17-5d0270e099c849a1ae72e568c743b8f7-2026071716581646791-pdf",
+          "title": "辽宁省成品油价格调整公告（2026年7月17日24时起执行）",
+          "raw_sha256": "1d7ef6d6f0298e68624ae079b05ec9dce26e66b8ab2fefdb2a8eed99aba61e82",
+          "adapter": "liaoning",
+          "parser_version": "liaoning-v1",
+          "extracted_at": "2026-07-22T13:42:52+08:00",
+          "published_at": "2026-07-17",
+          "adjustment_date": "2026-07-17",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 6.87,
+            "92": 7.41,
+            "95": 7.83,
+            "0": 7.07
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "220000",
       "province_name": "吉林省",
       "sources": [
@@ -228,6 +260,37 @@
             "92": 7.39,
             "95": 7.86,
             "0": 7.04
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "330000",
+      "province_name": "浙江省",
+      "sources": [
+        {
+          "name": "浙江省发展和改革委员会",
+          "url": "https://fzggw.zj.gov.cn/col/col1632199/cpyjg/art/2026/art_dddc04b9b47d4560bc26fcf36a74ce52.html",
+          "notice_id": "zhejiang-j-gov-cn-col-col1632199-cpyjg-art-2026-art-dddc04b9b47d4560bc26fcf36a74ce52-html",
+          "title": "浙江省成品油价格调整",
+          "raw_sha256": "ba17161e640ed06e04b8f08f0c43c56e893d4d86a8c1ba7ee07816bc32a99261",
+          "adapter": "zhejiang",
+          "parser_version": "zhejiang-v1",
+          "extracted_at": "2026-07-22T13:43:17+08:00",
+          "published_at": "2026-07-17",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 6.85,
+            "92": 7.39,
+            "95": 7.86,
+            "0": 7.06
           },
           "missing_products": []
         }
@@ -489,6 +552,60 @@
       ]
     },
     {
+      "province_code": "510000",
+      "province_name": "四川省",
+      "sources": [
+        {
+          "name": "四川省发展和改革委员会",
+          "url": "https://fgw.sc.gov.cn/sfgw/tzgg/2026/7/17/3271604472b242149a4a9e6f3c15e332.shtml",
+          "notice_id": "sichuan-https-fgw-sc-gov-cn-sfgw-tzgg-2026-7-17-3271604472b242149a4a9e6f3c15e332-shtml",
+          "title": "关于调整成品油价格的通知（川发改价格〔2026〕295号）",
+          "raw_sha256": "e335164bb410b8d01b22a5e86f15a80a728c781d37f2b1be991d2d3a72e1e29a",
+          "adapter": "sichuan",
+          "parser_version": "sichuan-v2",
+          "extracted_at": "2026-07-22T13:43:24+08:00",
+          "published_at": "2026-07-17",
+          "adjustment_date": "2026-07-17",
+          "confidence": "high"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "sichuan-1",
+          "zone_name": "一价区",
+          "items": {
+            "89": 6.98,
+            "92": 7.52,
+            "95": 8.03,
+            "0": 7.13
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "sichuan-2",
+          "zone_name": "二价区",
+          "items": {
+            "89": 7.05,
+            "92": 7.59,
+            "95": 8.11,
+            "0": 7.21
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "sichuan-3",
+          "zone_name": "三价区",
+          "items": {
+            "89": 7.12,
+            "92": 7.67,
+            "95": 8.19,
+            "0": 7.3
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "520000",
       "province_name": "贵州省",
       "sources": [
@@ -657,7 +774,7 @@
       "zones": [
         {
           "zone_code": "shaanxi-1",
-          "zone_name": "中北部价区",
+          "zone_name": "中北部价区（西安市区）",
           "items": {
             "89": 6.89,
             "92": 7.31,
@@ -673,6 +790,17 @@
             "89": 6.97,
             "92": 7.39,
             "95": 7.8,
+            "0": 7.14
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "shaanxi-3",
+          "zone_name": "中北部价区（西安市区外）",
+          "items": {
+            "89": 6.89,
+            "92": 7.31,
+            "95": 7.72,
             "0": 7.14
           },
           "missing_products": []
@@ -794,5 +922,5 @@
       ]
     }
   ],
-  "updated_at": "2026-07-18T14:31:13+08:00"
+  "updated_at": "2026-07-22T13:43:24+08:00"
 }

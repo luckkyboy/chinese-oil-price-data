@@ -1,4 +1,6 @@
 # Core crawling, extraction, and normalization code uses Python standard library only.
+# Keep lightweight runtime dependencies shared with quality CI.
+-r requirements-core.txt
 #
 # OCR is required for image-based notices, such as Hebei's price table images.
 paddlepaddle==3.2.0

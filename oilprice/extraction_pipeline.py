@@ -5,7 +5,9 @@ import logging
 import time
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
+from typing import Callable
 
+from .extract.doc import doc_to_text
 from .extract.docx import docx_to_text
 from .extract.html import html_to_text
 from .extract.pdf import pdf_to_text
@@ -23,10 +25,16 @@ from .ocr.paddle import image_to_text
 from .options import ExtractFilesOptions
 from .payloads import AttachmentPayload, NoticePayload, ParsedNoticePayload, ZonePayload
 from .paths import ROOT
-from .parsers import parse_notice
+from .parsers import parse_notice, parser_version
 
 
 logger = logging.getLogger(__name__)
+DOCUMENT_TEXT_EXTRACTORS: dict[str, Callable[[Path], str]] = {
+    ".doc": doc_to_text,
+    ".docx": docx_to_text,
+    ".pdf": pdf_to_text,
+    ".xls": xls_to_text,
+}
 
 
 def command_extract_files(args: argparse.Namespace) -> None:
@@ -84,6 +92,7 @@ def run_extract_files(options: ExtractFilesOptions) -> str:
         updated_attachments: list[AttachmentPayload] = []
         for attachment in notice.get("attachments", []):
             updated_attachment = dict(attachment)
+            updated_attachment.pop("extraction_error", None)
             attachment_path = attachment.get("path")
             if not attachment_path:
                 updated_attachments.append(updated_attachment)
@@ -95,15 +104,16 @@ def run_extract_files(options: ExtractFilesOptions) -> str:
                 f"attachment_text start suffix={absolute_attachment_path.suffix.lower()} "
                 f"path={attachment_path}"
             )
-            if absolute_attachment_path.suffix.lower() == ".docx":
-                attachment_text = extract_attachment_text(absolute_attachment_path)
-                if attachment_text:
-                    attachment_texts.append(attachment_text)
-            elif absolute_attachment_path.suffix.lower() == ".xls":
-                attachment_text = extract_attachment_text(absolute_attachment_path)
-                if attachment_text:
-                    attachment_texts.append(attachment_text)
-            elif absolute_attachment_path.suffix.lower() == ".pdf":
+            suffix = absolute_attachment_path.suffix.lower()
+            if attachment.get("type") == "document" and suffix not in DOCUMENT_TEXT_EXTRACTORS:
+                extraction_error = _unsupported_document_extraction_error(suffix)
+                updated_attachment["extraction_error"] = extraction_error
+                logger.warning(
+                    f"[warn] {notice.get('province_name', province_code)} ({province_code}) "
+                    f"attachment extraction unsupported suffix={suffix or '<none>'} "
+                    f"path={attachment_path}: {extraction_error}"
+                )
+            elif suffix in DOCUMENT_TEXT_EXTRACTORS:
                 attachment_text = extract_attachment_text(absolute_attachment_path)
                 if attachment_text:
                     attachment_texts.append(attachment_text)
@@ -141,22 +151,28 @@ def run_extract_files(options: ExtractFilesOptions) -> str:
             f"[extract-file] {notice.get('province_name', province_code)} ({province_code}) "
             f"parse_notice start chars={len(combined_text)}"
         )
-        parsed = parse_notice(str(notice.get("adapter", "generic")), combined_text)
+        adapter = str(notice.get("adapter", "generic"))
+        parsed = parse_notice(adapter, combined_text)
         parsed = normalize_parsed_prices(parsed)
         logger.info(
             f"[extract-file] {notice.get('province_name', province_code)} ({province_code}) "
             f"parse_notice elapsed={_elapsed(parse_start)}"
         )
+        raw_sha256 = notice.get("raw_sha256") or notice.get("sha256")
         extracted_payload: NoticePayload = {
             "notice_id": notice["notice_id"],
             "province_code": notice["province_code"],
             "province_name": notice["province_name"],
             "source_name": notice.get("source_name", notice["province_name"]),
-            "adapter": notice.get("adapter", "generic"),
+            "adapter": adapter,
+            "parser_version": parser_version(adapter),
             "title": notice["title"],
-            "published_at": parsed.get("adjustment_date") or notice.get("published_at"),
+            "published_at": notice.get("published_at"),
+            "adjustment_date": parsed.get("adjustment_date"),
             "source_url": notice["source_url"],
             "raw_path": raw_path,
+            "sha256": raw_sha256,
+            "raw_sha256": raw_sha256,
             "content_text": combined_text,
             "attachments": updated_attachments,
             "extracted_prices": parsed.get("extracted_prices"),
@@ -188,15 +204,21 @@ def run_extract_files(options: ExtractFilesOptions) -> str:
 def extract_attachment_text(path: Path) -> str:
     try:
         suffix = path.suffix.lower()
-        if suffix == ".docx":
-            return docx_to_text(path)
-        if suffix == ".xls":
-            return xls_to_text(path)
-        if suffix == ".pdf":
-            return pdf_to_text(path)
-        return ""
+        extractor = DOCUMENT_TEXT_EXTRACTORS.get(suffix)
+        if extractor is None:
+            raise ValueError(_unsupported_document_extraction_error(suffix))
+        return extractor(path)
     except Exception as exc:
         raise TextExtractionError(str(path), exc) from exc
+
+
+def _unsupported_document_extraction_error(suffix: str) -> str:
+    display_suffix = suffix or "<none>"
+    supported = ", ".join(sorted(DOCUMENT_TEXT_EXTRACTORS))
+    return (
+        f"unsupported document attachment suffix {display_suffix!r}; "
+        f"supported suffixes: {supported}"
+    )
 
 
 def normalize_parsed_prices(parsed: ParsedNoticePayload) -> ParsedNoticePayload:

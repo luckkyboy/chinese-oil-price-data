@@ -37,7 +37,8 @@
       "additionalProperties": false,
       "required": [
         "zone_code",
-        "zone_name"
+        "zone_name",
+        "areas"
       ],
       "properties": {
         "zone_code": {
@@ -147,7 +148,7 @@
         },
         "url": {
           "type": "string",
-          "format": "uri"
+          "format": "http-uri"
         }
       }
     }

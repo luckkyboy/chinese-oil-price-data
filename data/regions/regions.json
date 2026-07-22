@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-04-29T00:00:00+08:00",
-  "count": 3092,
+  "generated_at": "2026-07-21T00:00:00+08:00",
+  "count": 3090,
   "items": [
     {
       "region": "上海",
@@ -5793,11 +5793,6 @@
       "zone_code": "default"
     },
     {
-      "region": "广东",
-      "province_code": "440000",
-      "zone_code": "default"
-    },
-    {
       "region": "广东东莞",
       "province_code": "440000",
       "zone_code": "default",
@@ -7450,12 +7445,6 @@
       "province_code": "650000",
       "zone_code": "default",
       "locality": "伊犁"
-    },
-    {
-      "region": "新疆伊犁伊宁",
-      "province_code": "650000",
-      "zone_code": "default",
-      "locality": "伊犁伊宁"
     },
     {
       "region": "新疆伊犁伊宁",
@@ -9685,12 +9674,6 @@
       "province_code": "130000",
       "zone_code": "default",
       "locality": "张家口下花园"
-    },
-    {
-      "region": "河北张家口宣化",
-      "province_code": "130000",
-      "zone_code": "default",
-      "locality": "张家口宣化"
     },
     {
       "region": "河北张家口宣化",
@@ -12081,156 +12064,156 @@
     {
       "region": "海南",
       "province_code": "460000",
-      "zone_code": "yunnan-1"
+      "zone_code": "default"
     },
     {
       "region": "海南三亚",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚"
     },
     {
       "region": "海南三亚万宁",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚万宁"
     },
     {
       "region": "海南三亚东方",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚东方"
     },
     {
       "region": "海南三亚中沙",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚中沙"
     },
     {
       "region": "海南三亚临高",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚临高"
     },
     {
       "region": "海南三亚乐东",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚乐东"
     },
     {
       "region": "海南三亚五指山",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚五指山"
     },
     {
       "region": "海南三亚保亭",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚保亭"
     },
     {
       "region": "海南三亚儋州",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚儋州"
     },
     {
       "region": "海南三亚南沙",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚南沙"
     },
     {
       "region": "海南三亚定安",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚定安"
     },
     {
       "region": "海南三亚屯昌",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚屯昌"
     },
     {
       "region": "海南三亚文昌",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚文昌"
     },
     {
       "region": "海南三亚昌江",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚昌江"
     },
     {
       "region": "海南三亚澄迈",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚澄迈"
     },
     {
       "region": "海南三亚琼中",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚琼中"
     },
     {
       "region": "海南三亚琼海",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚琼海"
     },
     {
       "region": "海南三亚白沙",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚白沙"
     },
     {
       "region": "海南三亚西沙",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚西沙"
     },
     {
       "region": "海南三亚陵水",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "三亚陵水"
     },
     {
       "region": "海南海口",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "海口"
     },
     {
       "region": "海南海口琼山",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "海口琼山"
     },
     {
       "region": "海南海口秀英",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "海口秀英"
     },
     {
       "region": "海南海口美兰",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "海口美兰"
     },
     {
       "region": "海南海口龙华",
       "province_code": "460000",
-      "zone_code": "yunnan-1",
+      "zone_code": "default",
       "locality": "海口龙华"
     },
     {
@@ -16642,589 +16625,589 @@
     {
       "region": "陕西咸阳",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳"
     },
     {
       "region": "陕西咸阳三原",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳三原"
     },
     {
       "region": "陕西咸阳乾县",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳乾县"
     },
     {
       "region": "陕西咸阳兴平",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳兴平"
     },
     {
       "region": "陕西咸阳彬县",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳彬县"
     },
     {
       "region": "陕西咸阳旬邑",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳旬邑"
     },
     {
       "region": "陕西咸阳杨凌",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳杨凌"
     },
     {
       "region": "陕西咸阳武功",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳武功"
     },
     {
       "region": "陕西咸阳永寿",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳永寿"
     },
     {
       "region": "陕西咸阳泾阳",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳泾阳"
     },
     {
       "region": "陕西咸阳淳化",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳淳化"
     },
     {
       "region": "陕西咸阳渭城",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳渭城"
     },
     {
       "region": "陕西咸阳礼泉",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳礼泉"
     },
     {
       "region": "陕西咸阳秦都",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳秦都"
     },
     {
       "region": "陕西咸阳长武",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "咸阳长武"
     },
     {
       "region": "陕西商洛",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "商洛"
     },
     {
       "region": "陕西商洛丹凤",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "商洛丹凤"
     },
     {
       "region": "陕西商洛商南",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "商洛商南"
     },
     {
       "region": "陕西商洛商州",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "商洛商州"
     },
     {
       "region": "陕西商洛山阳",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "商洛山阳"
     },
     {
       "region": "陕西商洛柞水",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "商洛柞水"
     },
     {
       "region": "陕西商洛洛南",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "商洛洛南"
     },
     {
       "region": "陕西商洛镇安",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "商洛镇安"
     },
     {
       "region": "陕西安康",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "安康"
     },
     {
       "region": "陕西安康宁陕",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "安康宁陕"
     },
     {
       "region": "陕西安康岚皋",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "安康岚皋"
     },
     {
       "region": "陕西安康平利",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "安康平利"
     },
     {
       "region": "陕西安康旬阳",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "安康旬阳"
     },
     {
       "region": "陕西安康汉滨",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "安康汉滨"
     },
     {
       "region": "陕西安康汉阴",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "安康汉阴"
     },
     {
       "region": "陕西安康白河",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "安康白河"
     },
     {
       "region": "陕西安康石泉",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "安康石泉"
     },
     {
       "region": "陕西安康紫阳",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "安康紫阳"
     },
     {
       "region": "陕西安康镇坪",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "安康镇坪"
     },
     {
       "region": "陕西宝鸡",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡"
     },
     {
       "region": "陕西宝鸡凤县",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡凤县"
     },
     {
       "region": "陕西宝鸡凤翔",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡凤翔"
     },
     {
       "region": "陕西宝鸡千阳",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡千阳"
     },
     {
       "region": "陕西宝鸡太白",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡太白"
     },
     {
       "region": "陕西宝鸡岐山",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡岐山"
     },
     {
       "region": "陕西宝鸡扶风",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡扶风"
     },
     {
       "region": "陕西宝鸡渭滨",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡渭滨"
     },
     {
       "region": "陕西宝鸡眉县",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡眉县"
     },
     {
       "region": "陕西宝鸡金台",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡金台"
     },
     {
       "region": "陕西宝鸡陇县",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡陇县"
     },
     {
       "region": "陕西宝鸡陈仓",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡陈仓"
     },
     {
       "region": "陕西宝鸡麟游",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "宝鸡麟游"
     },
     {
       "region": "陕西延安",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安"
     },
     {
       "region": "陕西延安吴起",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安吴起"
     },
     {
       "region": "陕西延安子长",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安子长"
     },
     {
       "region": "陕西延安安塞",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安安塞"
     },
     {
       "region": "陕西延安宜川",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安宜川"
     },
     {
       "region": "陕西延安宝塔",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安宝塔"
     },
     {
       "region": "陕西延安富县",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安富县"
     },
     {
       "region": "陕西延安延川",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安延川"
     },
     {
       "region": "陕西延安延长",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安延长"
     },
     {
       "region": "陕西延安志丹",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安志丹"
     },
     {
       "region": "陕西延安洛川",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安洛川"
     },
     {
       "region": "陕西延安甘泉",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安甘泉"
     },
     {
       "region": "陕西延安黄陵",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安黄陵"
     },
     {
       "region": "陕西延安黄龙",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "延安黄龙"
     },
     {
       "region": "陕西榆林",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林"
     },
     {
       "region": "陕西榆林佳县",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林佳县"
     },
     {
       "region": "陕西榆林吴堡",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林吴堡"
     },
     {
       "region": "陕西榆林子洲",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林子洲"
     },
     {
       "region": "陕西榆林定边",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林定边"
     },
     {
       "region": "陕西榆林府谷",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林府谷"
     },
     {
       "region": "陕西榆林榆阳",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林榆阳"
     },
     {
       "region": "陕西榆林横山",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林横山"
     },
     {
       "region": "陕西榆林清涧",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林清涧"
     },
     {
       "region": "陕西榆林神木",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林神木"
     },
     {
       "region": "陕西榆林米脂",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林米脂"
     },
     {
       "region": "陕西榆林绥德",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林绥德"
     },
     {
       "region": "陕西榆林靖边",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "榆林靖边"
     },
     {
       "region": "陕西汉中",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "汉中"
     },
     {
       "region": "陕西汉中佛坪",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "汉中佛坪"
     },
     {
       "region": "陕西汉中勉县",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "汉中勉县"
     },
     {
       "region": "陕西汉中南郑",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "汉中南郑"
     },
     {
       "region": "陕西汉中城固",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "汉中城固"
     },
     {
       "region": "陕西汉中宁强",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "汉中宁强"
     },
     {
       "region": "陕西汉中汉台",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "汉中汉台"
     },
     {
       "region": "陕西汉中洋县",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "汉中洋县"
     },
     {
       "region": "陕西汉中留坝",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "汉中留坝"
     },
     {
       "region": "陕西汉中略阳",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "汉中略阳"
     },
     {
       "region": "陕西汉中西乡",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "汉中西乡"
     },
     {
       "region": "陕西汉中镇巴",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-2",
       "locality": "汉中镇巴"
     },
     {
       "region": "陕西渭南",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "渭南"
     },
     {
       "region": "陕西渭南临渭",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "渭南临渭"
     },
     {
       "region": "陕西渭南华县",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "渭南华县"
     },
     {
       "region": "陕西渭南华阴",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "渭南华阴"
     },
     {
       "region": "陕西渭南合阳",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "渭南合阳"
     },
     {
       "region": "陕西渭南大荔",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "渭南大荔"
     },
     {
       "region": "陕西渭南富平",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "渭南富平"
     },
     {
       "region": "陕西渭南潼关",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "渭南潼关"
     },
     {
       "region": "陕西渭南澄城",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "渭南澄城"
     },
     {
       "region": "陕西渭南白水",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "渭南白水"
     },
     {
       "region": "陕西渭南蒲城",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "渭南蒲城"
     },
     {
       "region": "陕西渭南韩城",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "渭南韩城"
     },
     {
@@ -17314,31 +17297,31 @@
     {
       "region": "陕西铜川",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "铜川"
     },
     {
       "region": "陕西铜川印台",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "铜川印台"
     },
     {
       "region": "陕西铜川宜君",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "铜川宜君"
     },
     {
       "region": "陕西铜川王益",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "铜川王益"
     },
     {
       "region": "陕西铜川耀州",
       "province_code": "610000",
-      "zone_code": "shaanxi-1",
+      "zone_code": "shaanxi-3",
       "locality": "铜川耀州"
     },
     {

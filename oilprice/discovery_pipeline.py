@@ -46,12 +46,29 @@ def command_discover(args: argparse.Namespace) -> None:
     emit_result(index_path)
 
 
+def validate_requested_province_codes(
+    enabled_sources: list[EnabledSource],
+    requested_codes: set[str] | None,
+) -> None:
+    if requested_codes is None:
+        return
+
+    configured_codes = {str(item["province_code"]) for item in enabled_sources}
+    missing_codes = sorted(requested_codes - configured_codes)
+    if missing_codes:
+        raise ValueError(
+            "no enabled source configured for province code(s): " + ", ".join(missing_codes)
+        )
+
+
 def run_discover(options: DiscoverOptions) -> str:
     enabled_sources = load_enabled_sources(options.sources_path)
+    validate_requested_province_codes(enabled_sources, options.province_codes)
     pending_codes: set[str] | None = None
     if options.adjustment_date and not options.force:
         pending_codes = pending_province_codes_from_summary(options.adjustment_date)
     notices: list[NoticePayload] = []
+    errors: list[dict[str, str]] = []
 
     for item in enabled_sources:
         province_code = str(item["province_code"])
@@ -83,6 +100,7 @@ def run_discover(options: DiscoverOptions) -> str:
                     logger.warning(
                         f"[skip] {item['province_name']}: enhancer error {exc.cause} for {exc.url}"
                     )
+                    errors.append(_discovery_error_payload(item, source, "enhancer", exc))
                     continue
             else:
                 try:
@@ -95,6 +113,7 @@ def run_discover(options: DiscoverOptions) -> str:
                     logger.warning(
                         f"[skip] {item['province_name']}: browser error {exc.cause} for {exc.url}"
                     )
+                    errors.append(_discovery_error_payload(item, source, "browser", exc))
                     continue
                 try:
                     refs = _parse_list_html(item, html, list_url, keywords)
@@ -105,11 +124,13 @@ def run_discover(options: DiscoverOptions) -> str:
                     logger.warning(
                         f"[skip] {item['province_name']}: browser error {exc.cause} for {exc.url}"
                     )
+                    errors.append(_discovery_error_payload(item, source, "browser", exc))
                     continue
                 except ParseDiscoveryError as exc:
                     logger.warning(
                         f"[skip] {item['province_name']}: parse error {exc.cause} for {exc.url}"
                     )
+                    errors.append(_discovery_error_payload(item, source, "parse", exc))
                     continue
             for ref in refs:
                 notice: NoticePayload = {
@@ -134,8 +155,33 @@ def run_discover(options: DiscoverOptions) -> str:
     if options.adjustment_date:
         notices = filter_notices_for_adjustment_date(notices, options.adjustment_date)
 
-    write_json(options.index_path, {"updated_at": now_china_iso(), "notices": notices})
+    write_json(
+        options.index_path,
+        {
+            "updated_at": now_china_iso(),
+            "notices": notices,
+            "errors": errors,
+        },
+    )
     return str(options.index_path)
+
+
+def _discovery_error_payload(
+    item: EnabledSource,
+    source: SourceConfig,
+    stage: str,
+    error: DiscoveryError,
+) -> dict[str, str]:
+    return {
+        "province_code": str(item["province_code"]),
+        "province_name": str(item["province_name"]),
+        "source_name": str(source.get("name") or item["province_name"]),
+        "stage": stage,
+        "url": error.url,
+        "error_type": type(error).__name__,
+        "cause_type": type(error.cause).__name__,
+        "message": str(error.cause),
+    }
 
 
 def _discover_with_enhancer(

@@ -5,6 +5,7 @@ import logging
 import time
 
 from .extract.attachments import attachment_suffix, find_attachment_links
+from .errors import AttachmentFetchError
 from .fetching import (
     fetch_notice_with_browser,
     pdf_attachment_from_viewer_url,
@@ -19,7 +20,7 @@ from .notices import (
     slug_from_notice,
 )
 from .options import FetchOptions
-from .payloads import AttachmentPayload, NoticePayload
+from .payloads import AttachmentErrorPayload, AttachmentPayload, NoticePayload
 from .paths import ROOT
 
 
@@ -70,6 +71,7 @@ def run_fetch(options: FetchOptions) -> str:
         )
         raw_html = raw_path.read_text(encoding="utf-8", errors="replace")
         attachments: list[AttachmentPayload] = []
+        attachment_errors: list[AttachmentErrorPayload] = []
         embedded_pdf = pdf_attachment_from_viewer_url(str(notice["source_url"]))
         if embedded_pdf:
             url = embedded_pdf["url"]
@@ -79,14 +81,24 @@ def run_fetch(options: FetchOptions) -> str:
                 / province_slug
                 / f"{notice_id}_attachment_1{attachment_suffix(url)}"
             )
-            result = save_attachment_raw(
-                url,
-                attachment_path,
-                timeout=options.timeout,
-                referer=str(notice["source_url"]),
-                browser_session=options.browser_session,
-            )
-            if result:
+            try:
+                result = save_attachment_raw(
+                    url,
+                    attachment_path,
+                    timeout=options.timeout,
+                    referer=str(notice["source_url"]),
+                    browser_session=options.browser_session,
+                )
+            except AttachmentFetchError as exc:
+                attachment_errors.append(
+                    _attachment_error_payload(
+                        url,
+                        exc,
+                        name=embedded_pdf.get("name"),
+                        attachment_type="document",
+                    )
+                )
+            else:
                 attachments.append(
                     {
                         "url": url,
@@ -117,14 +129,23 @@ def run_fetch(options: FetchOptions) -> str:
                 skipped_attachments += 1
                 continue
             attachment_start = time.perf_counter()
-            result = save_attachment_raw(
-                attachment["url"],
-                attachment_path,
-                timeout=options.timeout,
-                referer=str(notice["source_url"]),
-                browser_session=options.browser_session,
-            )
-            if not result:
+            try:
+                result = save_attachment_raw(
+                    attachment["url"],
+                    attachment_path,
+                    timeout=options.timeout,
+                    referer=str(notice["source_url"]),
+                    browser_session=options.browser_session,
+                )
+            except AttachmentFetchError as exc:
+                attachment_errors.append(
+                    _attachment_error_payload(
+                        attachment["url"],
+                        exc,
+                        name=attachment.get("name"),
+                        attachment_type=attachment.get("type"),
+                    )
+                )
                 continue
             logger.info(
                 f"[fetch] {notice.get('province_name', province_code)} ({province_code}) "
@@ -143,8 +164,16 @@ def run_fetch(options: FetchOptions) -> str:
         updated = dict(notice)
         updated["raw_path"] = repo_relative(raw_path, ROOT)
         updated["sha256"] = sha256
+        updated.pop("attachments", None)
+        updated.pop("attachment_errors", None)
         if attachments:
             updated["attachments"] = attachments
+        if attachment_errors:
+            updated["attachment_errors"] = attachment_errors
+            logger.warning(
+                f"[warn] {notice.get('province_name', province_code)} ({province_code}) "
+                f"attachments failed={len(attachment_errors)}"
+            )
         if skipped_attachments:
             logger.info(
                 f"[fetch] {notice.get('province_name', province_code)} ({province_code}) "
@@ -152,9 +181,44 @@ def run_fetch(options: FetchOptions) -> str:
             )
         fetched.append(updated)
 
-    write_json(options.index_path, {"updated_at": now_china_iso(), "notices": fetched})
+    updated_index = dict(index)
+    updated_index["updated_at"] = now_china_iso()
+    updated_index["notices"] = fetched
+    write_json(options.index_path, updated_index)
     return str(options.index_path)
 
 
 def _elapsed(start: float) -> str:
     return f"{time.perf_counter() - start:.1f}s"
+
+
+def _attachment_error_payload(
+    url: str,
+    error: AttachmentFetchError,
+    *,
+    name: str | None,
+    attachment_type: str | None,
+) -> AttachmentErrorPayload:
+    cause = _root_error_cause(error)
+    payload: AttachmentErrorPayload = {
+        "url": url,
+        "message": str(cause),
+        "cause_type": type(cause).__name__,
+    }
+    if name:
+        payload["name"] = name
+    if attachment_type:
+        payload["type"] = attachment_type
+    return payload
+
+
+def _root_error_cause(error: Exception) -> Exception:
+    cause = error
+    seen: set[int] = set()
+    while id(cause) not in seen:
+        seen.add(id(cause))
+        nested = getattr(cause, "cause", None)
+        if not isinstance(nested, Exception):
+            break
+        cause = nested
+    return cause

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Callable
 
 from .anhui import parse_notice as parse_anhui_notice
 from .beijing import parse_notice as parse_beijing_notice
@@ -28,6 +29,36 @@ from .zhejiang import parse_notice as parse_zhejiang_notice
 from ..payloads import ParsedNoticePayload
 
 
+PARSER_FUNCTIONS: dict[str, Callable[[str], ParsedNoticePayload]] = {
+    "anhui": parse_anhui_notice,
+    "beijing": parse_beijing_notice,
+    "fujian": parse_fujian_notice,
+    "generic": parse_generic_notice,
+    "guangxi": parse_guangxi_notice,
+    "guizhou": parse_guizhou_notice,
+    "hebei": parse_hebei_notice,
+    "heilongjiang": parse_heilongjiang_notice,
+    "henan": parse_henan_notice,
+    "jiangsu": parse_jiangsu_notice,
+    "jiangxi": parse_jiangxi_notice,
+    "liaoning": parse_liaoning_notice,
+    "neimenggu": parse_neimenggu_notice,
+    "ningxia": parse_ningxia_notice,
+    "qinghai": parse_qinghai_notice,
+    "shaanxi": parse_shaanxi_notice,
+    "shandong": parse_shandong_notice,
+    "shanxi": parse_shanxi_notice,
+    "sichuan": parse_sichuan_notice,
+    "xinjiang": parse_xinjiang_notice,
+    "xizang": parse_xizang_notice,
+    "yunnan": parse_yunnan_notice,
+    "zhejiang": parse_zhejiang_notice,
+}
+PARSER_REVISIONS = {name: 1 for name in PARSER_FUNCTIONS}
+PARSER_REVISIONS["shaanxi"] = 2
+PARSER_REVISIONS["sichuan"] = 2
+
+
 DATE_PATTERNS = [
     re.compile(r"自\s*([0-9]{4})年([0-9]{1,2})月([0-9]{1,2})日\s*24时起"),
     re.compile(r"([0-9]{4})年([0-9]{1,2})月([0-9]{1,2})日\s*24时起执行"),
@@ -38,58 +69,21 @@ DATE_PATTERNS = [
 
 
 def parse_notice(adapter: str, text: str) -> ParsedNoticePayload:
-    if adapter == "anhui":
-        result = parse_anhui_notice(text)
-    elif adapter == "sichuan":
-        result = parse_sichuan_notice(text)
-    elif adapter == "beijing":
-        result = parse_beijing_notice(text)
-    elif adapter == "hebei":
-        result = parse_hebei_notice(text)
-    elif adapter == "heilongjiang":
-        result = parse_heilongjiang_notice(text)
-    elif adapter == "henan":
-        result = parse_henan_notice(text)
-    elif adapter == "fujian":
-        result = parse_fujian_notice(text)
-    elif adapter == "guizhou":
-        result = parse_guizhou_notice(text)
-    elif adapter == "guangxi":
-        result = parse_guangxi_notice(text)
-    elif adapter == "jiangsu":
-        result = parse_jiangsu_notice(text)
-    elif adapter == "jiangxi":
-        result = parse_jiangxi_notice(text)
-    elif adapter == "liaoning":
-        result = parse_liaoning_notice(text)
-    elif adapter == "neimenggu":
-        result = parse_neimenggu_notice(text)
-    elif adapter == "ningxia":
-        result = parse_ningxia_notice(text)
-    elif adapter == "qinghai":
-        result = parse_qinghai_notice(text)
-    elif adapter == "shaanxi":
-        result = parse_shaanxi_notice(text)
-    elif adapter == "shandong":
-        result = parse_shandong_notice(text)
-    elif adapter == "shanxi":
-        result = parse_shanxi_notice(text)
-    elif adapter == "xinjiang":
-        result = parse_xinjiang_notice(text)
-    elif adapter == "xizang":
-        result = parse_xizang_notice(text)
-    elif adapter == "yunnan":
-        result = parse_yunnan_notice(text)
-    elif adapter == "zhejiang":
-        result = parse_zhejiang_notice(text)
-    else:
-        result = parse_generic_notice(text)
+    parser = PARSER_FUNCTIONS.get(adapter, parse_generic_notice)
+    result = parser(text)
 
     if "adjustment_date" not in result:
         adjustment_date = extract_adjustment_date(text)
         if adjustment_date:
             result["adjustment_date"] = adjustment_date
     return result
+
+
+def parser_version(adapter: str) -> str:
+    """Return a provenance version for the parser that actually handles an adapter."""
+
+    resolved_adapter = adapter if adapter in PARSER_FUNCTIONS else "generic"
+    return f"{resolved_adapter}-v{PARSER_REVISIONS[resolved_adapter]}"
 
 
 def extract_adjustment_date(text: str) -> str | None:
