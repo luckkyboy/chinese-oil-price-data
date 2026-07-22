@@ -1,0 +1,86 @@
+{
+  "province_code": "610000",
+  "province_name": "陕西省",
+  "zones": [
+    {
+      "zone_code": "shaanxi-1",
+      "zone_name": "中北部价区（西安市区）",
+      "areas": [
+        {
+          "level": "city",
+          "name": "西安市"
+        }
+      ],
+      "note": "组合价区：汽油执行中北部价区价格，0号柴油执行西安市区价格。",
+      "sources": [
+        {
+          "name": "陕西省发展和改革委员会",
+          "url": "https://sndrc.shaanxi.gov.cn/sy/xwxx/gggg/202607/t20260703_3653572.html"
+        }
+      ]
+    },
+    {
+      "zone_code": "shaanxi-2",
+      "zone_name": "陕南价区",
+      "areas": [
+        {
+          "level": "city",
+          "name": "汉中市"
+        },
+        {
+          "level": "city",
+          "name": "安康市"
+        },
+        {
+          "level": "city",
+          "name": "商洛市"
+        }
+      ],
+      "note": "组合价区：汽油执行陕南价区价格，0号柴油执行省内其他市场价格。",
+      "sources": [
+        {
+          "name": "陕西省发展和改革委员会",
+          "url": "https://sndrc.shaanxi.gov.cn/sy/xwxx/gggg/202607/t20260703_3653572.html"
+        }
+      ]
+    },
+    {
+      "zone_code": "shaanxi-3",
+      "zone_name": "中北部价区（西安市区外）",
+      "areas": [
+        {
+          "level": "city",
+          "name": "宝鸡市"
+        },
+        {
+          "level": "city",
+          "name": "咸阳市"
+        },
+        {
+          "level": "city",
+          "name": "铜川市"
+        },
+        {
+          "level": "city",
+          "name": "渭南市"
+        },
+        {
+          "level": "city",
+          "name": "延安市"
+        },
+        {
+          "level": "city",
+          "name": "榆林市"
+        }
+      ],
+      "note": "组合价区：汽油执行中北部价区价格，0号柴油执行省内其他市场价格。",
+      "sources": [
+        {
+          "name": "陕西省发展和改革委员会",
+          "url": "https://sndrc.shaanxi.gov.cn/sy/xwxx/gggg/202607/t20260703_3653572.html"
+        }
+      ]
+    }
+  ],
+  "updated_at": "2026-07-21T00:00:00+08:00"
+}

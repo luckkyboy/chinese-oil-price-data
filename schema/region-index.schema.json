@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/luckkyboy/chinese-oil-price-data/schema/region-index.schema.json",
+  "title": "Chinese administrative region to oil price zone index",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "generated_at",
+    "count",
+    "items"
+  ],
+  "properties": {
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/item"
+      }
+    }
+  },
+  "$defs": {
+    "item": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "region",
+        "province_code",
+        "zone_code"
+      ],
+      "properties": {
+        "region": {
+          "type": "string",
+          "minLength": 1
+        },
+        "province_code": {
+          "type": "string",
+          "pattern": "^[0-9]{6}$"
+        },
+        "zone_code": {
+          "type": "string",
+          "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+        },
+        "locality": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
