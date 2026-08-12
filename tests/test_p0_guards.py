@@ -590,8 +590,10 @@ class WorkflowInjectionGuardTests(unittest.TestCase):
     def test_daily_workflow_uses_supported_python(self) -> None:
         workflow = Path(".github/workflows/daily-fetch.yml").read_text(encoding="utf-8")
 
-        self.assertIn("actions/setup-python@v5", workflow)
+        self.assertIn("actions/checkout@v6", workflow)
+        self.assertIn("actions/setup-python@v6", workflow)
         self.assertIn('python-version: "3.12"', workflow)
+        self.assertNotIn("cache: pip", workflow)
 
 
 if __name__ == "__main__":
