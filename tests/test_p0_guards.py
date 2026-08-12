@@ -587,6 +587,12 @@ class WorkflowInjectionGuardTests(unittest.TestCase):
         self.assertIn("pip install -r requirements-core.txt", quality_workflow)
         self.assertNotIn("jsonschema>=", quality_workflow)
 
+    def test_daily_workflow_uses_supported_python(self) -> None:
+        workflow = Path(".github/workflows/daily-fetch.yml").read_text(encoding="utf-8")
+
+        self.assertIn("actions/setup-python@v5", workflow)
+        self.assertIn('python-version: "3.12"', workflow)
+
 
 if __name__ == "__main__":
     unittest.main()
