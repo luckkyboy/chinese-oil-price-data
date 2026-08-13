@@ -41,8 +41,6 @@ def discover_from_hubei_qtgk_json(
         if not raw_url:
             continue
         source_url = urljoin(list_url, raw_url)
-        if source_url.startswith("http://"):
-            source_url = "https://" + source_url[len("http://") :]
         if source_url in seen:
             continue
         seen.add(source_url)

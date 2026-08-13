@@ -209,19 +209,34 @@ def fetch_notice_html_with_browser(
     rendered_fallback: bool = False,
 ) -> str:
     try:
-        return fetch_text_with_browser(
+        html = fetch_text_with_browser(
             source_url,
             timeout_seconds=timeout,
             browser_session=browser_session,
         )
+        if _looks_like_browser_challenge(html):
+            raise RuntimeError(f"browser challenge received for {source_url}")
+        return html
     except Exception:
         if not rendered_fallback:
             raise
-        return fetch_page_html(
+        rendered_html = fetch_page_html(
             source_url,
             browser_session=browser_session,
             timeout_seconds=timeout,
         ).html
+        if _looks_like_browser_challenge(rendered_html):
+            raise RuntimeError(f"browser challenge was not resolved for {source_url}")
+        return rendered_html
+
+
+def _looks_like_browser_challenge(html: str) -> bool:
+    compact = "".join(html.lower().split())
+    return (
+        "$_ss=window['$_ss']" in compact
+        and "<body></body>" in compact
+        and "r='m'" in compact
+    )
 
 
 def should_ocr_attachment(

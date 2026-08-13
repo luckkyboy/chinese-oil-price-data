@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, call, patch
 
 from oilprice import fetch_pipeline, fetching
+from oilprice.adapters.enhancers import hubei
 from oilprice.crawl import browser_fetch, browser_session as browser_session_module
 from oilprice.crawl.browser_session import BrowserFetchResult, BrowserSession
 from oilprice.errors import (
@@ -71,6 +72,88 @@ class NoticeRenderedFallbackTests(unittest.TestCase):
 
         self.assertEqual(html, "<html>direct</html>")
         render_page.assert_not_called()
+
+    def test_browser_challenge_uses_rendered_fallback(self) -> None:
+        challenge = """<html><head><script r='m'>
+        $_ss=window['$_ss'];
+        </script></head><body></body></html>"""
+        rendered = BrowserFetchResult(
+            html="<html>notice content</html>",
+            status=200,
+            final_url=URL,
+            title="notice",
+            bytes=27,
+        )
+
+        with (
+            patch.object(fetching, "fetch_text_with_browser", return_value=challenge),
+            patch.object(fetching, "fetch_page_html", return_value=rendered) as render_page,
+        ):
+            html = fetching.fetch_notice_html_with_browser(
+                URL,
+                timeout=10,
+                rendered_fallback=True,
+            )
+
+        self.assertEqual(html, rendered.html)
+        render_page.assert_called_once()
+
+    def test_unresolved_browser_challenge_is_rejected(self) -> None:
+        challenge = """<html><head><script r='m'>
+        $_ss=window['$_ss'];
+        </script></head><body></body></html>"""
+        unresolved = BrowserFetchResult(
+            html=challenge,
+            status=200,
+            final_url=URL,
+            title="",
+            bytes=len(challenge.encode("utf-8")),
+        )
+
+        with (
+            patch.object(fetching, "fetch_text_with_browser", return_value=challenge),
+            patch.object(fetching, "fetch_page_html", return_value=unresolved),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "challenge was not resolved"):
+                fetching.fetch_notice_html_with_browser(
+                    URL,
+                    timeout=10,
+                    rendered_fallback=True,
+                )
+
+
+class HubeiDiscoveryTests(unittest.TestCase):
+    def test_official_http_notice_url_is_not_rewritten_to_blocked_https(self) -> None:
+        source_url = "http://fgw.hubei.gov.cn/fbjd/zc/zcwj/gg/202607/notice.shtml"
+        payload = {
+            "data": [
+                {
+                    "FILENAME": "湖北成品油价格调整",
+                    "URL": source_url,
+                    "PUBDATE": "2026-07-31",
+                }
+            ]
+        }
+        source = {
+            "name": "湖北省发展和改革委员会",
+            "adapter": "generic",
+            "base_url": "https://fgw.hubei.gov.cn/",
+            "list_urls": ["https://fgw.hubei.gov.cn/fbjd/zc/zcwj/qtgk.json"],
+        }
+
+        with patch.object(hubei, "fetch_json", return_value=payload):
+            refs = hubei.discover_from_hubei_qtgk_json(
+                source=source,
+                list_url=source["list_urls"][0],
+                province_code="420000",
+                province_name="湖北",
+                province_slug="hubei",
+                keywords=["成品油"],
+                timeout=10,
+            )
+
+        self.assertEqual(len(refs), 1)
+        self.assertEqual(refs[0].source_url, source_url)
 
 
 class BrowserStatusTests(unittest.TestCase):
