@@ -157,6 +157,28 @@ class HubeiDiscoveryTests(unittest.TestCase):
 
 
 class BrowserStatusTests(unittest.TestCase):
+    def test_page_html_allows_412_browser_challenge_to_settle(self) -> None:
+        response = MagicMock(status=412)
+        page = MagicMock()
+        page.goto.return_value = response
+        page.url = URL
+        page.title.return_value = "notice"
+        session = BrowserSession()
+        session.new_page = MagicMock(return_value=page)
+
+        with (
+            patch(
+                "oilprice.crawl.browser_session.capture_settled_html",
+                return_value="<html>resolved notice</html>",
+            ) as capture_html,
+            patch("oilprice.crawl.browser_session.close_page"),
+        ):
+            result = session.fetch_page_html(URL, timeout_seconds=5)
+
+        self.assertEqual(result.html, "<html>resolved notice</html>")
+        self.assertEqual(result.status, 412)
+        capture_html.assert_called_once()
+
     def test_page_html_rejects_404_even_when_the_page_has_content(self) -> None:
         response = MagicMock(status=404)
         page = MagicMock()

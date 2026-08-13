@@ -79,7 +79,10 @@ class BrowserSession:
         try:
             response = page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)
             status = response.status if response else None
-            if status is not None and status >= 400:
+            # Some government-site bot checks return their executable browser
+            # challenge with HTTP 412. Let the page run that challenge and
+            # validate the settled HTML at the notice-fetching boundary.
+            if status is not None and status >= 400 and status != 412:
                 raise BrowserHTTPError(source_url, status)
             try:
                 page.wait_for_load_state("networkidle", timeout=5000)

@@ -94,13 +94,22 @@ class NoticeDateSemanticsTests(unittest.TestCase):
                 "notice_id": "legacy-published-date",
                 "published_at": "2026-07-21",
             },
+            {
+                "notice_id": "published-later-with-adjustment-in-title",
+                "published_at": "2026-08-04",
+                "title": "吉林省成品油最高零售价格表（2026年7月20日24时起执行）",
+            },
         ]
 
         selected = filter_notices_for_adjustment_date(notices, "2026-07-20")
 
         self.assertEqual(
             [notice["notice_id"] for notice in selected],
-            ["explicit-match", "legacy-published-date"],
+            [
+                "explicit-match",
+                "legacy-published-date",
+                "published-later-with-adjustment-in-title",
+            ],
         )
 
 

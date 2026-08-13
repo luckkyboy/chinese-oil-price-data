@@ -7,4 +7,4 @@ paddlepaddle==3.2.0
 paddleocr==3.3.3
 xlrd==2.0.1
 pypdfium2==4.30.1
-cloakbrowser==0.3.31
+cloakbrowser==0.5.7

@@ -18,6 +18,9 @@ DATE_IN_CONTEXT_RE = re.compile(
 MONTH_DAY_IN_CONTEXT_RE = re.compile(r"(?<![0-9])([0-9]{1,2})\s*(?:-|/|月)\s*([0-9]{1,2})(?:日)?(?![0-9])")
 YEAR_MONTH_IN_PATH_RE = re.compile(r"/([12][0-9]{3})([01][0-9])(?:/|$)")
 YEAR_IN_PATH_RE = re.compile(r"/([12][0-9]{3})(?:/|$)")
+COMPACT_DATE_IN_URL_RE = re.compile(
+    r"(?<![0-9])([12][0-9]{3})([01][0-9])([0-3][0-9])(?![0-9])"
+)
 LI_BLOCK_RE = re.compile(r"<li\b[^>]*>(?P<body>.*?)</li>", flags=re.IGNORECASE | re.DOTALL)
 LI_HREF_RE = re.compile(r"<a[^>]*href=[\"'](?P<href>[^\"']+)[\"']", flags=re.IGNORECASE | re.DOTALL)
 
@@ -93,7 +96,11 @@ def discover_from_html(
         if dedupe_key in seen:
             continue
         seen.add(dedupe_key)
-        published_at = li_dates.get(dedupe_key) or _published_date_from_link_context(html, href, list_url)
+        published_at = (
+            _published_date_from_url(source_url)
+            or li_dates.get(dedupe_key)
+            or _published_date_from_link_context(html, href, list_url)
+        )
         refs.append(
             NoticeRef(
                 notice_id=build_notice_id(province_slug, source_url),
@@ -184,7 +191,17 @@ def _extract_date(text: str, year_hint: int | None = None) -> str | None:
         iso_text = _safe_iso_date(year_hint, month, day_of_month)
         if iso_text:
             return iso_text
-    return f"{month:02d}/{day_of_month:02d}"
+    return None
+
+
+def _published_date_from_url(source_url: str) -> str | None:
+    match = COMPACT_DATE_IN_URL_RE.search(source_url)
+    if match:
+        year, month, day_of_month = (int(value) for value in match.groups())
+        iso_text = _safe_iso_date(year, month, day_of_month)
+        if iso_text:
+            return iso_text
+    return _extract_date(source_url)
 
 
 def _infer_year_hint(raw_href: str, list_url: str, context: str) -> int | None:

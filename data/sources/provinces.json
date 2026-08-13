@@ -332,7 +332,8 @@
           "name": "湖南省发展和改革委员会",
           "base_url": "https://fgw.hunan.gov.cn/",
           "list_urls": [
-            "https://fgw.hunan.gov.cn/fgw/jggb11/newxxgklist.html"
+            "https://fgw.hunan.gov.cn/fgw/jggb11/newxxgklist.html",
+            "https://fgw.hunan.gov.cn/fgw/xxgk_70899/tzgg/newxxgklist_nochn.html"
           ],
           "notice_keywords": [
             "成品油价格"

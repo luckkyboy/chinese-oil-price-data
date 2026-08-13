@@ -38,25 +38,42 @@ def parse_notice_fallback(text: str) -> dict[str, object]:
 
 def _extract_zones(text: str) -> list[dict[str, object]]:
     zones: list[dict[str, object]] = []
-    for zone_name, block in ZONE_BLOCK_RE.findall(text):
-        decimals = [float(raw) for raw in DECIMAL_RE.findall(block) if 5.0 < float(raw) < 15.0]
+    matches = list(ZONE_BLOCK_RE.finditer(text))
+    if matches and ZONE_CODE_MAP[matches[0].group(1)] != "qinghai-1":
+        prefix_decimals = _price_decimals(text[: matches[0].start()])
+        # Some Qinghai tables render the first label as only "价区". Its
+        # seven litre prices are still the values immediately before 二价区.
+        if len(prefix_decimals) >= 7:
+            first_zone_name = next(
+                name for name, code in ZONE_CODE_MAP.items() if code == "qinghai-1"
+            )
+            zones.append(_zone_payload(first_zone_name, prefix_decimals[-7:]))
+
+    for match in matches:
+        zone_name, block = match.groups()
+        decimals = _price_decimals(block)
         # Block format (liters only): 89L, 92L, 95L, 0L, -10L, -20L, -35L
         if len(decimals) < 4:
             continue
-        items = {
+        zones.append(_zone_payload(zone_name, decimals))
+    return zones
+
+
+def _price_decimals(text: str) -> list[float]:
+    return [float(raw) for raw in DECIMAL_RE.findall(text) if 5.0 < float(raw) < 15.0]
+
+
+def _zone_payload(zone_name: str, decimals: list[float]) -> dict[str, object]:
+    return {
+        "zone_code": ZONE_CODE_MAP[zone_name],
+        "zone_name": zone_name,
+        "items": {
             "89": decimals[0],
             "92": decimals[1],
             "95": decimals[2],
             "0": decimals[3],
-        }
-        zones.append(
-            {
-                "zone_code": ZONE_CODE_MAP[zone_name],
-                "zone_name": zone_name,
-                "items": items,
-            }
-        )
-    return zones
+        },
+    }
 
 
 def _normalize_text(text: str) -> str:

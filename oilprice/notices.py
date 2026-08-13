@@ -83,7 +83,7 @@ def filter_notices_for_adjustment_date(
         if is_iso_date(published_at):
             if published_at in exact_dates:
                 filtered.append(notice)
-            continue
+                continue
         haystack = " ".join(
             str(notice.get(key, ""))
             for key in (
@@ -131,6 +131,7 @@ def date_markers_for_adjustment_window(adjustment_date: str) -> set[str]:
                 f"{month}/{day_of_month}",
                 f"{month:02d}-{day_of_month:02d}",
                 f"{month}-{day_of_month}",
+                f"{day.year}年{month}月{day_of_month}日",
             }
         )
     return markers
