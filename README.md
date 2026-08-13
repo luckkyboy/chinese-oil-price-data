@@ -59,15 +59,69 @@
 ## 本地测试
 
 ### 安装依赖
+
+项目使用 Python 3.12。建议在虚拟环境中安装完整抓取依赖：
+
 ```bash
+python3.12 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
 ```
 
-### 命令
+Windows PowerShell 激活命令为：
+
+```powershell
+.venv\Scripts\Activate.ps1
+```
+
+### 抓取并生成价格数据
+
+`extract` 是日常使用的完整命令，会在同一个 CloakBrowser 会话中依次执行公告发现、页面及附件下载、内容解析和价格文件生成。
 
 ```bash
+# 强制重新抓取指定调价日的全部省份；政府站点较慢时建议使用 90 秒超时
+python -m oilprice.cli extract 2026-07-31 --force --timeout 90
+
+# 仅重试尚未完成的省份
+python -m oilprice.cli extract 2026-07-31 --timeout 90
+
+# 只抓取一个或多个省份（多个代码用逗号分隔）
+python -m oilprice.cli extract 2026-07-31 --province-code 420000 --force --timeout 90
+python -m oilprice.cli extract 2026-07-31 --province-code 420000,540000 --force --timeout 90
+```
+
+生成结果位于：
+
+```text
+data/prices/2026/2026-07-31.json
+data/prices/2026/2026-07-31.summary.json
+data/prices/latest.json
+```
+
+### 校验与测试
+
+```bash
+# 校验 data/ 和 schema/ 下受控 JSON 的 Schema 及跨文件约束
 python -m oilprice.cli validate-json
-python -m oilprice.cli extract 2026-04-21
-python -m oilprice.cli price 2026-04-21
-python -m oilprice.cli extract 2026-06-04 --province-code 620000 --force
+
+# 运行完整单元测试
+python -m unittest discover -s tests -v
+```
+
+### 分步调试
+
+通常直接使用 `extract` 即可。需要定位问题时，可单独执行公告发现、原始文件下载，或根据已经解析的公告重建价格文件：
+
+```bash
+python -m oilprice.cli discover 2026-07-31 --force --timeout 90
+python -m oilprice.cli fetch 2026-07-31 --force --timeout 90
+python -m oilprice.cli price 2026-07-31
+```
+
+### 查询价格
+
+```bash
+python -m oilprice.cli lookup-price 武汉市 --province hubei --adjustment-date 2026-07-31
+python -m oilprice.cli lookup-price 武汉市 --province hubei --adjustment-date 2026-07-31 --product 92
 ```
