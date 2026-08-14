@@ -1,0 +1,1179 @@
+{
+  "adjustment_date": "2026-08-14",
+  "effective_from": "2026-08-15T00:00:00+08:00",
+  "timezone": "Asia/Shanghai",
+  "unit": "CNY/L",
+  "currency": "CNY",
+  "products": [
+    "89",
+    "92",
+    "95",
+    "0"
+  ],
+  "provinces": [
+    {
+      "province_code": "110000",
+      "province_name": "北京市",
+      "sources": [
+        {
+          "name": "北京市发展和改革委员会",
+          "url": "https://fgw.beijing.gov.cn/fgwzwgk/2024zcwj/bwqtwj/202608/t20260814_4823165.htm",
+          "notice_id": "beijing-https-fgw-beijing-gov-cn-fgwzwgk-2024zcwj-bwqtwj-202608-t20260814-4823165-htm",
+          "title": "本市成品油价格调整",
+          "raw_sha256": "184256137e267f452ed544e60cd6ed7a8c5f44383c8ee4e42c7326a51f602f40",
+          "adapter": "beijing",
+          "parser_version": "beijing-v1",
+          "extracted_at": "2026-08-15T01:31:18+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "high"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.29,
+            "92": 7.78,
+            "95": 8.29,
+            "0": 7.5
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "120000",
+      "province_name": "天津市",
+      "sources": [
+        {
+          "name": "天津市发展和改革委员会",
+          "url": "https://fzgg.tj.gov.cn/xxfb/tzggx/202608/t20260814_7353051.html",
+          "notice_id": "tianjin-https-fzgg-tj-gov-cn-xxfb-tzggx-202608-t20260814-7353051-html",
+          "title": "天津市发展改革委关于调整我市成品油价格的公告 2026-08-14",
+          "raw_sha256": "db9e2c981b3fc0f7431c55f2baab25e52ab9e4f678a348a6fb348042635e4104",
+          "adapter": "generic",
+          "parser_version": "generic-v1",
+          "extracted_at": "2026-08-15T01:33:34+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.21,
+            "92": 7.78,
+            "95": 8.22,
+            "0": 7.45
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "130000",
+      "province_name": "河北省",
+      "sources": [
+        {
+          "name": "河北省发展和改革委员会",
+          "url": "https://hbdrc.hebei.gov.cn/gggs_980/202608/t20260814_138182.html",
+          "notice_id": "hebei-https-hbdrc-hebei-gov-cn-gggs-980-202608-t20260814-138182-html",
+          "title": "关于调整成品油价格的公告（2026年第15号）",
+          "raw_sha256": "9a47a8f3b011924ac1079bebfd59618d09e410fa2bcbd7272ed843d3049cdc1d",
+          "adapter": "hebei",
+          "parser_version": "hebei-v1",
+          "extracted_at": "2026-08-15T01:33:54+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "low"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.21,
+            "92": 7.78,
+            "95": 8.22
+          },
+          "missing_products": [
+            "0"
+          ]
+        }
+      ]
+    },
+    {
+      "province_code": "140000",
+      "province_name": "山西省",
+      "sources": [
+        {
+          "name": "山西省发展和改革委员会",
+          "url": "https://fgw.shanxi.gov.cn/tzgg/202608/t20260814_10200126.shtml",
+          "notice_id": "shanxi-https-fgw-shanxi-gov-cn-tzgg-202608-t20260814-10200126-shtml",
+          "title": "关于调整我省成品油零售价格的公告",
+          "raw_sha256": "e88c1f00f73cf18d2d1f8aa1f882f5c293994b2274bbbeecc2f7f90e449317ec",
+          "adapter": "shanxi",
+          "parser_version": "shanxi-v1",
+          "extracted_at": "2026-08-15T01:33:56+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.24,
+            "92": 7.73,
+            "95": 8.35,
+            "0": 7.52
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "150000",
+      "province_name": "内蒙古自治区",
+      "sources": [
+        {
+          "name": "内蒙古自治区发展和改革委员会",
+          "url": "https://fgw.nmg.gov.cn/ywgz/jfgz/cpyjg/202608/t20260814_2940944.html",
+          "notice_id": "neimenggu-https-fgw-nmg-gov-cn-ywgz-jfgz-cpyjg-202608-t20260814-2940944-html",
+          "title": "我区成品油价格调整",
+          "raw_sha256": "f15ca37ab67823986b99efbbd6f77385317f6757b14ba163905414cfe411a656",
+          "adapter": "neimenggu",
+          "parser_version": "neimenggu-v1",
+          "extracted_at": "2026-08-15T01:34:00+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "low"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "east",
+          "zone_name": "东部价区",
+          "items": {
+            "92": 7.84,
+            "95": 8.35,
+            "0": 7.32
+          },
+          "missing_products": [
+            "89"
+          ]
+        },
+        {
+          "zone_code": "west",
+          "zone_name": "西部价区",
+          "items": {
+            "92": 7.79,
+            "95": 8.27,
+            "0": 7.3
+          },
+          "missing_products": [
+            "89"
+          ]
+        }
+      ]
+    },
+    {
+      "province_code": "210000",
+      "province_name": "辽宁省",
+      "sources": [
+        {
+          "name": "辽宁省发展和改革委员会",
+          "url": "https://fgw.ln.gov.cn/uiFramework/js/pdfjs/web/viewer.html?file=/fgw/articleFileDir/2026-08/14/3af13f860f5d4812b8f51c9b7d6fc1d0/2026081417253963780.pdf",
+          "notice_id": "liaoning-ticlefiledir-2026-08-14-3af13f860f5d4812b8f51c9b7d6fc1d0-2026081417253963780-pdf",
+          "title": "辽宁省成品油价格调整公告（2026年8月14日24时起执行）",
+          "raw_sha256": "5f218e15adc1f1372f2eda0aeb32abbc6514c29754080982a8912fd4ed61fe67",
+          "adapter": "liaoning",
+          "parser_version": "liaoning-v1",
+          "extracted_at": "2026-08-15T01:34:03+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.21,
+            "92": 7.78,
+            "95": 8.21,
+            "0": 7.45
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "220000",
+      "province_name": "吉林省",
+      "sources": [
+        {
+          "name": "吉林省发展和改革委员会",
+          "url": "https://jldrc.jl.gov.cn/ztzl/nyzyjg/202608/t20260814_3655617.html",
+          "notice_id": "jilin-https-jldrc-jl-gov-cn-ztzl-nyzyjg-202608-t20260814-3655617-html",
+          "title": "吉林省成品油最高零售价格表（2026年8月14日24时起执行）",
+          "raw_sha256": "c069a5fa05fa59c53fda456cc28431cbdcf7376328dc9cf3ba85c2be5845ccc0",
+          "adapter": "generic",
+          "parser_version": "generic-v1",
+          "extracted_at": "2026-08-15T01:34:07+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "92": 7.75,
+            "95": 8.36,
+            "0": 7.36
+          },
+          "missing_products": [
+            "89"
+          ]
+        }
+      ]
+    },
+    {
+      "province_code": "230000",
+      "province_name": "黑龙江省",
+      "sources": [
+        {
+          "name": "黑龙江省发展和改革委员会",
+          "url": "https://drc.hlj.gov.cn/drc/c111486/202608/c00_31967100.shtml",
+          "notice_id": "heilongjiang-https-drc-hlj-gov-cn-drc-c111486-202608-c00-31967100-shtml",
+          "title": "我省调整成品油价格",
+          "raw_sha256": "90046c892b3d11d143ee95f87a7783687fba6106309096d2c206043a5c1183ad",
+          "adapter": "heilongjiang",
+          "parser_version": "heilongjiang-v1",
+          "extracted_at": "2026-08-15T01:34:11+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "low"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.37,
+            "92": 7.81,
+            "95": 8.34
+          },
+          "missing_products": [
+            "0"
+          ]
+        }
+      ]
+    },
+    {
+      "province_code": "310000",
+      "province_name": "上海市",
+      "sources": [
+        {
+          "name": "上海市发展和改革委员会",
+          "url": "https://fgw.sh.gov.cn/fgw_jggl/20260814/6b5b9cca255c42e9b8823dc387a4ce4b.html",
+          "notice_id": "shanghai-https-fgw-sh-gov-cn-fgw-jggl-20260814-6b5b9cca255c42e9b8823dc387a4ce4b-html",
+          "title": "上海市发展和改革委员会关于车用汽、柴油价格的通知（2026年8月14日）",
+          "raw_sha256": "2d56e2eff6698e24deac6828b5234e31b94db46ef3dda45006daf07d174ea6c7",
+          "adapter": "generic",
+          "parser_version": "generic-v1",
+          "extracted_at": "2026-08-15T01:36:24+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "92": 7.75,
+            "95": 8.24
+          },
+          "missing_products": [
+            "89",
+            "0"
+          ]
+        }
+      ]
+    },
+    {
+      "province_code": "320000",
+      "province_name": "江苏省",
+      "sources": [
+        {
+          "name": "江苏省发展和改革委员会",
+          "url": "https://fzggw.jiangsu.gov.cn/art/2026/8/14/art_284_11816385.html",
+          "notice_id": "jiangsu-https-fzggw-jiangsu-gov-cn-art-2026-8-14-art-284-11816385-html",
+          "title": "江苏省成品油价格调整公告（2026年第15号）",
+          "raw_sha256": "b843bfcefba65b96ed6b9597723d5a3db9e1e712442932faf017340848960d4d",
+          "adapter": "jiangsu",
+          "parser_version": "jiangsu-v1",
+          "extracted_at": "2026-08-15T01:36:24+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.27,
+            "92": 7.75,
+            "95": 8.25,
+            "0": 7.41
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "330000",
+      "province_name": "浙江省",
+      "sources": [
+        {
+          "name": "浙江省发展和改革委员会",
+          "url": "https://fzggw.zj.gov.cn/col/col1632199/cpyjg/art/2026/art_3245a1f8163a4180bd8b2b7f327e52dc.html",
+          "notice_id": "zhejiang-j-gov-cn-col-col1632199-cpyjg-art-2026-art-3245a1f8163a4180bd8b2b7f327e52dc-html",
+          "title": "浙江省成品油价格调整",
+          "raw_sha256": "922f54a73b74a84cde3224d6156e90975e1d255a78e9990e1c84fe364f660e54",
+          "adapter": "zhejiang",
+          "parser_version": "zhejiang-v1",
+          "extracted_at": "2026-08-15T01:36:31+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.19,
+            "92": 7.75,
+            "95": 8.25,
+            "0": 7.43
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "340000",
+      "province_name": "安徽省",
+      "sources": [
+        {
+          "name": "安徽省发展和改革委员会",
+          "url": "https://fzggw.ah.gov.cn/ywdt/tzgg/150643451.html",
+          "notice_id": "anhui-https-fzggw-ah-gov-cn-ywdt-tzgg-150643451-html",
+          "title": "安徽省发展改革委关于调整安徽省成品油价格的通告",
+          "raw_sha256": "01e0d2ebf0042dcb02cc9159cfc0afa8f49e3b26ff40a11fe1aa4379207eb691",
+          "adapter": "anhui",
+          "parser_version": "anhui-v1",
+          "extracted_at": "2026-08-15T01:36:34+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.25,
+            "92": 7.74,
+            "95": 8.28,
+            "0": 7.48
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "350000",
+      "province_name": "福建省",
+      "sources": [
+        {
+          "name": "福建省发展和改革委员会",
+          "url": "https://fgw.fujian.gov.cn/zfxxgkzl/zfxxgkml/yzdgkdqtxx/202608/t20260814_7199969.htm",
+          "notice_id": "fujian-ttps-fgw-fujian-gov-cn-zfxxgkzl-zfxxgkml-yzdgkdqtxx-202608-t20260814-7199969-htm",
+          "title": "福建省发展和改革委员会关于成品油价格调整的通告",
+          "raw_sha256": "7fbc6eb16aa50949aaa6666a882ff28deb39ceb06a86ab24e78eb26c76140d40",
+          "adapter": "fujian",
+          "parser_version": "fujian-v1",
+          "extracted_at": "2026-08-15T01:36:41+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.21,
+            "92": 7.75,
+            "95": 8.27,
+            "0": 7.44
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "360000",
+      "province_name": "江西省",
+      "sources": [
+        {
+          "name": "江西省发展和改革委员会",
+          "url": "https://drc.jiangxi.gov.cn/jxsfzhggwyh/col/col14590/content/content_2088179308871098368.html",
+          "notice_id": "jiangxi-jiangxi-gov-cn-jxsfzhggwyh-col-col14590-content-content-2088179308871098368-html",
+          "title": "江西省发展改革委关于成品油价格调整的通告",
+          "raw_sha256": "f2694a49367ce122a814dbb5b5197c990dcec6d2b6df69951f4bf67eedfa6583",
+          "adapter": "jiangxi",
+          "parser_version": "jiangxi-v1",
+          "extracted_at": "2026-08-15T01:36:42+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.2,
+            "92": 7.74,
+            "95": 8.31,
+            "0": 7.5
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "370000",
+      "province_name": "山东省",
+      "sources": [
+        {
+          "name": "山东省发展和改革委员会",
+          "url": "http://fgw.shandong.gov.cn/art/2026/8/14/art_91082_10496905.html",
+          "notice_id": "shandong-http-fgw-shandong-gov-cn-art-2026-8-14-art-91082-10496905-html",
+          "title": "我省成品油价格调整(2026年8月14日)",
+          "raw_sha256": "9447be17c44925c319c5cd6bb82a7a26e3dac4cefd26a9e7ff03f5a31542e618",
+          "adapter": "shandong",
+          "parser_version": "shandong-v1",
+          "extracted_at": "2026-08-15T01:36:43+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.19,
+            "92": 7.75,
+            "95": 8.31,
+            "0": 7.36
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "410000",
+      "province_name": "河南省",
+      "sources": [
+        {
+          "name": "河南省发展和改革委员会",
+          "url": "https://fgw.henan.gov.cn/2026/08-14/3399241.html",
+          "notice_id": "henan-https-fgw-henan-gov-cn-2026-08-14-3399241-html",
+          "title": "明日起我省调整成品油价格",
+          "raw_sha256": "5f4f186d74bb5549b01cf80fe64a0b98ae5e2b3cec082d9b1efd457c71950d2d",
+          "adapter": "henan",
+          "parser_version": "henan-v1",
+          "extracted_at": "2026-08-15T01:36:57+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "low"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "92": 7.79,
+            "95": 8.32,
+            "0": 7.43
+          },
+          "missing_products": [
+            "89"
+          ]
+        }
+      ]
+    },
+    {
+      "province_code": "420000",
+      "province_name": "湖北省",
+      "sources": [
+        {
+          "name": "湖北省发展和改革委员会",
+          "url": "http://fgw.hubei.gov.cn/fbjd/zc/zcwj/gg/202608/t20260814_5995146.shtml",
+          "notice_id": "hubei-http-fgw-hubei-gov-cn-fbjd-zc-zcwj-gg-202608-t20260814-5995146-shtml",
+          "title": "2026年8月14日24时起 湖北成品油价格调整",
+          "raw_sha256": "7a0da66c95e713f34989cc813feedaa97572591fab06715f446e61794d205a8a",
+          "adapter": "generic",
+          "parser_version": "generic-v1",
+          "extracted_at": "2026-08-15T01:36:46+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "92": 7.79,
+            "95": 8.34,
+            "0": 7.44
+          },
+          "missing_products": [
+            "89"
+          ]
+        }
+      ]
+    },
+    {
+      "province_code": "430000",
+      "province_name": "湖南省",
+      "sources": [
+        {
+          "name": "湖南省发展和改革委员会",
+          "url": "https://fgw.hunan.gov.cn/fgw/jggb11/202608/t20260814_34045097.html",
+          "notice_id": "hunan-https-fgw-hunan-gov-cn-fgw-jggb11-202608-t20260814-34045097-html",
+          "title": "2026-08-14 var keywords = \"\"; if(keywords!=\"\"&&keywords!=\"null\")document.write(' '+keywords+''); 关于调整成品油价格的通知(2026年8月14日)",
+          "raw_sha256": "e9899a149573c271e00e8658f4db3816ec8902a8377ade72fd02fd23e9583080",
+          "adapter": "ningxia",
+          "parser_version": "ningxia-v1",
+          "extracted_at": "2026-08-15T01:36:55+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.25,
+            "92": 7.73,
+            "95": 8.22,
+            "0": 7.52
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "440000",
+      "province_name": "广东省",
+      "sources": [
+        {
+          "name": "广东省发展和改革委员会",
+          "url": "https://drc.gd.gov.cn/ywgg/content/post_4942632.html",
+          "notice_id": "guangdong-https-drc-gd-gov-cn-ywgg-content-post-4942632-html",
+          "title": "2026年8月14日24时起成品油价格调整",
+          "raw_sha256": "3a7ab8a5d125dc96dc66a2360ccc3fabcaa2db409f108f9bb3d433e11b8646b8",
+          "adapter": "generic",
+          "parser_version": "generic-v1",
+          "extracted_at": "2026-08-15T01:39:13+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.24,
+            "92": 7.8,
+            "95": 8.45,
+            "0": 7.45
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "450000",
+      "province_name": "广西壮族自治区",
+      "sources": [
+        {
+          "name": "广西壮族自治区发展和改革委员会",
+          "url": "http://fgw.gxzf.gov.cn/xwzx/xwfb/t28035268.shtml",
+          "notice_id": "guangxi-http-fgw-gxzf-gov-cn-xwzx-xwfb-t28035268-shtml",
+          "title": "2026年8月14日24时起广西成品油价格调整",
+          "raw_sha256": "5ba5eee804cb6b9b66cecb1764d10f2231e8c7d7c9e0ef25896aafc855b8e599",
+          "adapter": "guangxi",
+          "parser_version": "guangxi-v1",
+          "extracted_at": "2026-08-15T01:39:14+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.3,
+            "92": 7.84,
+            "95": 8.47,
+            "0": 7.5
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "460000",
+      "province_name": "海南省",
+      "sources": [
+        {
+          "name": "海南省发展和改革委员会",
+          "url": "https://plan.hainan.gov.cn/sfgw/gzdt/202608/1e3dfc088f2d40be9ee923c3c62a464e.shtml",
+          "notice_id": "hainan-https-plan-hainan-gov-cn-sfgw-gzdt-202608-1e3dfc088f2d40be9ee923c3c62a464e-shtml",
+          "title": "海南省成品油价格按机制下调",
+          "raw_sha256": "76fac375245df9f19b79844554fbf7f295514aa2ec5b29825f7daaed37b6d645",
+          "adapter": "generic",
+          "parser_version": "generic-v1",
+          "extracted_at": "2026-08-15T01:37:00+08:00",
+          "published_at": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 8.21,
+            "92": 8.9,
+            "95": 9.45,
+            "0": 7.53
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "500000",
+      "province_name": "重庆市",
+      "sources": [
+        {
+          "name": "重庆市发展和改革委员会",
+          "url": "https://fzggw.cq.gov.cn/zwgk/zfxxgkml/jgxx/jgzc/202608/t20260814_15934418.html",
+          "notice_id": "chongqing-https-fzggw-cq-gov-cn-zwgk-zfxxgkml-jgxx-jgzc-202608-t20260814-15934418-html",
+          "title": "重庆市成品油价格调整",
+          "raw_sha256": "304ef8e36704e27abf1d3b8b44dcbefdaaeb7791249bbd64626a7fb0cd726173",
+          "adapter": "generic",
+          "parser_version": "generic-v1",
+          "extracted_at": "2026-08-15T01:37:02+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.42,
+            "92": 7.85,
+            "95": 8.29,
+            "0": 7.51
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "510000",
+      "province_name": "四川省",
+      "sources": [
+        {
+          "name": "四川省发展和改革委员会",
+          "url": "https://fgw.sc.gov.cn/sfgw/tzgg/2026/8/14/e59b18ad993e4dd8850ecc9364805a7f.shtml",
+          "notice_id": "sichuan-https-fgw-sc-gov-cn-sfgw-tzgg-2026-8-14-e59b18ad993e4dd8850ecc9364805a7f-shtml",
+          "title": "关于降低成品油价格的通知（川发改价格〔2026〕342号）",
+          "raw_sha256": "41096a377956df5dac5be9d3181b5596c9ea58b3175858a746259d8df7f87a2a",
+          "adapter": "sichuan",
+          "parser_version": "sichuan-v2",
+          "extracted_at": "2026-08-15T01:41:37+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "high"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "sichuan-1",
+          "zone_name": "一价区",
+          "items": {
+            "89": 7.31,
+            "92": 7.88,
+            "95": 8.42,
+            "0": 7.5
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "sichuan-2",
+          "zone_name": "二价区",
+          "items": {
+            "89": 7.39,
+            "92": 7.96,
+            "95": 8.5,
+            "0": 7.58
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "sichuan-3",
+          "zone_name": "三价区",
+          "items": {
+            "89": 7.46,
+            "92": 8.03,
+            "95": 8.57,
+            "0": 7.66
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "520000",
+      "province_name": "贵州省",
+      "sources": [
+        {
+          "name": "贵州省发展和改革委员会",
+          "url": "https://fgw.guizhou.gov.cn/fggz/tzgg/202608/t20260814_90734639.html",
+          "notice_id": "guizhou-https-fgw-guizhou-gov-cn-fggz-tzgg-202608-t20260814-90734639-html",
+          "title": "2026年8月14日24时起贵州成品油价格调整",
+          "raw_sha256": "6842483c43ce95b875dbe9c791852e7bd4784845f1e9b79a76af00fc63966813",
+          "adapter": "guizhou",
+          "parser_version": "guizhou-v1",
+          "extracted_at": "2026-08-15T01:41:49+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "guizhou-1",
+          "zone_name": "一价区",
+          "items": {
+            "89": 7.47,
+            "92": 7.91,
+            "95": 8.36,
+            "0": 7.55
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "guizhou-2",
+          "zone_name": "二价区",
+          "items": {
+            "89": 7.5,
+            "92": 7.95,
+            "95": 8.4,
+            "0": 7.58
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "guizhou-3",
+          "zone_name": "三价区",
+          "items": {
+            "89": 7.53,
+            "92": 7.98,
+            "95": 8.43,
+            "0": 7.61
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "530000",
+      "province_name": "云南省",
+      "sources": [
+        {
+          "name": "云南省发展和改革委员会",
+          "url": "https://yndrc.yn.gov.cn/html/2026/jiageyushoufei_0814/28031.html",
+          "notice_id": "yunnan-https-yndrc-yn-gov-cn-html-2026-jiageyushoufei-0814-28031-html",
+          "title": "云南省成品油价格按机制调整",
+          "raw_sha256": "c3776b2ec541eefbfca18ae7a2baae648d2b0d82e02bced58ff37cdbb8c1312d",
+          "adapter": "yunnan",
+          "parser_version": "yunnan-v1",
+          "extracted_at": "2026-08-15T01:41:55+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "yunnan-1",
+          "zone_name": "一价区",
+          "items": {
+            "89": 7.3,
+            "92": 7.93,
+            "95": 8.51,
+            "0": 7.52
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "yunnan-2",
+          "zone_name": "二价区",
+          "items": {
+            "89": 7.38,
+            "92": 8.01,
+            "95": 8.59,
+            "0": 7.6
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "yunnan-3",
+          "zone_name": "三价区",
+          "items": {
+            "89": 7.45,
+            "92": 8.08,
+            "95": 8.67,
+            "0": 7.69
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "yunnan-4",
+          "zone_name": "四价区",
+          "items": {
+            "89": 7.53,
+            "92": 8.16,
+            "95": 8.74,
+            "0": 7.78
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "yunnan-5",
+          "zone_name": "五价区",
+          "items": {
+            "89": 7.59,
+            "92": 8.22,
+            "95": 8.8,
+            "0": 7.84
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "540000",
+      "province_name": "西藏自治区",
+      "sources": [
+        {
+          "name": "西藏自治区发展和改革委员会",
+          "url": "https://drc.xizang.gov.cn/fgdt/jggl/202608/t20260814_553898.html",
+          "notice_id": "xizang-https-drc-xizang-gov-cn-fgdt-jggl-202608-t20260814-553898-html",
+          "title": "西藏自治区成品油销售价格调整通知",
+          "raw_sha256": "ac70e6358b18b6cc0f086e0c3cc8df52e2275c9a297e8facc8663c7df594037a",
+          "adapter": "xizang",
+          "parser_version": "xizang-v1",
+          "extracted_at": "2026-08-15T01:42:08+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "xizang-ali",
+          "zone_name": "阿里价区",
+          "items": {
+            "89": 8.53,
+            "92": 9.05,
+            "95": 9.55,
+            "0": 8.39
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "xizang-changdu",
+          "zone_name": "昌都价区",
+          "items": {
+            "89": 8.34,
+            "92": 8.85,
+            "95": 9.34,
+            "0": 8.19
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "xizang-lasa",
+          "zone_name": "拉萨价区",
+          "items": {
+            "89": 8.17,
+            "92": 8.66,
+            "95": 9.16,
+            "0": 7.99
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "610000",
+      "province_name": "陕西省",
+      "sources": [
+        {
+          "name": "陕西省发展和改革委员会",
+          "url": "https://sndrc.shaanxi.gov.cn/sy/xwxx/gggg/202608/t20260814_3666741.html",
+          "notice_id": "shaanxi-https-sndrc-shaanxi-gov-cn-sy-xwxx-gggg-202608-t20260814-3666741-html",
+          "title": "陕西省成品油价格调整通告",
+          "raw_sha256": "a75f8423b952e148aed82e5b3cfdc49eeed6cd6216b28066291b3e74b1510090",
+          "adapter": "shaanxi",
+          "parser_version": "shaanxi-v2",
+          "extracted_at": "2026-08-15T01:42:01+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "shaanxi-1",
+          "zone_name": "中北部价区（西安市区）",
+          "items": {
+            "89": 7.23,
+            "92": 7.67,
+            "95": 8.1,
+            "0": 7.34
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "shaanxi-2",
+          "zone_name": "陕南价区",
+          "items": {
+            "89": 7.31,
+            "92": 7.75,
+            "95": 8.19,
+            "0": 7.51
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "shaanxi-3",
+          "zone_name": "中北部价区（西安市区外）",
+          "items": {
+            "89": 7.23,
+            "92": 7.67,
+            "95": 8.1,
+            "0": 7.51
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "620000",
+      "province_name": "甘肃省",
+      "sources": [
+        {
+          "name": "甘肃省发展和改革委员会",
+          "url": "https://fzgg.gansu.gov.cn/fzgg/zfdj/202608/174379582.shtml",
+          "notice_id": "gansu-https-fzgg-gansu-gov-cn-fzgg-zfdj-202608-174379582-shtml",
+          "title": "我省按国家规定调整成品油 最高批发价格和最高零售价格",
+          "raw_sha256": "38f3b15b41bca366ac8b7778d4cfca3d18d5a686841371b2005259c8e1b89a11",
+          "adapter": "generic",
+          "parser_version": "generic-v1",
+          "extracted_at": "2026-08-15T01:41:30+08:00",
+          "published_at": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.19,
+            "92": 7.78,
+            "95": 8.31,
+            "0": 7.35
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "630000",
+      "province_name": "青海省",
+      "sources": [
+        {
+          "name": "青海省发展和改革委员会",
+          "url": "http://fgw.qinghai.gov.cn/xwzx/tzgg/202608/t20260814_92402.html",
+          "notice_id": "qinghai-http-fgw-qinghai-gov-cn-xwzx-tzgg-202608-t20260814-92402-html",
+          "title": "我省调整省内成品油最高零售价格",
+          "raw_sha256": "6a808e8ffa04f16596c2cdd055dabb7d1f97381b4de97a9d7bd59805e397e35b",
+          "adapter": "qinghai",
+          "parser_version": "qinghai-v1",
+          "extracted_at": "2026-08-15T01:42:05+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "qinghai-1",
+          "zone_name": "一价区",
+          "items": {
+            "89": 7.27,
+            "92": 7.74,
+            "95": 8.3,
+            "0": 7.37
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "qinghai-2",
+          "zone_name": "二价区",
+          "items": {
+            "89": 7.35,
+            "92": 7.83,
+            "95": 8.39,
+            "0": 7.46
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "qinghai-3",
+          "zone_name": "三价区",
+          "items": {
+            "89": 7.45,
+            "92": 7.93,
+            "95": 8.51,
+            "0": 7.57
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "640000",
+      "province_name": "宁夏回族自治区",
+      "sources": [
+        {
+          "name": "宁夏回族自治区发展和改革委员会",
+          "url": "https://fzggw.nx.gov.cn/tzgg/202608/t20260814_5313437.html",
+          "notice_id": "ningxia-https-fzggw-nx-gov-cn-tzgg-202608-t20260814-5313437-html",
+          "title": "宁夏成品油价格调整公告（2026年第15号）",
+          "raw_sha256": "daa48827b1234a71637ddc0829da22f33d1f1494ae0910933c0993f86cab5203",
+          "adapter": "ningxia",
+          "parser_version": "ningxia-v1",
+          "extracted_at": "2026-08-15T01:41:26+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.25,
+            "92": 7.68,
+            "95": 8.12,
+            "0": 7.33
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
+      "province_code": "650000",
+      "province_name": "新疆维吾尔自治区",
+      "sources": [
+        {
+          "name": "新疆维吾尔自治区发展和改革委员会",
+          "url": "https://xjdrc.xinjiang.gov.cn/xjfgw/c108396/202608/6f951baf5bd04b54a645b0bd6d7fc6ed.shtml",
+          "notice_id": "xinjiang-jdrc-xinjiang-gov-cn-xjfgw-c108396-202608-6f951baf5bd04b54a645b0bd6d7fc6ed-shtml",
+          "title": "我区成品油价格调整",
+          "raw_sha256": "74ad6ef2e4f2c50db8bf8186e5e6b2b2c3dced42dd5e0ffb00a3df9bbd3dd32f",
+          "adapter": "xinjiang",
+          "parser_version": "xinjiang-v1",
+          "extracted_at": "2026-08-15T01:41:28+08:00",
+          "published_at": "2026-08-14",
+          "adjustment_date": "2026-08-14",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 6.99,
+            "92": 7.41,
+            "95": 7.83,
+            "0": 7.24
+          },
+          "missing_products": []
+        }
+      ]
+    }
+  ],
+  "updated_at": "2026-08-15T01:42:08+08:00"
+}
