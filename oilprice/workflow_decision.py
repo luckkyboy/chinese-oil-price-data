@@ -5,7 +5,7 @@ import re
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from typing import Iterable, Literal, Mapping, Sequence
+from typing import Literal, Mapping, Sequence
 from zoneinfo import ZoneInfo
 
 
@@ -44,16 +44,17 @@ class _AdjustmentWindow:
 def decide_fetch(
     calendar: Mapping[str, object],
     summaries: Mapping[str, Mapping[str, object]],
-    snapshot_dates: Iterable[str],
     *,
     through_date: date,
     requested_date: str = "",
 ) -> FetchDecision:
     """Choose one adjustment window without reading or writing external state.
 
-    Scheduled runs track windows starting at the earliest existing price snapshot.
-    When there are no snapshots, only the newest window due by ``through_date`` is
-    considered. Explicit dates retain the single-date workflow behavior.
+    Scheduled runs evaluate only the newest window due by ``through_date``. On
+    a day without a due adjustment this is the latest completed window, so a
+    fully collected summary (provinces_total == provinces_success) makes the
+    workflow skip instead of re-running stale partial windows from previous
+    rounds. Explicit dates retain the single-date workflow behavior.
     """
 
     windows = _parse_windows(calendar)
@@ -81,30 +82,8 @@ def decide_fetch(
             reason="no_due_adjustment_date",
         )
 
-    parsed_snapshot_dates = [
-        _parse_canonical_date(value, label="snapshot date")
-        for value in snapshot_dates
-    ]
-    if parsed_snapshot_dates:
-        tracking_start = min(parsed_snapshot_dates)
-        tracked_windows = [
-            window for window in due_windows if window.value >= tracking_start
-        ]
-        # A future-only snapshot set is inconsistent but must not make a due
-        # adjustment disappear from the scheduler.
-        if not tracked_windows:
-            tracked_windows = [due_windows[-1]]
-    else:
-        tracked_windows = [due_windows[-1]]
-
-    decisions = [
-        _classify_window(window, summaries.get(window.text))
-        for window in tracked_windows
-    ]
-    unresolved = [decision for decision in decisions if decision.mode != "skip"]
-    if unresolved:
-        return unresolved[-1]
-    return decisions[-1]
+    latest_window = due_windows[-1]
+    return _classify_window(latest_window, summaries.get(latest_window.text))
 
 
 def decide_fetch_for_repository(
@@ -124,12 +103,6 @@ def decide_fetch_for_repository(
     calendar = _read_json(calendar_path)
 
     prices_root = root / "data" / "prices"
-    snapshot_dates = [
-        path.stem
-        for path in prices_root.glob("[0-9][0-9][0-9][0-9]/*.json")
-        if not path.name.endswith(".summary.json")
-    ]
-
     summaries: dict[str, Mapping[str, object]] = {}
     for window in _parse_windows(calendar):
         adjustment_date = window.text
@@ -147,7 +120,6 @@ def decide_fetch_for_repository(
     return decide_fetch(
         calendar,
         summaries,
-        snapshot_dates,
         through_date=through_date,
         requested_date=requested_date,
     )

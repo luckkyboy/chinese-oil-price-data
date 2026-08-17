@@ -40,7 +40,6 @@ class WorkflowDecisionTests(unittest.TestCase):
                 "2026-07-03": _summary("complete"),
                 "2026-07-17": _summary("partial", ["210000", "510000"]),
             },
-            ["2026-07-03", "2026-07-17"],
             through_date=date(2026, 7, 20),
         )
 
@@ -48,14 +47,13 @@ class WorkflowDecisionTests(unittest.TestCase):
         self.assertEqual(decision.mode, "missing")
         self.assertEqual(decision.provinces_missing, ("210000", "510000"))
 
-    def test_cross_day_run_skips_latest_window_when_all_tracked_are_complete(self) -> None:
+    def test_latest_complete_window_skips_old_partial_window(self) -> None:
         decision = decide_fetch(
             self.calendar,
             {
-                "2026-07-03": _summary("complete"),
+                "2026-07-03": _summary("partial", ["630000"]),
                 "2026-07-17": _summary("complete"),
             },
-            ["2026-07-03", "2026-07-17"],
             through_date=date(2026, 7, 20),
         )
 
@@ -70,7 +68,6 @@ class WorkflowDecisionTests(unittest.TestCase):
                 "2026-07-03": _summary("partial", ["630000"]),
                 "2026-07-17": _summary("partial", ["510000"]),
             },
-            ["2026-07-03"],
             through_date=date(2026, 7, 20),
         )
 
@@ -81,7 +78,6 @@ class WorkflowDecisionTests(unittest.TestCase):
         decision = decide_fetch(
             self.calendar,
             {"2026-07-03": _summary("complete")},
-            ["2026-07-03"],
             through_date=date(2026, 7, 20),
         )
 
@@ -93,7 +89,6 @@ class WorkflowDecisionTests(unittest.TestCase):
         decision = decide_fetch(
             self.calendar,
             {"2026-07-17": _summary("complete", ["330000"])},
-            ["2026-07-17"],
             through_date=date(2026, 7, 20),
         )
 
@@ -104,7 +99,6 @@ class WorkflowDecisionTests(unittest.TestCase):
         decision = decide_fetch(
             self.calendar,
             {"2026-07-17": _summary("partial")},
-            ["2026-07-17"],
             through_date=date(2026, 7, 20),
         )
 
@@ -116,7 +110,6 @@ class WorkflowDecisionTests(unittest.TestCase):
             decide_fetch(
                 self.calendar,
                 {},
-                [],
                 through_date=date(2026, 7, 20),
                 requested_date="2026-7-17",
             )
@@ -125,7 +118,6 @@ class WorkflowDecisionTests(unittest.TestCase):
         decision = decide_fetch(
             self.calendar,
             {"2026-07-03": _summary("partial", ["630000"])},
-            ["2026-07-03"],
             through_date=date(2026, 7, 20),
             requested_date="2026-07-17",
         )
@@ -141,7 +133,6 @@ class WorkflowDecisionTests(unittest.TestCase):
         decision = decide_fetch(
             calendar,
             {"2026-07-03": _summary("complete")},
-            ["2026-07-03"],
             through_date=date(2026, 7, 20),
         )
 
@@ -149,11 +140,10 @@ class WorkflowDecisionTests(unittest.TestCase):
         self.assertEqual(decision.mode, "skip")
         self.assertEqual(decision.reason, "calendar_no_change")
 
-    def test_without_snapshots_only_latest_due_window_is_tracked(self) -> None:
+    def test_latest_due_window_without_summary_forces_full_run(self) -> None:
         decision = decide_fetch(
             self.calendar,
             {},
-            [],
             through_date=date(2026, 7, 20),
         )
 
