@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import sys
 import tempfile
+import logging
 from threading import Lock
 from pathlib import Path
 from typing import Any
@@ -16,6 +17,7 @@ _OCR_INSTANCE: Any | None = None
 _OCR_ERROR: OcrUnavailableError | None = None
 _OCR_LOCK = Lock()
 _DEFAULT_PADDLEX_CACHE_HOME = Path(sys.prefix) / ".paddlex"
+_OCR_CPU_THREADS = 1
 
 
 def image_to_text(path: Path) -> str:
@@ -36,7 +38,15 @@ def image_to_text(path: Path) -> str:
 def initialize_ocr() -> None:
     """Eagerly initialize the process-wide OCR engine for the current CLI run."""
 
-    _get_ocr()
+    root_logger = logging.getLogger()
+    root_level = root_logger.level
+    try:
+        _get_ocr()
+    finally:
+        # PaddleOCR 3.x currently changes the application root logger to WARNING
+        # while constructing the pipeline. Restore the CLI's logging contract so
+        # per-province timing records remain visible after OCR warm-up.
+        root_logger.setLevel(root_level)
 
 
 def _get_ocr() -> Any:
@@ -53,7 +63,13 @@ def _get_ocr() -> Any:
         if _OCR_ERROR is not None:
             raise _OCR_ERROR
 
+        # PaddleX uses the PADDLE_PDX_* name. Keep the legacy variable too because
+        # older PaddleOCR/PaddleX combinations still read it.
+        os.environ.setdefault("PADDLE_PDX_DISABLE_MODEL_SOURCE_CHECK", "True")
         os.environ.setdefault("DISABLE_MODEL_SOURCE_CHECK", "True")
+        # PP-OCRv5 + Windows/Linux CPU oneDNN/PIR has known native crashes and
+        # hangs in the first predict() call. The safe CPU path is intentional.
+        os.environ.setdefault("FLAGS_enable_pir_api", "0")
         os.environ.setdefault("PADDLE_PDX_CACHE_HOME", str(_DEFAULT_PADDLEX_CACHE_HOME))
         _DEFAULT_PADDLEX_CACHE_HOME.mkdir(parents=True, exist_ok=True)
         try:
@@ -73,8 +89,13 @@ def _get_ocr() -> Any:
 def _build_ocr(paddle_ocr_class: Any) -> Any:
     try:
         return paddle_ocr_class(
-            lang="ch",
-            ocr_version="PP-OCRv5",
+            text_detection_model_name="PP-OCRv5_mobile_det",
+            text_recognition_model_name="PP-OCRv5_mobile_rec",
+            device="cpu",
+            enable_mkldnn=False,
+            cpu_threads=_OCR_CPU_THREADS,
+            text_det_limit_type="max",
+            text_det_limit_side_len=1280,
             use_doc_orientation_classify=False,
             use_doc_unwarping=False,
             use_textline_orientation=False,
