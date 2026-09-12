@@ -293,8 +293,7 @@ class ExtractionOrchestrationGuardTests(unittest.TestCase):
                 patch.object(pipeline, "run_extract_files") as run_extract_files,
                 patch.object(pipeline, "run_build_prices") as run_build_prices,
             ):
-                with self.assertRaisesRegex(RuntimeError, "discovery failed"):
-                    pipeline.run_extract(options)
+                pipeline.run_extract(options)
 
             self.assertEqual(read_json(options.index_path)["notices"], [existing_notice])
             run_fetch.assert_not_called()
@@ -333,8 +332,7 @@ class ExtractionOrchestrationGuardTests(unittest.TestCase):
                 patch.object(pipeline, "run_extract_files") as run_extract_files,
                 patch.object(pipeline, "run_build_prices") as run_build_prices,
             ):
-                with self.assertRaisesRegex(RuntimeError, "no notices found"):
-                    pipeline.run_extract(options)
+                pipeline.run_extract(options)
 
             self.assertEqual(read_json(options.index_path)["notices"], [existing_notice])
             run_fetch.assert_not_called()
@@ -386,8 +384,7 @@ class ExtractionOrchestrationGuardTests(unittest.TestCase):
                 patch.object(pipeline, "run_extract_files") as run_extract_files,
                 patch.object(pipeline, "run_build_prices") as run_build_prices,
             ):
-                with self.assertRaisesRegex(RuntimeError, "fetch failed"):
-                    pipeline.run_extract(options)
+                pipeline.run_extract(options)
 
             self.assertEqual(read_json(options.index_path)["notices"], [existing_notice])
             run_extract_files.assert_not_called()

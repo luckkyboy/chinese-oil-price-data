@@ -9,6 +9,7 @@ from .crawl.browser_client import BrowserSession
 from .discovery_pipeline import run_discover, validate_requested_province_codes
 from .extraction_pipeline import run_extract_files
 from .fetch_pipeline import run_fetch
+from .fetching import should_ocr_attachment
 from .io import emit_result, read_json, repo_relative
 from .notices import (
     SkipReason,
@@ -21,6 +22,7 @@ from .notices import (
 )
 from .options import DiscoverOptions, ExtractFilesOptions, ExtractOptions, FetchOptions, PriceOptions
 from .paths import ROOT
+from .ocr.paddle import initialize_ocr
 from .payloads import EnabledSource
 from .prices import run_build_prices
 from .regions import resolve_zone
@@ -72,6 +74,7 @@ def run_extract(options: ExtractOptions) -> str:
         f"[extract] shared CloakBrowser session start index={repo_relative(options.index_path, ROOT)}",
     )
     processed_province_codes: set[str] = set()
+    ocr_initialized = False
     with BrowserSession(headless=True) as browser_session:
         for item in target_sources:
             province_code = str(item["province_code"])
@@ -103,40 +106,63 @@ def run_extract(options: ExtractOptions) -> str:
                     reasons.append(_format_discovery_errors(discovery_errors))
                 if not discovered_notices:
                     reasons.append("no notices found")
-                raise RuntimeError(
-                    f"discovery failed for {province_name} ({province_code}): "
-                    + "; ".join(reasons)
+                _log_province_failure(
+                    province_name,
+                    province_code,
+                    "discovery",
+                    "; ".join(reasons),
                 )
+                continue
             logger.info(
                 f"[extract] {province_name} ({province_code}) discover "
                 f"notices={len(discovered_notices)} elapsed={_elapsed(province_start)}"
             )
 
             fetch_start = time.perf_counter()
-            run_fetch(
-                FetchOptions(
-                    index_path=province_index,
-                    adjustment_date=options.adjustment_date,
-                    timeout=options.timeout,
-                    force=True,
-                    province_codes={province_code},
-                    browser_session=browser_session,
+            try:
+                run_fetch(
+                    FetchOptions(
+                        index_path=province_index,
+                        adjustment_date=options.adjustment_date,
+                        timeout=options.timeout,
+                        force=True,
+                        province_codes={province_code},
+                        browser_session=browser_session,
+                    )
                 )
-            )
+            except Exception as exc:
+                _log_province_failure(province_name, province_code, "fetch", str(exc), exc)
+                continue
             logger.info(
                 f"[extract] {province_name} ({province_code}) fetch "
                 f"elapsed={_elapsed(fetch_start)}"
             )
 
+            if not ocr_initialized and _index_requires_ocr(province_index):
+                logger.info("[ocr] initializing shared PaddleOCR engine for this CLI run")
+                try:
+                    initialize_ocr()
+                except Exception as exc:
+                    logger.warning(
+                        "[ocr] shared PaddleOCR initialization failed; "
+                        "attachment-level OCR errors will be recorded: %s",
+                        exc,
+                    )
+                ocr_initialized = True
+
             extract_start = time.perf_counter()
-            run_extract_files(
-                ExtractFilesOptions(
-                    index_path=province_index,
-                    adjustment_date=options.adjustment_date,
-                    force=True,
-                    province_codes={province_code},
+            try:
+                run_extract_files(
+                    ExtractFilesOptions(
+                        index_path=province_index,
+                        adjustment_date=options.adjustment_date,
+                        force=True,
+                        province_codes={province_code},
+                    )
                 )
-            )
+            except Exception as exc:
+                _log_province_failure(province_name, province_code, "extract", str(exc), exc)
+                continue
             logger.info(
                 f"[extract] {province_name} ({province_code}) extract "
                 f"elapsed={_elapsed(extract_start)}"
@@ -181,6 +207,23 @@ def run_extract(options: ExtractOptions) -> str:
     return str(options.index_path)
 
 
+def _log_province_failure(
+    province_name: str,
+    province_code: str,
+    stage: str,
+    message: str,
+    error: Exception | None = None,
+) -> None:
+    logger.error(
+        f"[failed] {province_name} ({province_code}) stage={stage}: {message}"
+    )
+    if error is not None:
+        logger.exception(
+            f"[failed] {province_name} ({province_code}) stage={stage} traceback",
+            exc_info=error,
+        )
+
+
 def _format_discovery_errors(raw_errors: object) -> str:
     if not isinstance(raw_errors, list):
         return f"invalid discovery errors payload: {raw_errors}"
@@ -195,6 +238,26 @@ def _format_discovery_errors(raw_errors: object) -> str:
         message = str(error.get("message") or error.get("error_type") or "unknown error")
         details.append(f"{stage} error for {url}: {message}")
     return " | ".join(details) or "unknown discovery error"
+
+
+def _index_requires_ocr(index_path: Path) -> bool:
+    payload = read_json(index_path)
+    for notice in payload.get("notices", []):
+        if not isinstance(notice, dict) or not notice.get("ocr_attachments"):
+            continue
+        for attachment in notice.get("attachments", []):
+            if not isinstance(attachment, dict):
+                continue
+            attachment_path = attachment.get("path")
+            if not attachment_path:
+                continue
+            if should_ocr_attachment(
+                notice,
+                attachment,
+                ROOT / str(attachment_path).lstrip("/"),
+            ):
+                return True
+    return False
 
 
 def command_validate_json(args: argparse.Namespace) -> None:

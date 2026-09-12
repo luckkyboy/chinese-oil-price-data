@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import sys
 import tempfile
+from threading import Lock
 from pathlib import Path
 from typing import Any
 
@@ -13,6 +14,7 @@ class OcrUnavailableError(RuntimeError):
 
 _OCR_INSTANCE: Any | None = None
 _OCR_ERROR: OcrUnavailableError | None = None
+_OCR_LOCK = Lock()
 _DEFAULT_PADDLEX_CACHE_HOME = Path(sys.prefix) / ".paddlex"
 
 
@@ -31,6 +33,12 @@ def image_to_text(path: Path) -> str:
             cleanup_path.unlink(missing_ok=True)
 
 
+def initialize_ocr() -> None:
+    """Eagerly initialize the process-wide OCR engine for the current CLI run."""
+
+    _get_ocr()
+
+
 def _get_ocr() -> Any:
     global _OCR_INSTANCE, _OCR_ERROR
 
@@ -39,21 +47,27 @@ def _get_ocr() -> Any:
     if _OCR_ERROR is not None:
         raise _OCR_ERROR
 
-    os.environ.setdefault("DISABLE_MODEL_SOURCE_CHECK", "True")
-    os.environ.setdefault("PADDLE_PDX_CACHE_HOME", str(_DEFAULT_PADDLEX_CACHE_HOME))
-    _DEFAULT_PADDLEX_CACHE_HOME.mkdir(parents=True, exist_ok=True)
-    try:
-        from paddleocr import PaddleOCR
-    except ImportError as exc:
-        _OCR_ERROR = OcrUnavailableError("paddleocr is not installed")
-        raise _OCR_ERROR from exc
+    with _OCR_LOCK:
+        if _OCR_INSTANCE is not None:
+            return _OCR_INSTANCE
+        if _OCR_ERROR is not None:
+            raise _OCR_ERROR
 
-    try:
-        _OCR_INSTANCE = _build_ocr(PaddleOCR)
-    except Exception as exc:
-        _OCR_ERROR = OcrUnavailableError(f"paddleocr initialization failed: {exc}")
-        raise _OCR_ERROR from exc
-    return _OCR_INSTANCE
+        os.environ.setdefault("DISABLE_MODEL_SOURCE_CHECK", "True")
+        os.environ.setdefault("PADDLE_PDX_CACHE_HOME", str(_DEFAULT_PADDLEX_CACHE_HOME))
+        _DEFAULT_PADDLEX_CACHE_HOME.mkdir(parents=True, exist_ok=True)
+        try:
+            from paddleocr import PaddleOCR
+        except ImportError as exc:
+            _OCR_ERROR = OcrUnavailableError("paddleocr is not installed")
+            raise _OCR_ERROR from exc
+
+        try:
+            _OCR_INSTANCE = _build_ocr(PaddleOCR)
+        except Exception as exc:
+            _OCR_ERROR = OcrUnavailableError(f"paddleocr initialization failed: {exc}")
+            raise _OCR_ERROR from exc
+        return _OCR_INSTANCE
 
 
 def _build_ocr(paddle_ocr_class: Any) -> Any:

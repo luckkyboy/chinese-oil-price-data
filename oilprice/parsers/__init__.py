@@ -55,6 +55,7 @@ PARSER_FUNCTIONS: dict[str, Callable[[str], ParsedNoticePayload]] = {
     "zhejiang": parse_zhejiang_notice,
 }
 PARSER_REVISIONS = {name: 1 for name in PARSER_FUNCTIONS}
+PARSER_REVISIONS["guizhou"] = 2
 PARSER_REVISIONS["shaanxi"] = 2
 PARSER_REVISIONS["sichuan"] = 2
 
