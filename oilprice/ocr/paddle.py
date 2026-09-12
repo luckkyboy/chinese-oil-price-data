@@ -94,8 +94,13 @@ def _build_ocr(paddle_ocr_class: Any) -> Any:
             device="cpu",
             enable_mkldnn=False,
             cpu_threads=_OCR_CPU_THREADS,
-            text_det_limit_type="max",
-            text_det_limit_side_len=1280,
+            # Small table labels such as "一价区" can merge with a table's
+            # horizontal rule at the source resolution.  `min` upscales the
+            # short edge before detection; this preserves the one-stroke
+            # character "一" for PP-OCRv5_mobile_det without changing the
+            # recognition threshold or filtering valid OCR results.
+            text_det_limit_type="min",
+            text_det_limit_side_len=960,
             use_doc_orientation_classify=False,
             use_doc_unwarping=False,
             use_textline_orientation=False,

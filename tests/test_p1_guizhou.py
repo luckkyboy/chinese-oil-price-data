@@ -31,6 +31,22 @@ CURRENT_OCR_FORMAT = """
 
 
 class GuizhouParserTests(unittest.TestCase):
+    def test_uses_actual_tables_when_html_has_early_attachment_labels(self) -> None:
+        text = (
+            "网页附件：附表1 贵州省各价区汽油销售价格表；附表2 贵州省各价区柴油销售价格表\n"
+            + CURRENT_OCR_FORMAT
+        )
+        result = parse_notice(text)
+
+        self.assertEqual(
+            result["extracted_prices"],
+            {"89": 7.95, "92": 8.42, "95": 8.90, "0": 8.07},
+        )
+        self.assertEqual(
+            [zone["zone_code"] for zone in result["extracted_zones"]],
+            ["guizhou-1", "guizhou-2", "guizhou-3"],
+        )
+
     def test_detects_tables_from_product_headers_without_attachment_one(self) -> None:
         result = parse_notice(CURRENT_OCR_FORMAT)
 
