@@ -916,6 +916,60 @@
       ]
     },
     {
+      "province_code": "610000",
+      "province_name": "陕西省",
+      "sources": [
+        {
+          "name": "陕西省发展和改革委员会",
+          "url": "https://sndrc.shaanxi.gov.cn/sy/xwxx/gggg/202608/t20260828_3671934.html",
+          "notice_id": "shaanxi-https-sndrc-shaanxi-gov-cn-sy-xwxx-gggg-202608-t20260828-3671934-html",
+          "title": "陕西省成品油价格调整通告",
+          "raw_sha256": "8d109ea84617d5dd4a6381afd147da7e33c7939160809a8d640e1c9726c5ba35",
+          "adapter": "shaanxi",
+          "parser_version": "shaanxi-v2",
+          "extracted_at": "2026-09-13T21:38:12+08:00",
+          "published_at": "2026-08-28",
+          "adjustment_date": "2026-08-28",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "shaanxi-1",
+          "zone_name": "中北部价区（西安市区）",
+          "items": {
+            "89": 7.52,
+            "92": 7.97,
+            "95": 8.42,
+            "0": 7.65
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "shaanxi-2",
+          "zone_name": "陕南价区",
+          "items": {
+            "89": 7.59,
+            "92": 8.05,
+            "95": 8.5,
+            "0": 7.82
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "shaanxi-3",
+          "zone_name": "中北部价区（西安市区外）",
+          "items": {
+            "89": 7.52,
+            "92": 7.97,
+            "95": 8.42,
+            "0": 7.82
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "620000",
       "province_name": "甘肃省",
       "sources": [
@@ -1065,5 +1119,5 @@
       ]
     }
   ],
-  "updated_at": "2026-09-13T10:59:35+08:00"
+  "updated_at": "2026-09-13T21:38:14+08:00"
 }
