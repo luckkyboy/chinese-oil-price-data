@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+import logging
 from collections.abc import Callable
 from typing import TypeVar
 
@@ -18,6 +19,9 @@ DEFAULT_FETCH_ATTEMPTS = 3
 DEFAULT_RETRY_BACKOFF_SECONDS = 0.25
 _RETRYABLE_HTTP_STATUSES = {408, 425, 429}
 _T = TypeVar("_T")
+
+
+logger = logging.getLogger(__name__)
 
 
 def fetch_page_html(
@@ -168,8 +172,17 @@ def _call_with_retry(
         raise ValueError("backoff_seconds must not be negative")
 
     for attempt in range(1, max_attempts + 1):
+        attempt_start = time.perf_counter()
         try:
-            return operation()
+            result = operation()
+            logger.debug(
+                "[browser] attempt=%s/%s success elapsed=%.1fs url=%s",
+                attempt,
+                max_attempts,
+                time.perf_counter() - attempt_start,
+                source_url,
+            )
+            return result
         except Exception as exc:
             error = (
                 exc
@@ -181,6 +194,15 @@ def _call_with_retry(
                     raise
                 raise error from exc
             delay = backoff_seconds * (2 ** (attempt - 1))
+            logger.warning(
+                "[browser] retry attempt=%s/%s elapsed=%.1fs sleep=%.2fs url=%s error=%s",
+                attempt,
+                max_attempts,
+                time.perf_counter() - attempt_start,
+                delay,
+                source_url,
+                type(error).__name__,
+            )
             if delay > 0:
                 time.sleep(delay)
 

@@ -3,6 +3,9 @@ from __future__ import annotations
 import time
 
 
+SETTLED_HTML_MAX_TIMEOUT_MS = 5_000
+
+
 class BrowserUnavailableError(RuntimeError):
     """Raised when CloakBrowser is not installed or its browser binary is unavailable."""
 
@@ -73,7 +76,14 @@ def close_page(page) -> None:
 
 
 def capture_settled_html(page, *, timeout_ms: int) -> str:
-    deadline = time.monotonic() + max(timeout_ms, 1000) / 1000.0
+    # Navigation has a much larger timeout than the small grace period needed
+    # for challenge pages or client-side content to settle. Never let this
+    # polling loop inherit a 90-second navigation timeout.
+    settle_timeout_ms = min(
+        max(timeout_ms, 1000),
+        SETTLED_HTML_MAX_TIMEOUT_MS,
+    )
+    deadline = time.monotonic() + settle_timeout_ms / 1000.0
     best = ""
     while time.monotonic() < deadline:
         try:

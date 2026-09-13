@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 import tempfile
+import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
@@ -22,6 +24,9 @@ from .browser_runtime import (
 )
 
 
+logger = logging.getLogger(__name__)
+
+
 @dataclass(frozen=True)
 class BrowserFetchResult:
     html: str
@@ -38,24 +43,36 @@ class BrowserSession:
         self.context = None
 
     def __enter__(self) -> "BrowserSession":
-        self.browser = launch_browser(headless=self.headless)
-        self.context = new_context(self.browser)
-        block_heavy_resources(self.context)
-        return self
+        try:
+            self.browser = launch_browser(headless=self.headless)
+            self.context = new_context(self.browser)
+            block_heavy_resources(self.context)
+            return self
+        except Exception:
+            # __exit__ is not called when __enter__ fails, so clean up here.
+            self.close()
+            raise
 
     def __exit__(self, exc_type, exc, traceback) -> None:
         self.close()
 
     def close(self) -> None:
+        # Always close the context before the browser. This is intentionally
+        # idempotent because callers may close a session from both __exit__
+        # and an exception handler.
         if self.context is not None:
-            try:
-                self.context.close()
-            except Exception:
-                pass
+            context = self.context
             self.context = None
+            try:
+                context.close()
+            except Exception as exc:
+                logger.debug("[browser] context close failed: %s", exc)
         if self.browser is not None:
-            close_browser(self.browser)
+            browser = self.browser
             self.browser = None
+            # close_browser is deliberately best-effort; keep browser cleanup
+            # separate from context cleanup so one failure cannot skip the other.
+            close_browser(browser)
 
     def new_page(self):
         if self.browser is None:
@@ -77,18 +94,28 @@ class BrowserSession:
         timeout_ms = max(timeout_seconds, 1) * 1000
         page = self.new_page()
         try:
-            response = page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)
+            response = _goto_with_logging(
+                page,
+                source_url,
+                wait_until="domcontentloaded",
+                timeout_ms=timeout_ms,
+            )
             status = response.status if response else None
             # Some government-site bot checks return their executable browser
             # challenge with HTTP 412. Let the page run that challenge and
             # validate the settled HTML at the notice-fetching boundary.
             if status is not None and status >= 400 and status != 412:
                 raise BrowserHTTPError(source_url, status)
-            try:
-                page.wait_for_load_state("networkidle", timeout=5000)
-            except Exception:
-                pass
+            # Do not wait for networkidle: government sites often keep
+            # analytics/polling connections open after the useful DOM exists.
+            settle_start = time.perf_counter()
             content = capture_settled_html(page, timeout_ms=timeout_ms)
+            logger.info(
+                "[browser] settled_html elapsed=%.1fs chars=%s url=%s",
+                time.perf_counter() - settle_start,
+                len(content),
+                source_url,
+            )
             final_url = page.url
             title = ""
             try:
@@ -194,7 +221,12 @@ class BrowserSession:
                     pass
             if referer:
                 try:
-                    page.goto(referer, wait_until="domcontentloaded", timeout=timeout_ms)
+                    _goto_with_logging(
+                        page,
+                        referer,
+                        wait_until="domcontentloaded",
+                        timeout_ms=timeout_ms,
+                    )
                     page.wait_for_timeout(500)
                     data = _fetch_bytes_from_page_context(
                         page,
@@ -218,7 +250,12 @@ class BrowserSession:
                     raise
                 except Exception:
                     pass
-            response = page.goto(source_url, wait_until="commit", timeout=timeout_ms)
+            response = _goto_with_logging(
+                page,
+                source_url,
+                wait_until="commit",
+                timeout_ms=timeout_ms,
+            )
             if response is None:
                 raise RuntimeError(f"browser did not return a response for {source_url}")
             _validate_response_url(response, source_url, url_validator)
@@ -264,7 +301,12 @@ class BrowserSession:
         page = self.new_page()
         try:
             if referer:
-                page.goto(referer, wait_until="domcontentloaded", timeout=timeout_ms)
+                _goto_with_logging(
+                    page,
+                    referer,
+                    wait_until="domcontentloaded",
+                    timeout_ms=timeout_ms,
+                )
                 page.wait_for_timeout(500)
             data = _fetch_bytes_from_page_context(
                 page,
@@ -366,7 +408,12 @@ def _fetch_direct_response_body(
     max_bytes: int | None,
     url_validator: Callable[[str], None] | None,
 ) -> bytes | None:
-    response = page.goto(source_url, wait_until="commit", timeout=timeout_ms)
+    response = _goto_with_logging(
+        page,
+        source_url,
+        wait_until="commit",
+        timeout_ms=timeout_ms,
+    )
     if response is None:
         return None
     _validate_response_url(response, source_url, url_validator)
@@ -636,6 +683,34 @@ def _looks_like_binary_payload(source_url: str, data: bytes | None) -> bool:
     if suffix in {"gif"}:
         return data.startswith((b"GIF87a", b"GIF89a"))
     return not data.lstrip()[:20].lower().startswith((b"<!doctype", b"<html"))
+
+
+def _goto_with_logging(page, source_url: str, *, wait_until: str, timeout_ms: int):
+    start = time.perf_counter()
+    try:
+        response = page.goto(
+            source_url,
+            wait_until=wait_until,
+            timeout=timeout_ms,
+        )
+    except Exception as exc:
+        logger.warning(
+            "[browser] goto failed wait_until=%s elapsed=%.1fs timeout=%ss url=%s error=%s",
+            wait_until,
+            time.perf_counter() - start,
+            max(timeout_ms, 1) / 1000,
+            source_url,
+            type(exc).__name__,
+        )
+        raise
+    logger.info(
+        "[browser] goto wait_until=%s elapsed=%.1fs status=%s url=%s",
+        wait_until,
+        time.perf_counter() - start,
+        response.status if response else None,
+        source_url,
+    )
+    return response
 
 
 def unquote_path_name(url: str) -> str:

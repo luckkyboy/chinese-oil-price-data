@@ -4,6 +4,7 @@ import hashlib
 import ipaddress
 import logging
 import socket
+import time
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
@@ -167,7 +168,29 @@ def fetch_fast_rendered_html(
 ) -> str:
     page = browser_session.new_page()
     try:
-        response = page.goto(source_url, wait_until="domcontentloaded", timeout=timeout_ms)
+        navigation_start = time.perf_counter()
+        try:
+            response = page.goto(
+                source_url,
+                wait_until="domcontentloaded",
+                timeout=timeout_ms,
+            )
+        except Exception as exc:
+            logger.warning(
+                "[browser] goto failed wait_until=domcontentloaded elapsed=%.1fs "
+                "timeout=%ss url=%s error=%s",
+                time.perf_counter() - navigation_start,
+                max(timeout_ms, 1) / 1000,
+                source_url,
+                type(exc).__name__,
+            )
+            raise
+        logger.info(
+            "[browser] goto wait_until=domcontentloaded elapsed=%.1fs status=%s url=%s",
+            time.perf_counter() - navigation_start,
+            response.status if response else None,
+            source_url,
+        )
         status = response.status if response else None
         if status is not None and status >= 400:
             raise BrowserHTTPError(source_url, status)
