@@ -196,6 +196,11 @@ def run_extract(options: ExtractOptions) -> str:
                 additional_payloads={
                     options.index_path: notice_index_payload(notices_by_id),
                 },
+                # A province can finish extraction but still have no notice
+                # matching the target adjustment date. Keep successful
+                # provinces publishable and let the summary mark the others
+                # as missing instead of failing the whole CLI.
+                allow_missing_requested_provinces=True,
             )
         finally:
             candidate_index.unlink(missing_ok=True)

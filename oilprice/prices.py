@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 from collections.abc import Mapping
 from datetime import date
 from pathlib import Path
@@ -15,6 +16,9 @@ from .payloads import PriceProvincePayload, PriceSnapshotPayload
 from .paths import ROOT
 
 
+logger = logging.getLogger(__name__)
+
+
 def command_build_prices(args: argparse.Namespace) -> None:
     output_path = run_build_prices(PriceOptions.from_args(args))
     emit_result(output_path)
@@ -24,6 +28,7 @@ def run_build_prices(
     options: PriceOptions,
     *,
     additional_payloads: Mapping[Path, Any] | None = None,
+    allow_missing_requested_provinces: bool = False,
 ) -> str:
     index = read_json(options.index_path)
     notice_paths = []
@@ -39,7 +44,12 @@ def run_build_prices(
             continue
         notice_paths.append(path)
     snapshot = build_snapshot(options.adjustment_date, notice_paths)
-    validate_requested_provinces(snapshot, options.province_codes, options.adjustment_date)
+    validate_requested_provinces(
+        snapshot,
+        options.province_codes,
+        options.adjustment_date,
+        allow_missing=allow_missing_requested_provinces,
+    )
     validate_snapshot_zone_coverage(snapshot)
     output_path = (
         ROOT / "data/prices" / options.adjustment_date[:4] / f"{options.adjustment_date}.json"
@@ -81,6 +91,8 @@ def validate_requested_provinces(
     snapshot: PriceSnapshotPayload,
     requested_codes: set[str] | None,
     adjustment_date: str,
+    *,
+    allow_missing: bool = False,
 ) -> None:
     if requested_codes is None:
         return
@@ -98,10 +110,14 @@ def validate_requested_provinces(
     )
     missing_codes = sorted(requested_codes - incoming_codes)
     if missing_codes:
-        raise RuntimeError(
+        message = (
             f"Incoming price snapshot for {adjustment_date} is missing requested "
             f"province codes: {', '.join(missing_codes)}"
         )
+        if allow_missing:
+            logger.warning("[price] %s; keeping these provinces as missing", message)
+        else:
+            raise RuntimeError(message)
 
 
 def validate_snapshot_zone_coverage(

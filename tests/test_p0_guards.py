@@ -102,6 +102,7 @@ class PricePublicationGuardTests(unittest.TestCase):
         required_codes: set[str],
         incoming_codes: set[str],
         additional_payloads: dict[Path, object] | None = None,
+        allow_missing: bool = False,
     ) -> None:
         index_path = root / "tmp" / "index.json"
         write_json(index_path, {"notices": []})
@@ -127,7 +128,11 @@ class PricePublicationGuardTests(unittest.TestCase):
             ),
             patch.object(prices, "build_price_summary", return_value=summary),
         ):
-            prices.run_build_prices(options, additional_payloads=additional_payloads)
+            prices.run_build_prices(
+                options,
+                additional_payloads=additional_payloads,
+                allow_missing_requested_provinces=allow_missing,
+            )
 
     def test_price_publication_rolls_back_when_notice_index_promotion_fails(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -166,6 +171,23 @@ class PricePublicationGuardTests(unittest.TestCase):
 
             self.assertFalse(root.joinpath("data/prices/2026/2026-07-20.json").exists())
             self.assertFalse(root.joinpath("data/prices/latest.json").exists())
+
+    def test_pipeline_mode_allows_missing_provinces_to_publish_partial_snapshot(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            root = Path(temp_dir)
+            self._run_build(
+                root,
+                "2026-07-20",
+                {"110000", "610000"},
+                {"110000"},
+                allow_missing=True,
+            )
+
+            snapshot = read_json(root / "data/prices/2026/2026-07-20.json")
+            self.assertEqual(
+                [province["province_code"] for province in snapshot["provinces"]],
+                ["110000"],
+            )
 
     def test_historical_backfill_does_not_move_latest_backwards(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
