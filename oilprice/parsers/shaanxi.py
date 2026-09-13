@@ -101,7 +101,35 @@ def _split_sections(text: str) -> tuple[str, str]:
 
 def _normalize_text(text: str) -> str:
     text = text.replace("（", "(").replace("）", ")")
-    text = text.replace("O号", "0号").replace("０号", "0号")
+    text = text.translate(str.maketrans({
+        "０": "0",
+        "１": "1",
+        "２": "2",
+        "３": "3",
+        "４": "4",
+        "５": "5",
+        "６": "6",
+        "７": "7",
+        "８": "8",
+        "９": "9",
+        "．": ".",
+        "。": ".",
+        "，": ".",
+        "、": ".",
+    }))
+    text = text.replace("O号", "0号").replace("Ｏ号", "0号")
+    # OCR frequently confuses the first character of "价区" or inserts a
+    # space inside the zone label. Canonicalize only the known Shaanxi labels
+    # so unrelated text is not altered.
+    zone_aliases = (
+        (r"中\s*北\s*部\s*(?:价|阶|介)\s*区", "中北部价区"),
+        (r"陕\s*南\s*(?:价|阶|介)\s*区", "陕南价区"),
+        (r"西\s*安\s*市\s*区", "西安市区"),
+        (r"其\s*他\s*(?:价|阶|介)\s*区", "其他价区"),
+    )
+    for pattern, replacement in zone_aliases:
+        text = re.sub(pattern, replacement, text)
+    text = re.sub(r"元\s*(?:/|每)?\s*升", "元/升", text)
     return re.sub(r"[ \t\r\f\v]+", " ", text)
 
 

@@ -100,7 +100,7 @@ def _build_ocr(paddle_ocr_class: Any) -> Any:
             # character "一" for PP-OCRv5_mobile_det without changing the
             # recognition threshold or filtering valid OCR results.
             text_det_limit_type="min",
-            text_det_limit_side_len=960,
+            text_det_limit_side_len=1280,
             use_doc_orientation_classify=False,
             use_doc_unwarping=False,
             use_textline_orientation=False,

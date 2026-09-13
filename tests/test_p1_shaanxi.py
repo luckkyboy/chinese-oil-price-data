@@ -80,6 +80,25 @@ class ShaanxiParserTests(unittest.TestCase):
             },
         )
 
+    def test_normalizes_common_ocr_zone_label_errors(self) -> None:
+        ocr_text = """
+        自2026年8月28日24时起
+        汽 油
+        价区 89号 92号 95号
+        中北部阶区 7.52 7.97 8.42
+        陕南价 区 7.59 8.05 8.50
+        柴 油
+        价区 0号 -10号 -20号 -35号
+        西安 市区 7.65 8.10 8.49 8.79
+        其 他价区 7.82 8.28 8.68 8.99
+        """
+
+        result = parse_notice("shaanxi", ocr_text)
+
+        self.assertEqual(result["confidence"], "medium")
+        self.assertEqual(result["extracted_prices"], {"89": 7.52, "92": 7.97, "95": 8.42, "0": 7.65})
+        self.assertEqual(len(result["extracted_zones"]), 3)
+
 
 if __name__ == "__main__":
     unittest.main()
