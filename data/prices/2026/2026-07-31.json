@@ -305,13 +305,12 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
+            "89": 7.4,
             "92": 7.93,
-            "95": 8.44
+            "95": 8.44,
+            "0": 7.62
           },
-          "missing_products": [
-            "89",
-            "0"
-          ]
+          "missing_products": []
         }
       ]
     },

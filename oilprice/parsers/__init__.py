@@ -21,6 +21,7 @@ from .qinghai import parse_notice as parse_qinghai_notice
 from .shaanxi import parse_notice as parse_shaanxi_notice
 from .shandong import parse_notice as parse_shandong_notice
 from .shanxi import parse_notice as parse_shanxi_notice
+from .shanghai import parse_notice as parse_shanghai_notice
 from .sichuan import parse_notice as parse_sichuan_notice
 from .xinjiang import parse_notice as parse_xinjiang_notice
 from .xizang import parse_notice as parse_xizang_notice
@@ -48,6 +49,7 @@ PARSER_FUNCTIONS: dict[str, Callable[[str], ParsedNoticePayload]] = {
     "shaanxi": parse_shaanxi_notice,
     "shandong": parse_shandong_notice,
     "shanxi": parse_shanxi_notice,
+    "shanghai": parse_shanghai_notice,
     "sichuan": parse_sichuan_notice,
     "xinjiang": parse_xinjiang_notice,
     "xizang": parse_xizang_notice,
@@ -58,6 +60,7 @@ PARSER_REVISIONS = {name: 1 for name in PARSER_FUNCTIONS}
 PARSER_REVISIONS["guizhou"] = 2
 PARSER_REVISIONS["shaanxi"] = 2
 PARSER_REVISIONS["sichuan"] = 2
+PARSER_REVISIONS["shanghai"] = 1
 
 
 DATE_PATTERNS = [

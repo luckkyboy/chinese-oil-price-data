@@ -180,7 +180,7 @@
           "notice_keywords": [
             "车用汽、柴油价格"
           ],
-          "adapter": "generic",
+          "adapter": "shanghai",
           "enabled": true
         }
       ]

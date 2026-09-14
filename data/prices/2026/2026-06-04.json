@@ -224,13 +224,12 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
+            "89": 7.76,
             "92": 8.31,
-            "95": 8.85
+            "95": 8.85,
+            "0": 8.02
           },
-          "missing_products": [
-            "89",
-            "0"
-          ]
+          "missing_products": []
         }
       ]
     },

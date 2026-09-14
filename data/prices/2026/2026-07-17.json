@@ -232,13 +232,12 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
+            "89": 6.89,
             "92": 7.38,
-            "95": 7.85
+            "95": 7.85,
+            "0": 7.05
           },
-          "missing_products": [
-            "89",
-            "0"
-          ]
+          "missing_products": []
         }
       ]
     },
