@@ -40,12 +40,44 @@ class WorkflowDecisionTests(unittest.TestCase):
                 "2026-07-03": _summary("complete"),
                 "2026-07-17": _summary("partial", ["210000", "510000"]),
             },
-            through_date=date(2026, 7, 20),
+            through_date=date(2026, 7, 19),
         )
 
         self.assertEqual(decision.target_date, "2026-07-17")
         self.assertEqual(decision.mode, "missing")
         self.assertEqual(decision.provinces_missing, ("210000", "510000"))
+
+    def test_missing_window_stops_after_three_complete_days(self) -> None:
+        decision = decide_fetch(
+            self.calendar,
+            {"2026-07-17": _summary("partial", ["510000"])},
+            through_date=date(2026, 7, 20),
+        )
+
+        self.assertEqual(decision.mode, "skip")
+        self.assertEqual(decision.reason, "retry_window_expired")
+        self.assertEqual(decision.provinces_missing, ("510000",))
+
+    def test_missing_window_retries_until_three_complete_days_have_elapsed(self) -> None:
+        decision = decide_fetch(
+            self.calendar,
+            {"2026-07-17": _summary("partial", ["510000"])},
+            through_date=date(2026, 7, 19),
+        )
+
+        self.assertEqual(decision.mode, "missing")
+        self.assertEqual(decision.reason, "summary_has_missing_provinces")
+
+    def test_explicit_date_can_retry_expired_window(self) -> None:
+        decision = decide_fetch(
+            self.calendar,
+            {"2026-07-17": _summary("partial", ["510000"])},
+            through_date=date(2026, 7, 19),
+            requested_date="2026-07-17",
+        )
+
+        self.assertEqual(decision.mode, "missing")
+        self.assertEqual(decision.provinces_missing, ("510000",))
 
     def test_latest_complete_window_skips_old_partial_window(self) -> None:
         decision = decide_fetch(
@@ -89,7 +121,7 @@ class WorkflowDecisionTests(unittest.TestCase):
         decision = decide_fetch(
             self.calendar,
             {"2026-07-17": _summary("complete", ["330000"])},
-            through_date=date(2026, 7, 20),
+            through_date=date(2026, 7, 19),
         )
 
         self.assertEqual(decision.mode, "missing")

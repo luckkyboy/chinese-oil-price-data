@@ -11,6 +11,7 @@ from zoneinfo import ZoneInfo
 
 FetchMode = Literal["force", "missing", "skip"]
 _PROVINCE_CODE_PATTERN = re.compile(r"^[0-9]{6}$")
+_MAX_AUTOMATIC_RETRY_DAYS = 3
 
 
 @dataclass(frozen=True)
@@ -83,7 +84,25 @@ def decide_fetch(
         )
 
     latest_window = due_windows[-1]
-    return _classify_window(latest_window, summaries.get(latest_window.text))
+    summary = summaries.get(latest_window.text)
+    decision = _classify_window(latest_window, summary)
+
+    # Give an incomplete adjustment window three complete calendar days after
+    # the adjustment date for automatic retries. Manual dispatches above keep
+    # the existing behavior and can still force a later recovery attempt.
+    if (
+        decision.mode == "missing"
+        and through_date >= latest_window.value + timedelta(days=_MAX_AUTOMATIC_RETRY_DAYS)
+    ):
+        return FetchDecision(
+            target_date=decision.target_date,
+            mode="skip",
+            reason="retry_window_expired",
+            summary_path=decision.summary_path,
+            provinces_missing=decision.provinces_missing,
+        )
+
+    return decision
 
 
 def decide_fetch_for_repository(
