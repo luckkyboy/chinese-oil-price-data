@@ -47,22 +47,22 @@ class WorkflowDecisionTests(unittest.TestCase):
         self.assertEqual(decision.mode, "missing")
         self.assertEqual(decision.provinces_missing, ("210000", "510000"))
 
-    def test_missing_window_stops_after_three_complete_days(self) -> None:
+    def test_missing_window_stops_after_five_complete_days(self) -> None:
         decision = decide_fetch(
             self.calendar,
             {"2026-07-17": _summary("partial", ["510000"])},
-            through_date=date(2026, 7, 20),
+            through_date=date(2026, 7, 22),
         )
 
         self.assertEqual(decision.mode, "skip")
         self.assertEqual(decision.reason, "retry_window_expired")
         self.assertEqual(decision.provinces_missing, ("510000",))
 
-    def test_missing_window_retries_until_three_complete_days_have_elapsed(self) -> None:
+    def test_missing_window_retries_until_five_complete_days_have_elapsed(self) -> None:
         decision = decide_fetch(
             self.calendar,
             {"2026-07-17": _summary("partial", ["510000"])},
-            through_date=date(2026, 7, 19),
+            through_date=date(2026, 7, 21),
         )
 
         self.assertEqual(decision.mode, "missing")

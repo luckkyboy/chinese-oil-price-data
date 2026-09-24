@@ -11,7 +11,7 @@ from zoneinfo import ZoneInfo
 
 FetchMode = Literal["force", "missing", "skip"]
 _PROVINCE_CODE_PATTERN = re.compile(r"^[0-9]{6}$")
-_MAX_AUTOMATIC_RETRY_DAYS = 3
+_MAX_AUTOMATIC_RETRY_DAYS = 5
 
 
 @dataclass(frozen=True)
@@ -87,7 +87,7 @@ def decide_fetch(
     summary = summaries.get(latest_window.text)
     decision = _classify_window(latest_window, summary)
 
-    # Give an incomplete adjustment window three complete calendar days after
+    # Give an incomplete adjustment window five complete calendar days after
     # the adjustment date for automatic retries. Manual dispatches above keep
     # the existing behavior and can still force a later recovery attempt.
     if (
