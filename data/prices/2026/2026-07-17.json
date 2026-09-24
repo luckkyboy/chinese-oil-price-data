@@ -63,7 +63,13 @@
       "sources": [
         {
           "name": "河北省发展和改革委员会",
-          "url": "https://hbdrc.hebei.gov.cn/gggs_980/202607/t20260717_137145.html"
+          "url": "https://hbdrc.hebei.gov.cn/gggs_980/202607/t20260717_137145.html",
+          "raw_sha256": "faabe4f8815b5394baa5f50a9ca9f4e53cf462be5e6d568ad2a0717cbc6f04f7",
+          "adapter": "hebei",
+          "parser_version": "hebei-v2",
+          "extracted_at": "2026-09-24T12:20:53+08:00",
+          "adjustment_date": "2026-07-17",
+          "confidence": "medium"
         }
       ],
       "zones": [
@@ -72,7 +78,7 @@
           "zone_name": "默认价区",
           "items": {
             "89": 6.87,
-            "92": 6.87,
+            "92": 7.41,
             "95": 7.83,
             "0": 7.07
           },
@@ -86,7 +92,13 @@
       "sources": [
         {
           "name": "山西省发展和改革委员会",
-          "url": "https://fgw.shanxi.gov.cn/tzgg/202607/t20260717_10179076.shtml"
+          "url": "https://fgw.shanxi.gov.cn/tzgg/202607/t20260717_10179076.shtml",
+          "raw_sha256": "c32c73ad118fac3ccbdefc2f566f0b3a299d683df2457ec39c3801ed59d6b5a0",
+          "adapter": "shanxi",
+          "parser_version": "shanxi-v2",
+          "extracted_at": "2026-09-24T12:20:53+08:00",
+          "adjustment_date": "2026-07-17",
+          "confidence": "medium"
         }
       ],
       "zones": [
@@ -95,7 +107,7 @@
           "zone_name": "默认价区",
           "items": {
             "89": 6.9,
-            "92": 6.9,
+            "92": 7.37,
             "95": 7.96,
             "0": 7.14
           },
@@ -921,5 +933,5 @@
       ]
     }
   ],
-  "updated_at": "2026-07-22T13:43:24+08:00"
+  "updated_at": "2026-09-24T12:49:52+08:00"
 }

@@ -17,7 +17,13 @@
       "sources": [
         {
           "name": "北京市发展和改革委员会",
-          "url": "https://fgw.beijing.gov.cn/fgwzwgk/2024zcwj/bwqtwj/202605/t20260508_4641763.htm"
+          "url": "https://fgw.beijing.gov.cn/fgwzwgk/2024zcwj/bwqtwj/202605/t20260508_4641763.htm",
+          "raw_sha256": "5ded97137c9452d5f9049f976f8eb439ac6fe3866139beadce6b830a64210b99",
+          "adapter": "beijing",
+          "parser_version": "beijing-v2",
+          "extracted_at": "2026-09-24T12:11:20+08:00",
+          "adjustment_date": "2026-05-08",
+          "confidence": "high"
         }
       ],
       "zones": [
@@ -25,10 +31,10 @@
           "zone_code": "default",
           "zone_name": "默认价区",
           "items": {
-            "89": 7.92,
-            "92": 8.46,
-            "95": 9.01,
-            "0": 8.2
+            "89": 8.16,
+            "92": 8.72,
+            "95": 9.28,
+            "0": 8.46
           },
           "missing_products": []
         }
@@ -895,5 +901,5 @@
       ]
     }
   ],
-  "updated_at": "2026-07-21T00:00:00+08:00"
+  "updated_at": "2026-09-24T12:49:52+08:00"
 }

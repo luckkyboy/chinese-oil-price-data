@@ -1061,10 +1061,10 @@
           "url": "http://fgw.qinghai.gov.cn/xwzx/tzgg/202609/t20260911_92671.html",
           "notice_id": "qinghai-http-fgw-qinghai-gov-cn-xwzx-tzgg-202609-t20260911-92671-html",
           "title": "我省调整省内成品油最高零售价格",
-          "raw_sha256": "3d07da104423ffefd7e42194fb67b8418523810f3f51278e8dc115a51d78474d",
+          "raw_sha256": "ce4c4cc8e506491dc6c4ee3a7d714a2993f06da7ab2b55a44fba7025f624d1a7",
           "adapter": "qinghai",
-          "parser_version": "qinghai-v1",
-          "extracted_at": "2026-09-13T00:04:16+08:00",
+          "parser_version": "qinghai-v2",
+          "extracted_at": "2026-09-24T12:10:14+08:00",
           "published_at": "2026-09-11",
           "adjustment_date": "2026-09-11",
           "confidence": "medium"
@@ -1089,7 +1089,7 @@
             "89": 7.83,
             "92": 8.34,
             "95": 8.94,
-            "0": 7.99
+            "0": 7.98
           },
           "missing_products": []
         },
@@ -1139,5 +1139,5 @@
       ]
     }
   ],
-  "updated_at": "2026-09-13T00:04:20+08:00"
+  "updated_at": "2026-09-24T12:49:52+08:00"
 }

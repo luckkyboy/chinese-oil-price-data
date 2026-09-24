@@ -86,7 +86,13 @@
       "sources": [
         {
           "name": "山西省发展和改革委员会",
-          "url": "https://fgw.shanxi.gov.cn/tzgg/202607/t20260703_10170206.shtml"
+          "url": "https://fgw.shanxi.gov.cn/tzgg/202607/t20260703_10170206.shtml",
+          "raw_sha256": "67f17234da53d0f778844f593477c0559cf706161307bd91d0716ac0578f04b1",
+          "adapter": "shanxi",
+          "parser_version": "shanxi-v2",
+          "extracted_at": "2026-09-24T12:19:13+08:00",
+          "adjustment_date": "2026-07-03",
+          "confidence": "medium"
         }
       ],
       "zones": [
@@ -96,7 +102,7 @@
           "items": {
             "89": 6.68,
             "92": 7.13,
-            "95": 7.13,
+            "95": 7.7,
             "0": 6.89
           },
           "missing_products": []
@@ -851,5 +857,5 @@
       ]
     }
   ],
-  "updated_at": "2026-07-21T00:00:00+08:00"
+  "updated_at": "2026-09-24T12:49:52+08:00"
 }

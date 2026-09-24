@@ -793,10 +793,10 @@
           "url": "https://fgw.guizhou.gov.cn/fggz/tzgg/202607/t20260731_90682015.html",
           "notice_id": "guizhou-https-fgw-guizhou-gov-cn-fggz-tzgg-202607-t20260731-90682015-html",
           "title": "2026年7月31日24时起贵州成品油价格调整",
-          "raw_sha256": "961ba44859ad1d03c90719344b0ad90e907fa30c1bd7c14bbc0c1e770bcab9e5",
+          "raw_sha256": "20e22b70457d8456558961c38ab188e5d4825ef3cfeec657b3397013e93eaac6",
           "adapter": "guizhou",
-          "parser_version": "guizhou-v1",
-          "extracted_at": "2026-08-13T10:41:37+08:00",
+          "parser_version": "guizhou-v3",
+          "extracted_at": "2026-09-24T12:23:53+08:00",
           "published_at": "2026-07-31",
           "adjustment_date": "2026-07-31",
           "confidence": "medium"
@@ -821,7 +821,7 @@
             "89": 7.67,
             "92": 8.13,
             "95": 8.59,
-            "0": 7.77
+            "0": 7.61
           },
           "missing_products": []
         },
@@ -1172,5 +1172,5 @@
       ]
     }
   ],
-  "updated_at": "2026-08-13T10:44:02+08:00"
+  "updated_at": "2026-09-24T12:49:52+08:00"
 }
