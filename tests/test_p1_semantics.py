@@ -74,9 +74,9 @@ class NoticeDateSemanticsTests(unittest.TestCase):
             self.assertEqual(extracted["parser_version"], parser_version("beijing"))
 
     def test_parser_versions_are_adapter_specific_and_follow_fallbacks(self) -> None:
-        self.assertEqual(parser_version("beijing"), "beijing-v1")
-        self.assertEqual(parser_version("shaanxi"), "shaanxi-v2")
-        self.assertEqual(parser_version("unknown-adapter"), "generic-v1")
+        self.assertEqual(parser_version("beijing"), "beijing-v2")
+        self.assertEqual(parser_version("shaanxi"), "shaanxi-v3")
+        self.assertEqual(parser_version("unknown-adapter"), "generic-v2")
 
     def test_filter_prefers_explicit_adjustment_date_and_keeps_legacy_fallback(self) -> None:
         notices = [

@@ -12,7 +12,7 @@ from .fetching import (
     save_attachment_raw,
     should_fetch_attachment,
 )
-from .io import emit_result, now_china_iso, read_json, repo_relative, write_json
+from .io import emit_result, new_artifact_directory, now_china_iso, read_json, repo_relative, write_json
 from .notices import (
     SkipReason,
     pending_province_codes_from_summary,
@@ -35,6 +35,7 @@ def command_fetch(args: argparse.Namespace) -> None:
 def run_fetch(options: FetchOptions) -> str:
     notice_root = options.index_path.parent
     index = read_json(options.index_path)
+    raw_root = new_artifact_directory(notice_root / "raw")
     fetched: list[NoticePayload] = []
     pending_codes: set[str] | None = None
     if options.adjustment_date and not options.force:
@@ -56,7 +57,7 @@ def run_fetch(options: FetchOptions) -> str:
 
         province_slug = slug_from_notice(notice)
         notice_id = notice["notice_id"]
-        raw_path = notice_root / "raw" / province_slug / f"{notice_id}.html"
+        raw_path = raw_root / province_slug / f"{notice_id}.html"
         notice_start = time.perf_counter()
         sha256 = fetch_notice_with_browser(
             str(notice["source_url"]),
@@ -76,8 +77,7 @@ def run_fetch(options: FetchOptions) -> str:
         if embedded_pdf:
             url = embedded_pdf["url"]
             attachment_path = (
-                notice_root
-                / "raw"
+                raw_root
                 / province_slug
                 / f"{notice_id}_attachment_1{attachment_suffix(url)}"
             )
@@ -120,8 +120,7 @@ def run_fetch(options: FetchOptions) -> str:
         ):
             suffix = attachment_suffix(attachment["url"])
             attachment_path = (
-                notice_root
-                / "raw"
+                raw_root
                 / province_slug
                 / f"{notice_id}_attachment_{index_number}{suffix}"
             )
@@ -164,6 +163,9 @@ def run_fetch(options: FetchOptions) -> str:
         updated = dict(notice)
         updated["raw_path"] = repo_relative(raw_path, ROOT)
         updated["sha256"] = sha256
+        updated["raw_sha256"] = sha256
+        # A new download invalidates the reference to the previous extraction.
+        updated.pop("extracted_path", None)
         updated.pop("attachments", None)
         updated.pop("attachment_errors", None)
         if attachments:

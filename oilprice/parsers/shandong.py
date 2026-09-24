@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import re
 
-from oilprice.extract.price_parser import PRODUCT_ORDER
-from oilprice.parsers.generic import parse_notice as parse_generic_notice
+from oilprice.parsers.table import parse_table_notice
+from oilprice.payloads import ParsedNoticePayload
 
 
 PRODUCT_LINE_PATTERNS = {
@@ -12,59 +12,7 @@ PRODUCT_LINE_PATTERNS = {
     "95": re.compile(r"^\s*95\s*[#﹟号]?\s*$", re.IGNORECASE),
     "0": re.compile(r"^\s*0\s*[#﹟号]?\s*$", re.IGNORECASE),
 }
-LITER_PRICE_RE = re.compile(r"[0-9]+\.[0-9]+")
 
 
-def parse_notice(text: str) -> dict[str, object]:
-    result = parse_generic_notice(text)
-    if len(result.get("extracted_prices") or {}) >= len(PRODUCT_ORDER):
-        return result
-
-    prices = _extract_table_row_prices(text)
-    if not prices:
-        return result if result.get("extracted_prices") else {"confidence": "manual_required"}
-
-    return {
-        "extracted_prices": prices,
-        "extracted_zones": [
-            {
-                "zone_code": "default",
-                "zone_name": "默认价区",
-                "items": {key: prices[key] for key in PRODUCT_ORDER if key in prices},
-            }
-        ],
-        "confidence": "medium" if len(prices) == len(PRODUCT_ORDER) else "low",
-    }
-
-
-def _extract_table_row_prices(text: str) -> dict[str, float]:
-    prices: dict[str, float] = {}
-    lines = _normalize_text(text).splitlines()
-    for index, raw_line in enumerate(lines):
-        line = raw_line.strip()
-        if not line:
-            continue
-        for product, pattern in PRODUCT_LINE_PATTERNS.items():
-            if product in prices or not pattern.search(line):
-                continue
-            # Shandong rows are split by line breaks: marker, liter price, then ton prices.
-            scan_text = "\n".join(lines[index + 1 : index + 8])
-            liter_price = _find_liter_price(scan_text)
-            if liter_price is not None:
-                prices[product] = liter_price
-    return prices
-
-
-def _normalize_text(text: str) -> str:
-    text = text.replace("＃", "#").replace("﹟", "#")
-    text = text.replace("O#", "0#").replace("０#", "0#")
-    text = text.replace("＋", "+").replace("－", "-")
-    return re.sub(r"[ \t\r\f\v]+", " ", text)
-
-
-def _find_liter_price(text: str) -> float | None:
-    for raw in LITER_PRICE_RE.findall(text):
-        value = float(raw)
-        if 5.0 < value < 15.0:
-            return value
-    return None
+def parse_notice(text: str) -> ParsedNoticePayload:
+    return parse_table_notice(text, PRODUCT_LINE_PATTERNS, scan_lines=8)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 from datetime import date, timedelta
 from enum import Enum
 from pathlib import Path
@@ -58,13 +59,11 @@ def notice_index_payload(notices_by_id: dict[str, NoticePayload]) -> dict[str, o
     }
 
 
-def cli_relative(path: Path) -> str:
-    return path.resolve().relative_to(ROOT.resolve()).as_posix()
-
-
 def filter_notices_for_adjustment_date(
     notices: list[NoticePayload],
     adjustment_date: str,
+    *,
+    allow_month_day: bool = True,
 ) -> list[NoticePayload]:
     markers = date_markers_for_adjustment_window(adjustment_date)
     exact_dates = {
@@ -74,7 +73,7 @@ def filter_notices_for_adjustment_date(
     filtered = []
     for notice in notices:
         explicit_adjustment_date = str(notice.get("adjustment_date") or "").strip()
-        if is_iso_date(explicit_adjustment_date):
+        if explicit_adjustment_date:
             if explicit_adjustment_date == adjustment_date:
                 filtered.append(notice)
             continue
@@ -89,14 +88,37 @@ def filter_notices_for_adjustment_date(
             for key in (
                 "title",
                 "source_url",
-                "notice_id",
                 "published_at",
                 "adjustment_date",
             )
         )
-        if any(marker in haystack for marker in markers):
+        # A full date cannot be overridden by a yearless substring. In
+        # particular, 2025-07-31 must not match the 2026-07-31 window.
+        full_dates = _dates_in_text(haystack)
+        if full_dates:
+            if full_dates & exact_dates:
+                filtered.append(notice)
+            continue
+        years = set(re.findall(r"(?<![0-9])(?:19|20)[0-9]{2}(?![0-9])", haystack))
+        if years and not years.intersection(day[:4] for day in exact_dates):
+            continue
+        if allow_month_day and any(
+            re.search(r"(?<![0-9])" + re.escape(marker) + r"(?![0-9])", haystack)
+            for marker in markers
+        ):
             filtered.append(notice)
     return filtered
+
+
+def _dates_in_text(text: str) -> set[str]:
+    dates: set[str] = set()
+    pattern = r"(?<![0-9])((?:19|20)[0-9]{2})(?:[-/年]?)([0-9]{1,2})(?:[-/月]?)([0-9]{1,2})(?:日)?(?![0-9])"
+    for year, month, day in re.findall(pattern, text):
+        try:
+            dates.add(date(int(year), int(month), int(day)).isoformat())
+        except ValueError:
+            continue
+    return dates
 
 
 def is_iso_date(value: str) -> bool:

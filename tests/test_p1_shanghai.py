@@ -19,7 +19,7 @@ class ShanghaiParserTests(unittest.TestCase):
 
         parsed = parse_notice("shanghai", text)
 
-        self.assertEqual(parser_version("shanghai"), "shanghai-v1")
+        self.assertEqual(parser_version("shanghai"), "shanghai-v2")
         self.assertEqual(
             parsed["extracted_prices"],
             {"89": 7.70, "92": 8.25, "95": 8.78, "0": 7.95},

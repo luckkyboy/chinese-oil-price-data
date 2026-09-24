@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import re
 
-from oilprice.extract.price_parser import PRODUCT_ORDER, extract_prices
-from oilprice.parsers.generic import parse_notice as parse_generic_notice
+from oilprice.extract.price_parser import extract_prices
+from oilprice.parsers.table import merge_prices, single_zone_result
 
 
 TON_PRICE_PATTERNS = {
@@ -28,29 +28,11 @@ LITER_CONVERSION = {
 
 
 def parse_notice(text: str) -> dict[str, object]:
-    result = parse_generic_notice(text)
-    if result.get("extracted_prices"):
-        return result
-
-    prices = extract_prices(text)
-    if not prices:
-        prices = _extract_from_ton_prices(text)
-    if not prices:
-        prices = _extract_from_garbled_table(text)
-    if not prices:
-        return {"confidence": "manual_required"}
-
-    return {
-        "extracted_prices": prices,
-        "extracted_zones": [
-            {
-                "zone_code": "default",
-                "zone_name": "默认价区",
-                "items": {key: prices[key] for key in PRODUCT_ORDER if key in prices},
-            }
-        ],
-        "confidence": "medium" if len(prices) == len(PRODUCT_ORDER) else "low",
-    }
+    return single_zone_result(merge_prices(
+        extract_prices(text),
+        _extract_from_ton_prices(text),
+        _extract_from_garbled_table(text),
+    ))
 
 
 def _extract_from_ton_prices(text: str) -> dict[str, float]:

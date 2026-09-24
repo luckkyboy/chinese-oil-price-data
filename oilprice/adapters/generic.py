@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import date
+import hashlib
 import re
 from html import unescape
 from html.parser import HTMLParser
@@ -116,10 +117,14 @@ def discover_from_html(
 
 
 def build_notice_id(province_slug: str, source_url: str) -> str:
-    stem = re.sub(r"[^a-zA-Z0-9]+", "-", source_url).strip("-").lower()
-    if len(stem) > 80:
-        stem = stem[-80:]
-    return f"{province_slug}-{stem}"
+    # Preserve path/query case and separators; they may identify different
+    # resources. Fragments do not affect the document downloaded from a URL.
+    parsed = urlparse(source_url.strip())
+    canonical = urlunparse(parsed._replace(
+        scheme=parsed.scheme.lower(), netloc=parsed.netloc.lower(), fragment="",
+    ))
+    digest = hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:32]
+    return f"{province_slug}-{digest}"
 
 
 def _normalize_notice_url(source_url: str, list_host: str, list_scheme: str) -> str:

@@ -14,7 +14,7 @@ from .extract.pdf import pdf_to_text
 from .extract.xls import xls_to_text
 from .errors import OcrError, TextExtractionError
 from .fetching import should_ocr_attachment
-from .io import emit_result, now_china_iso, read_json, repo_relative, write_json
+from .io import emit_result, new_artifact_directory, now_china_iso, read_json, repo_relative, write_json
 from .notices import (
     pending_province_codes_from_summary,
     province_skip_reason,
@@ -45,6 +45,7 @@ def command_extract_files(args: argparse.Namespace) -> None:
 def run_extract_files(options: ExtractFilesOptions) -> str:
     notice_root = options.index_path.parent
     index = read_json(options.index_path)
+    extracted_root = new_artifact_directory(notice_root / "extracted")
     updated_notices: list[NoticePayload] = []
     pending_codes: set[str] | None = None
     if options.adjustment_date and not options.force:
@@ -93,6 +94,8 @@ def run_extract_files(options: ExtractFilesOptions) -> str:
         for attachment in notice.get("attachments", []):
             updated_attachment = dict(attachment)
             updated_attachment.pop("extraction_error", None)
+            updated_attachment.pop("ocr_error", None)
+            updated_attachment.pop("ocr_text_path", None)
             attachment_path = attachment.get("path")
             if not attachment_path:
                 updated_attachments.append(updated_attachment)
@@ -125,8 +128,7 @@ def run_extract_files(options: ExtractFilesOptions) -> str:
                 else:
                     if attachment_text:
                         ocr_text_path = (
-                            notice_root
-                            / "extracted"
+                            extracted_root
                             / province_slug
                             / f"{notice['notice_id'][:64]}_{absolute_attachment_path.stem}.ocr.txt"
                         )
@@ -183,7 +185,7 @@ def run_extract_files(options: ExtractFilesOptions) -> str:
         extracted_payload = {
             key: value for key, value in extracted_payload.items() if value is not None
         }
-        extracted_path = notice_root / "extracted" / province_slug / f"{notice['notice_id']}.json"
+        extracted_path = extracted_root / province_slug / f"{notice['notice_id']}.json"
         write_start = time.perf_counter()
         write_json(extracted_path, extracted_payload)
         logger.info(
@@ -197,7 +199,9 @@ def run_extract_files(options: ExtractFilesOptions) -> str:
             updated["attachments"] = updated_attachments
         updated_notices.append(updated)
 
-    write_json(options.index_path, {"updated_at": now_china_iso(), "notices": updated_notices})
+    updated_index = dict(index)
+    updated_index.update(updated_at=now_china_iso(), notices=updated_notices)
+    write_json(options.index_path, updated_index)
     return str(options.index_path)
 
 

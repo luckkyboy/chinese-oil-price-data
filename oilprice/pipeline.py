@@ -10,7 +10,7 @@ from .discovery_pipeline import run_discover, validate_requested_province_codes
 from .extraction_pipeline import run_extract_files
 from .fetch_pipeline import run_fetch
 from .fetching import should_ocr_attachment
-from .io import emit_result, read_json, repo_relative
+from .io import emit_result, new_artifact_directory, read_json, repo_relative
 from .notices import (
     SkipReason,
     pending_province_codes_from_summary,
@@ -74,6 +74,7 @@ def run_extract(options: ExtractOptions) -> str:
         f"[extract] shared CloakBrowser session start index={repo_relative(options.index_path, ROOT)}",
     )
     processed_province_codes: set[str] = set()
+    run_root = new_artifact_directory(options.index_path.parent / "runs")
     ocr_initialized = False
     with BrowserSession(headless=True) as browser_session:
         for item in target_sources:
@@ -81,7 +82,7 @@ def run_extract(options: ExtractOptions) -> str:
             province_name = str(item["province_name"])
 
             province_start = time.perf_counter()
-            province_index = options.index_path.with_name(f"{province_code}.discover.json")
+            province_index = run_root / f"{province_code}.discover.json"
             run_discover(
                 DiscoverOptions(
                     sources_path=options.sources_path,
@@ -184,7 +185,9 @@ def run_extract(options: ExtractOptions) -> str:
 
     if processed_province_codes:
         price_start = time.perf_counter()
-        candidate_index = options.index_path.with_name(f".{options.index_path.name}.candidate")
+        candidate_index = options.index_path.with_name(
+            f".{options.index_path.name}.{run_root.name}.candidate"
+        )
         write_notice_index(candidate_index, notices_by_id)
         try:
             run_build_prices(
@@ -280,6 +283,8 @@ def command_lookup_price(args: argparse.Namespace) -> None:
     region_path = ROOT / "data/regions" / f"{args.province}.json"
     price_path = ROOT / "data/prices" / args.adjustment_date[:4] / f"{args.adjustment_date}.json"
     province_code = province_code_for_slug(args.province)
+    if province_code is None:
+        raise SystemExit(f"unknown province: {args.province}")
     zone = None
     if region_path.exists():
         zone = resolve_zone(region_path, args.area, parent=args.parent)
@@ -288,7 +293,7 @@ def command_lookup_price(args: argparse.Namespace) -> None:
 
     price_payload = read_json(price_path)
     for province in price_payload.get("provinces", []):
-        if province_code and province["province_code"] != province_code:
+        if province["province_code"] != province_code:
             continue
         if not zone:
             zones = province.get("zones", [])
@@ -311,6 +316,8 @@ def command_lookup_price(args: argparse.Namespace) -> None:
             emit_result(result)
             return
 
+    if zone is None:
+        raise SystemExit(f"province not found in {price_path}: {args.province}")
     raise SystemExit(f"zone not found in {price_path}: {zone['zone_code']}")
 
 

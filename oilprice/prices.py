@@ -40,7 +40,9 @@ def run_build_prices(
             continue
         path = ROOT / str(notice["extracted_path"]).lstrip("/")
         extracted_notice = read_json(path)
-        if not filter_notices_for_adjustment_date([extracted_notice], options.adjustment_date):
+        if not filter_notices_for_adjustment_date(
+            [extracted_notice], options.adjustment_date, allow_month_day=False
+        ):
             continue
         notice_paths.append(path)
     snapshot = build_snapshot(options.adjustment_date, notice_paths)

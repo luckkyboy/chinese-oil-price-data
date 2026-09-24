@@ -25,6 +25,12 @@ def write_json(path: Path, payload: Any) -> None:
     write_json_batch_atomic({path: payload})
 
 
+def new_artifact_directory(parent: Path) -> Path:
+    """Allocate an exclusive, short directory; previously referenced files stay immutable."""
+    parent.mkdir(parents=True, exist_ok=True)
+    return Path(tempfile.mkdtemp(prefix="run-", dir=parent))
+
+
 def write_json_batch_atomic(payloads: Mapping[Path, Any]) -> None:
     """Publish JSON files as one rollback-safe batch.
 

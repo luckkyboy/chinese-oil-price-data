@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from datetime import date
 from collections.abc import Callable
 
 from .anhui import parse_notice as parse_anhui_notice
@@ -56,19 +57,17 @@ PARSER_FUNCTIONS: dict[str, Callable[[str], ParsedNoticePayload]] = {
     "yunnan": parse_yunnan_notice,
     "zhejiang": parse_zhejiang_notice,
 }
-PARSER_REVISIONS = {name: 1 for name in PARSER_FUNCTIONS}
-PARSER_REVISIONS["guizhou"] = 2
-PARSER_REVISIONS["shaanxi"] = 2
-PARSER_REVISIONS["sichuan"] = 2
-PARSER_REVISIONS["shanghai"] = 1
+# All adapters share adjustment-date inference; bump their provenance together.
+PARSER_REVISIONS = {name: 2 for name in PARSER_FUNCTIONS}
+PARSER_REVISIONS["guizhou"] = 3
+PARSER_REVISIONS["shaanxi"] = 3
+PARSER_REVISIONS["sichuan"] = 3
 
 
 DATE_PATTERNS = [
     re.compile(r"自\s*([0-9]{4})年([0-9]{1,2})月([0-9]{1,2})日\s*24时起"),
     re.compile(r"([0-9]{4})年([0-9]{1,2})月([0-9]{1,2})日\s*24时起执行"),
     re.compile(r"([0-9]{4})年([0-9]{1,2})月([0-9]{1,2})日\s*起执行"),
-    re.compile(r"发布日期]\s*([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})"),
-    re.compile(r"发布时间[:：]\s*([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})"),
 ]
 
 
@@ -97,5 +96,8 @@ def extract_adjustment_date(text: str) -> str | None:
         if not match:
             continue
         year, month, day = match.groups()
-        return f"{int(year):04d}-{int(month):02d}-{int(day):02d}"
+        try:
+            return date(int(year), int(month), int(day)).isoformat()
+        except ValueError:
+            continue
     return None
