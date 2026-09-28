@@ -286,17 +286,23 @@ def merge_price_snapshots(
         if code:
             existing_map[code] = province
 
+    merged_map = dict(existing_map)
     for province in incoming.get("provinces", []):
         if not isinstance(province, dict):
             continue
         code = str(province.get("province_code") or "").strip()
         if code:
-            existing_map[code] = province
+            merged_map[code] = province
 
-    merged_provinces = sorted(existing_map.values(), key=lambda item: str(item.get("province_code", "")))
+    province_data_changed = merged_map != existing_map
+    merged_provinces = sorted(
+        merged_map.values(),
+        key=lambda item: str(item.get("province_code", "")),
+    )
     merged["provinces"] = merged_provinces
     merged["products"] = collect_products_from_provinces(merged_provinces)
-    merged["updated_at"] = incoming.get("updated_at", now_china_iso())
+    if province_data_changed or not existing.get("updated_at"):
+        merged["updated_at"] = incoming.get("updated_at", now_china_iso())
     return merged
 
 
