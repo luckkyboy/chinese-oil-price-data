@@ -122,7 +122,7 @@ def _normalize_text(text: str) -> str:
     # space inside the zone label. Canonicalize only the known Shaanxi labels
     # so unrelated text is not altered.
     zone_aliases = (
-        (r"中\s*北\s*部\s*(?:价|阶|介)\s*区", "中北部价区"),
+        (r"中\s*北\s*(?:部|培)\s*(?:价|阶|介)\s*区", "中北部价区"),
         (r"陕\s*南\s*(?:价|阶|介)\s*区", "陕南价区"),
         (r"西\s*安\s*市\s*区", "西安市区"),
         (r"其\s*他\s*(?:价|阶|介)\s*区", "其他价区"),
