@@ -255,6 +255,10 @@ class RepositoryDecisionTests(unittest.TestCase):
         self.assertEqual(decision.reason, "本次调价日价格不作调整，跳过")
         saved = read_json(self.calendar_path)
         self.assertIs(saved["adjustment_dates"][0]["skip"], True)
+        self.assertEqual(
+            saved["adjustment_dates"][0]["ndrc_notice"],
+            {"title": notice.title, "url": notice.url},
+        )
         self.assertEqual(saved["adjustment_dates"][1], self.calendar["adjustment_dates"][1])
         with patch("oilprice.workflow_decision.find_ndrc_notice") as lookup:
             self.assertEqual(self.decide(), decision)
@@ -268,6 +272,10 @@ class RepositoryDecisionTests(unittest.TestCase):
             self.assertEqual(self.decide().mode, "force")
             saved = read_json(self.calendar_path)
             self.assertIs(saved["adjustment_dates"][0]["skip"], False)
+            self.assertEqual(
+                saved["adjustment_dates"][0]["ndrc_notice"],
+                {"title": notice.title, "url": notice.url},
+            )
             self.assertEqual(saved["adjustment_dates"][1], self.calendar["adjustment_dates"][1])
             before = self.calendar_path.read_bytes()
             self.assertEqual(self.decide().mode, "force")

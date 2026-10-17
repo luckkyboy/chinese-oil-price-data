@@ -90,6 +90,25 @@
           "type": "boolean",
           "description": "Cached NDRC decision: true means no adjustment, false means adjustment confirmed; omit until an announcement is found."
         },
+        "ndrc_notice": {
+          "type": "object",
+          "description": "Official NDRC announcement used to determine skip for this adjustment window.",
+          "additionalProperties": false,
+          "required": [
+            "title",
+            "url"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "url": {
+              "type": "string",
+              "format": "http-uri"
+            }
+          }
+        },
         "result": {
           "type": "string",
           "enum": [

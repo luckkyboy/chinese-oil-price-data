@@ -166,6 +166,7 @@ def decide_fetch_for_repository(
             reason="ndrc_notice_not_found",
         )
     entry["skip"] = notice.no_change
+    entry["ndrc_notice"] = {"title": notice.title, "url": notice.url}
     write_json(calendar_path, calendar)
     return decide_fetch(
         calendar,
