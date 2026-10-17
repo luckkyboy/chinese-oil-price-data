@@ -10,83 +10,103 @@
   "adjustment_dates": [
     {
       "date": "2026-01-06",
-      "round": 1
+      "round": 1,
+      "skip": true
     },
     {
       "date": "2026-01-20",
-      "round": 2
+      "round": 2,
+      "skip": false
     },
     {
       "date": "2026-02-03",
-      "round": 3
+      "round": 3,
+      "skip": false
     },
     {
       "date": "2026-02-24",
-      "round": 4
+      "round": 4,
+      "skip": false
     },
     {
       "date": "2026-03-09",
-      "round": 5
+      "round": 5,
+      "skip": false
     },
     {
       "date": "2026-03-23",
-      "round": 6
+      "round": 6,
+      "skip": false
     },
     {
       "date": "2026-04-07",
-      "round": 7
+      "round": 7,
+      "skip": false
     },
     {
       "date": "2026-04-21",
-      "round": 8
+      "round": 8,
+      "skip": false
     },
     {
       "date": "2026-05-08",
-      "round": 9
+      "round": 9,
+      "skip": false
     },
     {
       "date": "2026-05-21",
-      "round": 10
+      "round": 10,
+      "skip": false
     },
     {
       "date": "2026-06-04",
-      "round": 11
+      "round": 11,
+      "skip": false
     },
     {
       "date": "2026-06-18",
-      "round": 12
+      "round": 12,
+      "skip": false
     },
     {
       "date": "2026-07-03",
-      "round": 13
+      "round": 13,
+      "skip": false
     },
     {
       "date": "2026-07-17",
-      "round": 14
+      "round": 14,
+      "skip": false
     },
     {
       "date": "2026-07-31",
-      "round": 15
+      "round": 15,
+      "skip": false
     },
     {
       "date": "2026-08-14",
-      "round": 16
+      "round": 16,
+      "skip": false
     },
     {
       "date": "2026-08-28",
-      "round": 17
+      "round": 17,
+      "skip": false
     },
     {
       "date": "2026-09-11",
-      "round": 18
+      "round": 18,
+      "skip": false
     },
     {
       "date": "2026-09-24",
-      "round": 19
+      "round": 19,
+      "skip": false
     },
     {
       "date": "2026-10-15",
-      "round": 20
+      "round": 20,
+      "skip": true
     },
     {
       "date": "2026-10-29",

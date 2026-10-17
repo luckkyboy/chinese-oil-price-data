@@ -17,6 +17,8 @@
 | 中国油价分区数据          | data/regions/{province}.json   |
 | 各省发改委地址            | data/sources/provinces.json    |
 
+Workflow 的 decide 阶段会在需要拉取价格且调价日缺少 `skip` 字段时，检查[国家发改委新闻发布栏目](https://www.ndrc.gov.cn/xwdt/xwfb/)中对应日期的成品油价格公告，并将结果写入、提交到 `data/calendar/{year}.json`。标题包含“不作调整”时写入 `skip=true`，跳过价格抓取，reason 为“本次调价日价格不作调整，跳过”；确认需要调整时写入 `skip=false`，继续抓取。后续定时运行或手动指定该日期均使用已保存的结果，不再查询发改委。字段缺省表示尚未确认；公告尚未找到时暂缓抓取，后续运行重试，不回写 `skip`。查询失败时 decide 报错，价格抓取不会启动。
+
 ## 数据来源
 
 > Big thanks to 国家发改委和各省级发改委持续、公开、规范地发布成品油价格公告，为本项目的数据建设提供了可靠基础。

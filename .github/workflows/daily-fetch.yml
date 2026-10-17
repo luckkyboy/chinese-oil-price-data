@@ -21,6 +21,8 @@ on:
 jobs:
   decide:
     runs-on: [self-hosted, oilprice]
+    permissions:
+      contents: write
     outputs:
       target_date: ${{ steps.decide.outputs.target_date }}
       mode: ${{ steps.decide.outputs.mode }}
@@ -34,9 +36,8 @@ jobs:
         with:
           python-version: "3.12"
 
-      # Decision logic uses the Python standard library only, so this job
-      # skips the heavy dependency install. When the latest adjustment window
-      # is complete, the fetch job below is skipped entirely.
+      # Decision logic and the NDRC news release check use the standard library.
+      # Both adjustment and no-change decisions are persisted for later runs.
       - name: Decide fetch mode
         id: decide
         env:
@@ -61,6 +62,20 @@ jobs:
               for key, value in outputs.items():
                   print(f"{key}={value}", file=output)
           PY
+
+      - name: Commit and push calendar decisions
+        env:
+          TARGET_DATE: ${{ steps.decide.outputs.target_date }}
+        run: |
+          if ! git diff --quiet -- data/calendar; then
+            python -m pip install -r requirements-core.txt
+            python -m oilprice.cli validate-json
+            git config --local user.email "github-actions[bot]@users.noreply.github.com"
+            git config --local user.name "github-actions[bot]"
+            git add data/calendar
+            git commit -m "actions:oilprice:update ${TARGET_DATE} calendar decision"
+            git push
+          fi
 
       - name: Write workflow summary
         if: always()
@@ -91,6 +106,9 @@ jobs:
       TARGET_DATE: ${{ needs.decide.outputs.target_date }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          # Include the calendar commit just pushed by the decide job.
+          ref: ${{ github.ref }}
 
       - uses: actions/setup-python@v6
         with:

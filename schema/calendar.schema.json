@@ -86,6 +86,10 @@
           "type": "integer",
           "minimum": 1
         },
+        "skip": {
+          "type": "boolean",
+          "description": "Cached NDRC decision: true means no adjustment, false means adjustment confirmed; omit until an announcement is found."
+        },
         "result": {
           "type": "string",
           "enum": [

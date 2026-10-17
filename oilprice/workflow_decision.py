@@ -8,6 +8,9 @@ from pathlib import Path
 from typing import Literal, Mapping, Sequence
 from zoneinfo import ZoneInfo
 
+from oilprice.io import write_json
+from oilprice.ndrc import find_ndrc_notice
+
 
 FetchMode = Literal["force", "missing", "skip"]
 _PROVINCE_CODE_PATTERN = re.compile(r"^[0-9]{6}$")
@@ -36,6 +39,7 @@ class FetchDecision:
 class _AdjustmentWindow:
     value: date
     result: str | None
+    skip: bool = False
 
     @property
     def text(self) -> str:
@@ -111,7 +115,7 @@ def decide_fetch_for_repository(
     requested_date: str = "",
     today_shanghai: date | None = None,
 ) -> FetchDecision:
-    """Load repository state and delegate the actual choice to ``decide_fetch``."""
+    """Choose a window and cache its confirmed NDRC adjustment decision."""
 
     root = root.resolve()
     calendar_latest = _read_json(root / "data" / "calendar" / "latest.json")
@@ -136,6 +140,33 @@ def decide_fetch_for_repository(
     if today_shanghai is None:
         today_shanghai = datetime.now(ZoneInfo("Asia/Shanghai")).date()
     through_date = today_shanghai - timedelta(days=1)
+    decision = decide_fetch(
+        calendar,
+        summaries,
+        through_date=through_date,
+        requested_date=requested_date,
+    )
+    if decision.mode == "skip":
+        return decision
+
+    entry = next(
+        entry for entry in calendar["adjustment_dates"]
+        if entry["date"] == decision.target_date
+    )
+    # An explicit false records a confirmed adjustment. Absence means the
+    # announcement has not been checked successfully yet.
+    if "skip" in entry:
+        return decision
+
+    notice = find_ndrc_notice(date.fromisoformat(decision.target_date))
+    if notice is None:
+        return FetchDecision(
+            target_date=decision.target_date,
+            mode="skip",
+            reason="ndrc_notice_not_found",
+        )
+    entry["skip"] = notice.no_change
+    write_json(calendar_path, calendar)
     return decide_fetch(
         calendar,
         summaries,
@@ -164,7 +195,10 @@ def _parse_windows(calendar: Mapping[str, object]) -> Sequence[_AdjustmentWindow
         result = raw_window.get("result")
         if result is not None and not isinstance(result, str):
             raise ValueError(f"calendar result for {raw_date} must be a string")
-        windows.append(_AdjustmentWindow(parsed_date, result))
+        skip = raw_window.get("skip", False)
+        if not isinstance(skip, bool):
+            raise ValueError(f"calendar skip for {raw_date} must be a boolean")
+        windows.append(_AdjustmentWindow(parsed_date, result, skip))
 
     return sorted(windows, key=lambda window: window.value)
 
@@ -173,6 +207,12 @@ def _classify_window(
     window: _AdjustmentWindow,
     summary: Mapping[str, object] | None,
 ) -> FetchDecision:
+    if window.skip:
+        return FetchDecision(
+            target_date=window.text,
+            mode="skip",
+            reason="本次调价日价格不作调整，跳过",
+        )
     if window.result == "no_change":
         return FetchDecision(
             target_date=window.text,
