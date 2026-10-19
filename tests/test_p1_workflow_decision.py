@@ -204,7 +204,7 @@ class WorkflowDecisionTests(unittest.TestCase):
                 )
                 self.assertEqual(decision.target_date, "2026-10-15")
                 self.assertEqual(decision.mode, "skip")
-                self.assertEqual(decision.reason, "本次调价日价格不作调整，跳过")
+                self.assertEqual(decision.reason, "ndrc_no_price_adjustment")
 
     def test_skip_false_retains_fetch_behavior(self) -> None:
         calendar = _calendar(("2026-10-15", None))
@@ -252,7 +252,7 @@ class RepositoryDecisionTests(unittest.TestCase):
             decision = self.decide()
             lookup.assert_called_once_with(date(2026, 10, 15))
         self.assertEqual(decision.mode, "skip")
-        self.assertEqual(decision.reason, "本次调价日价格不作调整，跳过")
+        self.assertEqual(decision.reason, "ndrc_no_price_adjustment")
         saved = read_json(self.calendar_path)
         self.assertIs(saved["adjustment_dates"][0]["skip"], True)
         self.assertEqual(

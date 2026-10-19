@@ -212,7 +212,7 @@ def _classify_window(
         return FetchDecision(
             target_date=window.text,
             mode="skip",
-            reason="本次调价日价格不作调整，跳过",
+            reason="ndrc_no_price_adjustment",
         )
     if window.result == "no_change":
         return FetchDecision(
