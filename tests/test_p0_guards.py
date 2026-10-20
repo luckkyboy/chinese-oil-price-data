@@ -315,7 +315,8 @@ class ExtractionOrchestrationGuardTests(unittest.TestCase):
                 patch.object(pipeline, "run_extract_files") as run_extract_files,
                 patch.object(pipeline, "run_build_prices") as run_build_prices,
             ):
-                pipeline.run_extract(options)
+                with self.assertRaisesRegex(RuntimeError, "No provinces successfully collected"):
+                    pipeline.run_extract(options)
 
             self.assertEqual(read_json(options.index_path)["notices"], [existing_notice])
             run_fetch.assert_not_called()
@@ -354,7 +355,8 @@ class ExtractionOrchestrationGuardTests(unittest.TestCase):
                 patch.object(pipeline, "run_extract_files") as run_extract_files,
                 patch.object(pipeline, "run_build_prices") as run_build_prices,
             ):
-                pipeline.run_extract(options)
+                with self.assertRaisesRegex(RuntimeError, "No provinces successfully collected"):
+                    pipeline.run_extract(options)
 
             self.assertEqual(read_json(options.index_path)["notices"], [existing_notice])
             run_fetch.assert_not_called()
@@ -406,7 +408,8 @@ class ExtractionOrchestrationGuardTests(unittest.TestCase):
                 patch.object(pipeline, "run_extract_files") as run_extract_files,
                 patch.object(pipeline, "run_build_prices") as run_build_prices,
             ):
-                pipeline.run_extract(options)
+                with self.assertRaisesRegex(RuntimeError, "No provinces successfully collected"):
+                    pipeline.run_extract(options)
 
             self.assertEqual(read_json(options.index_path)["notices"], [existing_notice])
             run_extract_files.assert_not_called()
@@ -455,6 +458,7 @@ class ExtractionOrchestrationGuardTests(unittest.TestCase):
                 patch.object(pipeline, "run_discover", side_effect=discover),
                 patch.object(pipeline, "run_fetch"),
                 patch.object(pipeline, "run_extract_files"),
+                patch.object(pipeline, "build_price_candidate", return_value=_snapshot("2026-07-20", {"110000"})),
                 patch.object(
                     pipeline,
                     "run_build_prices",
@@ -512,6 +516,7 @@ class ExtractionOrchestrationGuardTests(unittest.TestCase):
                 patch.object(pipeline, "run_fetch") as run_fetch,
                 patch.object(pipeline, "run_extract_files") as run_extract_files,
                 patch.object(pipeline, "run_build_prices") as run_build_prices,
+                patch.object(pipeline, "build_price_candidate", side_effect=lambda opts: _snapshot(opts.adjustment_date, opts.province_codes)),
             ):
                 pipeline.run_extract(options)
 

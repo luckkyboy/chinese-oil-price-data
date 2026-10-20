@@ -95,7 +95,7 @@ def decide_fetch(
     # the adjustment date for automatic retries. Manual dispatches above keep
     # the existing behavior and can still force a later recovery attempt.
     if (
-        decision.mode == "missing"
+        decision.mode in {"force", "missing"}
         and through_date >= latest_window.value + timedelta(days=_MAX_AUTOMATIC_RETRY_DAYS)
     ):
         return FetchDecision(
@@ -118,12 +118,15 @@ def decide_fetch_for_repository(
     """Choose a window and cache its confirmed NDRC adjustment decision."""
 
     root = root.resolve()
-    calendar_latest = _read_json(root / "data" / "calendar" / "latest.json")
-    calendar_path_value = calendar_latest.get("path")
-    if not isinstance(calendar_path_value, str) or not calendar_path_value.strip():
-        raise ValueError("calendar latest path must be a non-empty string")
-    calendar_path = _resolve_repo_path(root, calendar_path_value)
-    calendar = _read_json(calendar_path)
+    if today_shanghai is None:
+        today_shanghai = datetime.now(ZoneInfo("Asia/Shanghai")).date()
+    through_date = today_shanghai - timedelta(days=1)
+    calendars = _load_repository_calendars(root, through_date, requested_date)
+    calendar = {
+        "adjustment_dates": [
+            entry for _, payload in calendars for entry in payload["adjustment_dates"]
+        ],
+    }
 
     prices_root = root / "data" / "prices"
     summaries: dict[str, Mapping[str, object]] = {}
@@ -137,9 +140,6 @@ def decide_fetch_for_repository(
         if summary_path.exists():
             summaries[adjustment_date] = _read_json(summary_path)
 
-    if today_shanghai is None:
-        today_shanghai = datetime.now(ZoneInfo("Asia/Shanghai")).date()
-    through_date = today_shanghai - timedelta(days=1)
     decision = decide_fetch(
         calendar,
         summaries,
@@ -167,13 +167,57 @@ def decide_fetch_for_repository(
         )
     entry["skip"] = notice.no_change
     entry["ndrc_notice"] = {"title": notice.title, "url": notice.url}
-    write_json(calendar_path, calendar)
+    calendar_path, owning_calendar = next(
+        (path, payload) for path, payload in calendars
+        if any(item is entry for item in payload["adjustment_dates"])
+    )
+    write_json(calendar_path, owning_calendar)
     return decide_fetch(
         calendar,
         summaries,
         through_date=through_date,
         requested_date=requested_date,
     )
+
+
+def _load_repository_calendars(
+    root: Path, through_date: date, requested_date: str,
+) -> list[tuple[Path, dict[str, object]]]:
+    calendar_root = root / "data" / "calendar"
+    if requested_date.strip():
+        target = _parse_canonical_date(requested_date, label="workflow_dispatch date")
+        paths = [calendar_root / f"{target.year}.json"]
+    else:
+        latest = _read_json(calendar_root / "latest.json")
+        raw_path = latest.get("path")
+        if not isinstance(raw_path, str) or not raw_path.strip():
+            raise ValueError("calendar latest path must be a non-empty string")
+        latest_path = _resolve_repo_path(root, raw_path)
+        # The latest pointer may already refer to next year's calendar. Keep
+        # the previous year's final window eligible during the year boundary.
+        paths = [
+            latest_path,
+            calendar_root / f"{through_date.year}.json",
+            calendar_root / f"{through_date.year - 1}.json",
+        ]
+
+    loaded: list[tuple[Path, dict[str, object]]] = []
+    seen: set[Path] = set()
+    for path in paths:
+        path = path.resolve()
+        if path in seen:
+            continue
+        seen.add(path)
+        if not path.exists():
+            # A broken latest pointer is a configuration error; optional
+            # adjacent years and absent manual years have no eligible windows.
+            if not requested_date.strip() and path == paths[0]:
+                raise FileNotFoundError(path)
+            continue
+        payload = _read_json(path)
+        _parse_windows(payload)
+        loaded.append((path, payload))
+    return loaded
 
 
 def _parse_windows(calendar: Mapping[str, object]) -> Sequence[_AdjustmentWindow]:

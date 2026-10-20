@@ -30,29 +30,9 @@ def run_build_prices(
     additional_payloads: Mapping[Path, Any] | None = None,
     allow_missing_requested_provinces: bool = False,
 ) -> str:
-    index = read_json(options.index_path)
-    notice_paths = []
-    for notice in index.get("notices", []):
-        province_code = str(notice.get("province_code", "") or "")
-        if province_skip_reason(province_code, options.province_codes, None) == SkipReason.NOT_SELECTED:
-            continue
-        if not notice.get("extracted_path"):
-            continue
-        path = ROOT / str(notice["extracted_path"]).lstrip("/")
-        extracted_notice = read_json(path)
-        if not filter_notices_for_adjustment_date(
-            [extracted_notice], options.adjustment_date, allow_month_day=False
-        ):
-            continue
-        notice_paths.append(path)
-    snapshot = build_snapshot(options.adjustment_date, notice_paths)
-    validate_requested_provinces(
-        snapshot,
-        options.province_codes,
-        options.adjustment_date,
-        allow_missing=allow_missing_requested_provinces,
+    snapshot = build_price_candidate(
+        options, allow_missing_requested_provinces=allow_missing_requested_provinces,
     )
-    validate_snapshot_zone_coverage(snapshot)
     output_path = (
         ROOT / "data/prices" / options.adjustment_date[:4] / f"{options.adjustment_date}.json"
     )
@@ -87,6 +67,38 @@ def run_build_prices(
 
     write_json_batch_atomic(publication)
     return str(output_path)
+
+
+def build_price_candidate(
+    options: PriceOptions,
+    *,
+    allow_missing_requested_provinces: bool = False,
+) -> PriceSnapshotPayload:
+    """Build and validate a candidate without publishing any repository state."""
+    index = read_json(options.index_path)
+    notice_paths = []
+    for notice in index.get("notices", []):
+        province_code = str(notice.get("province_code", "") or "")
+        if province_skip_reason(province_code, options.province_codes, None) == SkipReason.NOT_SELECTED:
+            continue
+        if not notice.get("extracted_path"):
+            continue
+        path = ROOT / str(notice["extracted_path"]).lstrip("/")
+        extracted_notice = read_json(path)
+        if not filter_notices_for_adjustment_date(
+            [extracted_notice], options.adjustment_date, allow_month_day=False
+        ):
+            continue
+        notice_paths.append(path)
+    snapshot = build_snapshot(options.adjustment_date, notice_paths)
+    validate_requested_provinces(
+        snapshot,
+        options.province_codes,
+        options.adjustment_date,
+        allow_missing=allow_missing_requested_provinces,
+    )
+    validate_snapshot_zone_coverage(snapshot)
+    return snapshot
 
 
 def validate_requested_provinces(
@@ -272,6 +284,7 @@ def merge_price_snapshots(
     existing: PriceSnapshotPayload,
     incoming: PriceSnapshotPayload,
 ) -> PriceSnapshotPayload:
+    validate_price_regression(existing, incoming)
     merged = dict(existing)
 
     for key in ("adjustment_date", "effective_from", "timezone", "unit", "currency"):
@@ -304,6 +317,43 @@ def merge_price_snapshots(
     if province_data_changed or not existing.get("updated_at"):
         merged["updated_at"] = incoming.get("updated_at", now_china_iso())
     return merged
+
+
+def validate_price_regression(
+    existing: PriceSnapshotPayload,
+    incoming: PriceSnapshotPayload,
+) -> None:
+    """Do not lose already published products when recollecting the same date.
+
+    Missing products can mean a grade is not sold, so no new product is made
+    mandatory. Only products actually present in the same day's saved result
+    are protected. Keep the complete old province and its provenance together
+    rather than combining prices with unrelated incoming source metadata.
+    """
+    if existing.get("adjustment_date") != incoming.get("adjustment_date"):
+        raise ValueError("Cannot merge price snapshots for different adjustment dates")
+    existing_provinces = {
+        province["province_code"]: province
+        for province in existing.get("provinces", [])
+    }
+    for province in incoming.get("provinces", []):
+        previous = existing_provinces.get(province["province_code"])
+        if previous is None:
+            continue
+        incoming_zones = {
+            zone["zone_code"]: set(zone.get("items", {}))
+            for zone in province.get("zones", [])
+        }
+        lost = []
+        for zone in previous.get("zones", []):
+            products = set(zone.get("items", {})) - incoming_zones.get(zone["zone_code"], set())
+            if products:
+                lost.append(f"{zone['zone_code']}: {', '.join(sorted(products))}")
+        if lost:
+            raise RuntimeError(
+                f"Price regression for province {province['province_code']}; "
+                "previously published products missing (" + "; ".join(lost) + ")"
+            )
 
 
 def collect_products_from_provinces(provinces: list[PriceProvincePayload]) -> list[str]:

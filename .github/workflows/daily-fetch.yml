@@ -119,20 +119,6 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install -r requirements.txt
 
-      - name: Warm up PaddleOCR
-        run: |
-          python - <<'PY'
-          from paddleocr import PaddleOCR
-
-          PaddleOCR(
-              lang="ch",
-              ocr_version="PP-OCRv5",
-              use_doc_orientation_classify=False,
-              use_doc_unwarping=False,
-              use_textline_orientation=False,
-          )
-          PY
-
       - name: Run full extract
         if: needs.decide.outputs.mode == 'force'
         timeout-minutes: 30

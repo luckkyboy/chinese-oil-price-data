@@ -63,7 +63,8 @@ class NdrcNoticeTests(unittest.TestCase):
     def test_older_manual_window_follows_official_pagination(self) -> None:
         pages = [
             _link("国家发展改革委新闻", "20261016") + 'createPageHTML(40, 0, "index", "html");',
-            _link("2026年10月15日国内成品油价格不作调整"),
+            _link("2026年10月15日国内成品油价格不作调整")
+            + _link("国家发展改革委新闻", "20261014"),
         ]
         with patch(
             "oilprice.ndrc.urlopen",
@@ -75,6 +76,47 @@ class NdrcNoticeTests(unittest.TestCase):
             [call.args[0].full_url for call in fetch.call_args_list],
             [NEWS_RELEASE_URL, NEWS_RELEASE_URL + "index_1.html"],
         )
+
+    def test_target_day_without_notice_on_first_page_continues_same_day(self) -> None:
+        pages = [
+            _link("国家发展改革委新闻") + 'createPageHTML(3, 0, "index", "html");',
+            _link("2026年10月15日国内成品油价格不作调整"),
+            _link("国家发展改革委新闻", "20261014"),
+        ]
+        with patch(
+            "oilprice.ndrc.urlopen",
+            side_effect=[io.BytesIO(page.encode("utf-8")) for page in pages],
+        ) as fetch:
+            notice = find_ndrc_notice(date(2026, 10, 15))
+        self.assertTrue(notice.no_change)
+        self.assertEqual(fetch.call_count, 3)
+
+    def test_cross_page_conflicting_announcements_do_not_cache_first_match(self) -> None:
+        pages = [
+            _link("2026年10月15日国内成品油价格调整")
+            + 'createPageHTML(2, 0, "index", "html");',
+            _link("2026年10月15日国内成品油价格不作调整").replace("1408170", "1408171"),
+        ]
+        with patch(
+            "oilprice.ndrc.urlopen",
+            side_effect=[io.BytesIO(page.encode("utf-8")) for page in pages],
+        ):
+            with self.assertRaisesRegex(ValueError, "conflicting NDRC"):
+                find_ndrc_notice(date(2026, 10, 15))
+
+    def test_repeated_same_announcement_across_pages_is_accepted(self) -> None:
+        title = "2026年10月15日国内成品油价格不作调整"
+        pages = [
+            _link(title) + 'createPageHTML(2, 0, "index", "html");',
+            _link(title),
+        ]
+        with patch(
+            "oilprice.ndrc.urlopen",
+            side_effect=[io.BytesIO(page.encode("utf-8")) for page in pages],
+        ) as fetch:
+            notice = find_ndrc_notice(date(2026, 10, 15))
+        self.assertTrue(notice.no_change)
+        self.assertEqual(fetch.call_count, 2)
 
     def test_pending_window_stops_before_older_pages(self) -> None:
         html = _link("2026年9月24日国内成品油价格调整", "20260924")

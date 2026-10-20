@@ -3,14 +3,18 @@ from __future__ import annotations
 import base64
 import json
 import logging
+import socket
 import tempfile
+import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass
+from functools import partial
+from http.client import HTTPConnection, HTTPSConnection
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import quote, unquote, urlparse, urlsplit, urlunsplit
-from urllib.request import HTTPRedirectHandler, Request, build_opener
+from urllib.request import HTTPHandler, HTTPRedirectHandler, HTTPSHandler, Request, build_opener
 
 from oilprice.errors import BrowserHTTPError, ResponseTooLargeError
 
@@ -386,18 +390,26 @@ def _fetch_bytes_with_context_request(
         response = context.request.get(source_url, headers=headers, timeout=timeout_ms)
     except Exception:
         return None
-    _validate_response_url(response, source_url, url_validator)
     try:
-        if not response.ok:
+        _validate_response_url(response, source_url, url_validator)
+        try:
+            if not response.ok:
+                return None
+            _reject_oversized_response(source_url, response, max_bytes)
+            data = response.body()
+            _reject_oversized_data(source_url, data, max_bytes)
+            return data
+        except ResponseTooLargeError:
+            raise
+        except Exception:
             return None
-        _reject_oversized_response(source_url, response, max_bytes)
-        data = response.body()
-        _reject_oversized_data(source_url, data, max_bytes)
-        return data
-    except ResponseTooLargeError:
-        raise
-    except Exception:
-        return None
+    finally:
+        # APIRequestContext retains response bodies until explicitly disposed.
+        # Cleanup must not hide validation errors or a successful response.
+        try:
+            response.dispose()
+        except Exception as exc:
+            logger.debug("[browser] response dispose failed: %s", exc)
 
 
 def _fetch_direct_response_body(
@@ -517,7 +529,17 @@ class _ValidatingRedirectHandler(HTTPRedirectHandler):
         self.url_validator = url_validator
 
     def redirect_request(self, req, fp, code, msg, headers, newurl):
-        _validate_url(newurl, self.url_validator)
+        try:
+            _validate_url(newurl, self.url_validator)
+        except Exception:
+            # urllib normally closes the redirect response after this method
+            # returns; a validator rejection bypasses that cleanup.
+            if fp is not None:
+                try:
+                    fp.close()
+                except Exception as exc:
+                    logger.debug("[browser] redirect response close failed: %s", exc)
+            raise
         redirected = super().redirect_request(req, fp, code, msg, headers, newurl)
         source = urlparse(req.full_url)
         target = urlparse(newurl)
@@ -527,6 +549,112 @@ class _ValidatingRedirectHandler(HTTPRedirectHandler):
         ):
             redirected.remove_header("Cookie")
         return redirected
+
+
+class _HTTPDownloadDeadline:
+    """Interrupt active sockets at one deadline, even while a peer drips bytes."""
+
+    def __init__(self, source_url: str, timeout_ms: int) -> None:
+        self.source_url = source_url
+        self.expires_at = time.monotonic() + max(timeout_ms, 1) / 1000
+        self._sockets: set[socket.socket] = set()
+        self._lock = threading.Lock()
+        self._timer = threading.Timer(max(timeout_ms, 1) / 1000, self._interrupt)
+        self._timer.daemon = True
+
+    def __enter__(self) -> "_HTTPDownloadDeadline":
+        self._timer.start()
+        return self
+
+    def __exit__(self, exc_type, exc, traceback) -> None:
+        self._timer.cancel()
+        with self._lock:
+            for sock in self._sockets:
+                try:
+                    sock.close()
+                except OSError:
+                    pass
+            self._sockets.clear()
+
+    def remaining(self) -> float:
+        remaining = self.expires_at - time.monotonic()
+        if remaining <= 0:
+            raise TimeoutError(f"attachment download exceeded total timeout: {self.source_url}")
+        return remaining
+
+    def watch(self, sock: socket.socket) -> None:
+        # Register sockets before sending requests, so slow status/header lines
+        # and redirect responses are subject to the same deadline as the body.
+        with self._lock:
+            self._sockets.add(sock)
+            sock.settimeout(self.remaining())
+
+    def _interrupt(self) -> None:
+        with self._lock:
+            for sock in self._sockets:
+                # shutdown interrupts a read held by HTTPResponse's buffered
+                # file object; closing that file from this thread can deadlock.
+                try:
+                    sock.shutdown(socket.SHUT_RDWR)
+                except OSError:
+                    pass
+
+
+class _DeadlineConnectionMixin:
+    def __init__(self, *args, deadline: _HTTPDownloadDeadline, **kwargs) -> None:
+        self._deadline = deadline
+        super().__init__(*args, **kwargs)
+        self._create_connection = self._connect_socket
+
+    def _connect_socket(self, address, timeout=None, source_address=None):
+        sock = socket.create_connection(
+            address,
+            timeout=self._deadline.remaining(),
+            source_address=source_address,
+        )
+        try:
+            self._deadline.watch(sock)
+        except Exception:
+            sock.close()
+            raise
+        return sock
+
+    def connect(self) -> None:
+        super().connect()
+        if self.sock is not None:
+            # HTTPS replaces the original socket with an SSLSocket. The TLS
+            # handshake itself uses the remaining timeout set at TCP connect.
+            self._deadline.watch(self.sock)
+
+
+class _DeadlineHTTPConnection(_DeadlineConnectionMixin, HTTPConnection):
+    pass
+
+
+class _DeadlineHTTPSConnection(_DeadlineConnectionMixin, HTTPSConnection):
+    pass
+
+
+class _DeadlineHTTPHandler(HTTPHandler):
+    def __init__(self, deadline: _HTTPDownloadDeadline) -> None:
+        super().__init__()
+        self._deadline = deadline
+
+    def http_open(self, req):
+        return self.do_open(partial(_DeadlineHTTPConnection, deadline=self._deadline), req)
+
+
+class _DeadlineHTTPSHandler(HTTPSHandler):
+    def __init__(self, deadline: _HTTPDownloadDeadline) -> None:
+        super().__init__()
+        self._deadline = deadline
+
+    def https_open(self, req):
+        return self.do_open(
+            partial(_DeadlineHTTPSConnection, deadline=self._deadline),
+            req,
+            context=self._context,
+        )
 
 
 def _fetch_bytes_streaming_http(
@@ -550,35 +678,49 @@ def _fetch_bytes_streaming_http(
         headers["Cookie"] = cookie_header
 
     request = Request(_ascii_http_url(source_url), headers=headers)
-    opener = build_opener(_ValidatingRedirectHandler(url_validator))
-    try:
-        response = opener.open(request, timeout=max(timeout_ms / 1000, 1))
-    except HTTPError as exc:
-        raise BrowserHTTPError(source_url, exc.code) from exc
-
-    with response:
-        final_url = response.geturl()
-        _validate_url(final_url, url_validator)
-        status = getattr(response, "status", None)
-        if status is not None and status >= 400:
-            raise BrowserHTTPError(final_url, status)
-
-        raw_length = response.headers.get("content-length")
+    with _HTTPDownloadDeadline(source_url, timeout_ms) as deadline:
+        opener = build_opener(
+            _ValidatingRedirectHandler(url_validator),
+            _DeadlineHTTPHandler(deadline),
+            _DeadlineHTTPSHandler(deadline),
+        )
         try:
-            declared_length = int(raw_length)
-        except (TypeError, ValueError):
-            declared_length = None
-        if declared_length is not None and declared_length > max_bytes:
-            raise ResponseTooLargeError(source_url, max_bytes, declared_length)
+            try:
+                response = opener.open(request, timeout=deadline.remaining())
+            except HTTPError as exc:
+                exc.close()
+                raise BrowserHTTPError(source_url, exc.code) from exc
 
-        data = bytearray()
-        while len(data) <= max_bytes:
-            remaining = max_bytes + 1 - len(data)
-            chunk = response.read(min(64 * 1024, remaining))
-            if not chunk:
-                return bytes(data)
-            data.extend(chunk)
-        raise ResponseTooLargeError(source_url, max_bytes, len(data))
+            with response:
+                final_url = response.geturl()
+                _validate_url(final_url, url_validator)
+                status = getattr(response, "status", None)
+                if status is not None and status >= 400:
+                    raise BrowserHTTPError(final_url, status)
+
+                raw_length = response.headers.get("content-length")
+                try:
+                    declared_length = int(raw_length)
+                except (TypeError, ValueError):
+                    declared_length = None
+                if declared_length is not None and declared_length > max_bytes:
+                    raise ResponseTooLargeError(source_url, max_bytes, declared_length)
+
+                data = bytearray()
+                while len(data) <= max_bytes:
+                    deadline.remaining()
+                    remaining = max_bytes + 1 - len(data)
+                    chunk = response.read(min(64 * 1024, remaining))
+                    deadline.remaining()
+                    if not chunk:
+                        return bytes(data)
+                    data.extend(chunk)
+                raise ResponseTooLargeError(source_url, max_bytes, len(data))
+        except Exception:
+            # Interrupting a socket may appear as EOF, IncompleteRead, or an
+            # OSError. Preserve a consistent, retryable timeout for callers.
+            deadline.remaining()
+            raise
 
 
 def _browser_cookie_header(context, source_url: str) -> str | None:

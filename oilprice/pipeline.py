@@ -24,7 +24,7 @@ from .options import DiscoverOptions, ExtractFilesOptions, ExtractOptions, Fetch
 from .paths import ROOT
 from .ocr.paddle import initialize_ocr
 from .payloads import EnabledSource
-from .prices import run_build_prices
+from .prices import build_price_candidate, run_build_prices, validate_price_regression
 from .regions import resolve_zone
 from .sources import load_enabled_sources
 from .validation import validate_json_project
@@ -70,10 +70,18 @@ def run_extract(options: ExtractOptions) -> str:
         logger.info(f"[extract] no target provinces for {options.adjustment_date}; skip build")
         return str(options.index_path)
 
+    price_path = ROOT / "data/prices" / options.adjustment_date[:4] / f"{options.adjustment_date}.json"
+    existing_snapshot = read_json(price_path) if price_path.exists() else None
     logger.info(
         f"[extract] shared CloakBrowser session start index={repo_relative(options.index_path, ROOT)}",
     )
     processed_province_codes: set[str] = set()
+    failures: list[dict[str, str]] = []
+
+    def record_failure(code: str, name: str, stage: str, message: str, error: Exception | None = None) -> None:
+        failures.append({"province_code": code, "province_name": name, "stage": stage, "message": message})
+        _log_province_failure(name, code, stage, message, error)
+
     run_root = new_artifact_directory(options.index_path.parent / "runs")
     ocr_initialized = False
     with BrowserSession(headless=True) as browser_session:
@@ -83,37 +91,47 @@ def run_extract(options: ExtractOptions) -> str:
 
             province_start = time.perf_counter()
             province_index = run_root / f"{province_code}.discover.json"
-            run_discover(
-                DiscoverOptions(
-                    sources_path=options.sources_path,
-                    index_path=province_index,
-                    adjustment_date=options.adjustment_date,
-                    timeout=options.timeout,
-                    force=True,
-                    province_codes={province_code},
-                    browser_session=browser_session,
+            try:
+                run_discover(
+                    DiscoverOptions(
+                        sources_path=options.sources_path,
+                        index_path=province_index,
+                        adjustment_date=options.adjustment_date,
+                        timeout=options.timeout,
+                        force=True,
+                        province_codes={province_code},
+                        browser_session=browser_session,
+                    )
                 )
-            )
-            discovered_index = read_json(province_index)
+                discovered_index = read_json(province_index)
+            except Exception as exc:
+                record_failure(province_code, province_name, "discovery", str(exc), exc)
+                continue
             discovered_notices = [
                 notice
                 for notice in discovered_index.get("notices", [])
                 if isinstance(notice, dict)
             ]
             discovery_errors = discovered_index.get("errors", [])
-            if discovery_errors or not discovered_notices:
+            if not discovered_notices:
                 reasons = []
                 if discovery_errors:
                     reasons.append(_format_discovery_errors(discovery_errors))
                 if not discovered_notices:
                     reasons.append("no notices found")
-                _log_province_failure(
-                    province_name,
+                record_failure(
                     province_code,
+                    province_name,
                     "discovery",
                     "; ".join(reasons),
                 )
                 continue
+            if discovery_errors:
+                logger.warning(
+                    "[warn] %s (%s) some discovery sources failed; using %s available notices: %s",
+                    province_name, province_code, len(discovered_notices),
+                    _format_discovery_errors(discovery_errors),
+                )
             logger.info(
                 f"[extract] {province_name} ({province_code}) discover "
                 f"notices={len(discovered_notices)} elapsed={_elapsed(province_start)}"
@@ -132,7 +150,7 @@ def run_extract(options: ExtractOptions) -> str:
                     )
                 )
             except Exception as exc:
-                _log_province_failure(province_name, province_code, "fetch", str(exc), exc)
+                record_failure(province_code, province_name, "fetch", str(exc), exc)
                 continue
             logger.info(
                 f"[extract] {province_name} ({province_code}) fetch "
@@ -162,14 +180,23 @@ def run_extract(options: ExtractOptions) -> str:
                     )
                 )
             except Exception as exc:
-                _log_province_failure(province_name, province_code, "extract", str(exc), exc)
+                record_failure(province_code, province_name, "extract", str(exc), exc)
                 continue
             logger.info(
                 f"[extract] {province_name} ({province_code}) extract "
                 f"elapsed={_elapsed(extract_start)}"
             )
 
-            staged_notices_by_id = read_notice_map(province_index)
+            try:
+                candidate = build_price_candidate(
+                    PriceOptions(province_index, options.adjustment_date, {province_code}),
+                )
+                if existing_snapshot is not None:
+                    validate_price_regression(existing_snapshot, candidate)
+                staged_notices_by_id = read_notice_map(province_index)
+            except Exception as exc:
+                record_failure(province_code, province_name, "price", str(exc), exc)
+                continue
             merged_notices_by_id = {
                 notice_id: notice
                 for notice_id, notice in notices_by_id.items()
@@ -183,11 +210,21 @@ def run_extract(options: ExtractOptions) -> str:
                 f"notices={len(staged_notices_by_id)} total={_elapsed(province_start)}"
             )
 
+    if not processed_province_codes:
+        raise RuntimeError(
+            f"No provinces successfully collected for {options.adjustment_date}; "
+            f"failed={','.join(sorted(item['province_code'] for item in failures))}. "
+            "Existing prices and notice index were preserved."
+        )
+
     if processed_province_codes:
         price_start = time.perf_counter()
         candidate_index = options.index_path.with_name(
             f".{options.index_path.name}.{run_root.name}.candidate"
         )
+        published_index = notice_index_payload(notices_by_id)
+        published_index["errors"] = failures
+        published_index["status"] = "partial" if failures else "complete"
         write_notice_index(candidate_index, notices_by_id)
         try:
             run_build_prices(
@@ -197,12 +234,10 @@ def run_extract(options: ExtractOptions) -> str:
                     province_codes=processed_province_codes,
                 ),
                 additional_payloads={
-                    options.index_path: notice_index_payload(notices_by_id),
+                    options.index_path: published_index,
                 },
-                # A province can finish extraction but still have no notice
-                # matching the target adjustment date. Keep successful
-                # provinces publishable and let the summary mark the others
-                # as missing instead of failing the whole CLI.
+                # Individual candidates were checked inside the province's
+                # error boundary. Publish the successful subset atomically.
                 allow_missing_requested_provinces=True,
             )
         finally:
@@ -211,6 +246,11 @@ def run_extract(options: ExtractOptions) -> str:
             f"[price] provinces={','.join(sorted(processed_province_codes))} "
             f"elapsed={_elapsed(price_start)}"
         )
+
+    logger.info(
+        "[extract] result=%s provinces_success=%s provinces_failed=%s",
+        "partial" if failures else "complete", len(processed_province_codes), len(failures),
+    )
 
     return str(options.index_path)
 

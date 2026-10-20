@@ -76,12 +76,44 @@ class WorkflowDecisionTests(unittest.TestCase):
         decision = decide_fetch(
             self.calendar,
             {"2026-07-17": _summary("partial", ["510000"])},
-            through_date=date(2026, 7, 19),
+            through_date=date(2026, 8, 1),
             requested_date="2026-07-17",
         )
 
         self.assertEqual(decision.mode, "missing")
         self.assertEqual(decision.provinces_missing, ("510000",))
+
+    def test_all_automatic_fetch_modes_expire_at_day_five(self) -> None:
+        for summary in (
+            None,
+            _summary("partial", ["510000"]),
+            {"status": "invalid"},
+        ):
+            summaries = {} if summary is None else {"2026-07-17": summary}
+            for days_elapsed, expected_skip in ((4, False), (5, True)):
+                with self.subTest(summary=summary, days_elapsed=days_elapsed):
+                    decision = decide_fetch(
+                        self.calendar, summaries,
+                        through_date=date(2026, 7, 17 + days_elapsed),
+                    )
+                    self.assertEqual(decision.mode == "skip", expected_skip)
+                    if expected_skip:
+                        self.assertEqual(decision.reason, "retry_window_expired")
+
+    def test_manual_force_and_missing_runs_ignore_retry_expiry(self) -> None:
+        for summary, expected_mode in (
+            (None, "force"),
+            (_summary("partial", ["510000"]), "missing"),
+            ({"status": "invalid"}, "force"),
+        ):
+            with self.subTest(summary=summary):
+                decision = decide_fetch(
+                    self.calendar,
+                    {} if summary is None else {"2026-07-17": summary},
+                    through_date=date(2026, 8, 1),
+                    requested_date="2026-07-17",
+                )
+                self.assertEqual(decision.mode, expected_mode)
 
     def test_latest_complete_window_skips_old_partial_window(self) -> None:
         decision = decide_fetch(
@@ -346,6 +378,62 @@ class RepositoryDecisionTests(unittest.TestCase):
             self.assertEqual(self.decide().reason, "already_complete")
             self.assertEqual(self.decide(requested_date="2026-10-16").reason, "not_adjustment_date")
             lookup.assert_not_called()
+
+    def test_manual_previous_year_uses_its_calendar_without_latest_pointer(self) -> None:
+        (self.root / "data/calendar/latest.json").unlink()
+        notice = NdrcNotice("国内成品油价格调整", "https://www.ndrc.gov.cn/notice")
+        with patch("oilprice.workflow_decision.find_ndrc_notice", return_value=notice) as lookup:
+            decision = decide_fetch_for_repository(
+                self.root, today_shanghai=date(2027, 2, 1), requested_date="2026-10-15",
+            )
+        lookup.assert_called_once_with(date(2026, 10, 15))
+        self.assertEqual(decision.mode, "force")
+        self.assertEqual(decision.target_date, "2026-10-15")
+        self.assertIs(read_json(self.calendar_path)["adjustment_dates"][0]["skip"], False)
+
+    def test_manual_absent_year_is_not_an_adjustment_date(self) -> None:
+        with patch("oilprice.workflow_decision.find_ndrc_notice") as lookup:
+            decision = self.decide(requested_date="2025-12-22")
+        self.assertEqual(decision.reason, "not_adjustment_date")
+        lookup.assert_not_called()
+
+    def test_cross_year_tail_window_writes_its_own_calendar(self) -> None:
+        old_calendar = _calendar(("2026-12-30", None))
+        write_json(self.calendar_path, old_calendar)
+        new_path = self.root / "data/calendar/2027.json"
+        write_json(new_path, _calendar(("2027-01-13", None)))
+        write_json(self.root / "data/calendar/latest.json", {"path": "/data/calendar/2027.json"})
+        new_before = new_path.read_bytes()
+        notice = NdrcNotice("国内成品油价格不作调整", "https://www.ndrc.gov.cn/notice")
+        with patch("oilprice.workflow_decision.find_ndrc_notice", return_value=notice) as lookup:
+            decision = decide_fetch_for_repository(self.root, today_shanghai=date(2027, 1, 2))
+        lookup.assert_called_once_with(date(2026, 12, 30))
+        self.assertEqual(decision.target_date, "2026-12-30")
+        self.assertEqual(decision.reason, "ndrc_no_price_adjustment")
+        old_entry = read_json(self.calendar_path)["adjustment_dates"][0]
+        self.assertIs(old_entry["skip"], True)
+        self.assertEqual(old_entry["ndrc_notice"], {"title": notice.title, "url": notice.url})
+        self.assertEqual(new_path.read_bytes(), new_before)
+
+    def test_current_calendar_is_used_when_latest_pointer_lags(self) -> None:
+        self.calendar["adjustment_dates"][1]["skip"] = False
+        write_json(self.calendar_path, self.calendar)
+        old_path = self.root / "data/calendar/2025.json"
+        write_json(old_path, _calendar(("2025-12-22", None)))
+        write_json(self.root / "data/calendar/latest.json", {"path": "/data/calendar/2025.json"})
+        with patch("oilprice.workflow_decision.find_ndrc_notice") as lookup:
+            decision = decide_fetch_for_repository(self.root, today_shanghai=date(2026, 10, 30))
+        self.assertEqual(decision.target_date, "2026-10-29")
+        self.assertEqual(decision.mode, "force")
+        lookup.assert_not_called()
+
+    def test_expired_missing_summary_does_not_query_or_write_calendar(self) -> None:
+        before = self.calendar_path.read_bytes()
+        with patch("oilprice.workflow_decision.find_ndrc_notice") as lookup:
+            decision = decide_fetch_for_repository(self.root, today_shanghai=date(2026, 10, 21))
+        self.assertEqual(decision.reason, "retry_window_expired")
+        self.assertEqual(self.calendar_path.read_bytes(), before)
+        lookup.assert_not_called()
 
 
 if __name__ == "__main__":

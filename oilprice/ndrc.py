@@ -58,6 +58,8 @@ def find_ndrc_notice(target_date: date) -> NdrcNotice | None:
     parsing errors propagate so the workflow cannot start an unverified fetch.
     """
     page_count = 1
+    matches: dict[str, NdrcNotice] = {}
+    adjustment_outcomes: set[bool] = set()
     for page in range(40):
         if page >= page_count:
             break
@@ -74,7 +76,6 @@ def find_ndrc_notice(target_date: date) -> NdrcNotice | None:
         parser = _NewsLinks()
         parser.feed(html)
         publication_dates: list[date] = []
-        matches: dict[str, NdrcNotice] = {}
         for href, title in parser.links:
             url = urljoin(page_url, href)
             parts = urlsplit(url)
@@ -92,11 +93,14 @@ def find_ndrc_notice(target_date: date) -> NdrcNotice | None:
                 continue
             if not any(word in title for word in ("调整", "调控", "上调", "下调")):
                 continue
-            matches[url] = NdrcNotice(title=title, url=url)
-        if matches:
-            if len({notice.no_change for notice in matches.values()}) > 1:
+            notice = NdrcNotice(title=title, url=url)
+            adjustment_outcomes.add(notice.no_change)
+            if len(adjustment_outcomes) > 1:
                 raise ValueError(f"conflicting NDRC price announcements for {target_date}")
-            return next(iter(matches.values()))
-        if publication_dates and min(publication_dates) <= target_date:
+            matches.setdefault(url, notice)
+        # Notices for one publication day can straddle a page boundary. Scan
+        # until an older day appears, including after a match, so conflicting
+        # announcements on the following page cannot be silently ignored.
+        if publication_dates and min(publication_dates) < target_date:
             break
-    return None
+    return next(iter(matches.values()), None)

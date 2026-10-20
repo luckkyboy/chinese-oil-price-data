@@ -3,9 +3,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import date, timedelta
 from pathlib import Path
 from urllib.request import urlopen
+
+# Keep the documented direct-script entry point usable without installation.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from oilprice.io import write_json
 
 
 HOLIDAY_DATA_URL_TEMPLATE = (
@@ -152,6 +159,43 @@ def build_calendar_payload(
     }
 
 
+def preserve_calendar_metadata(
+    generated: dict[str, object], existing: dict[str, object],
+) -> dict[str, object]:
+    """Retain confirmed window metadata while refreshing derived dates/rounds."""
+    old_windows = existing.get("adjustment_dates")
+    if not isinstance(old_windows, list):
+        raise ValueError("existing calendar adjustment_dates must be a list")
+    old_by_date: dict[str, dict[str, object]] = {}
+    for entry in old_windows:
+        if isinstance(entry, str):
+            entry = {"date": entry}
+        if not isinstance(entry, dict) or not isinstance(entry.get("date"), str):
+            raise ValueError("existing calendar adjustment date entries must contain date")
+        entry_date = entry["date"]
+        if entry_date in old_by_date:
+            raise ValueError(f"duplicate existing calendar adjustment date: {entry_date}")
+        old_by_date[entry_date] = entry
+
+    generated_dates = {entry["date"] for entry in generated["adjustment_dates"]}
+    removed_confirmed = [
+        entry_date for entry_date, entry in old_by_date.items()
+        if entry_date not in generated_dates and set(entry) - {"date", "round"}
+    ]
+    if removed_confirmed:
+        raise ValueError(
+            "regenerated calendar would remove windows with saved metadata: "
+            + ", ".join(sorted(removed_confirmed))
+        )
+    return {
+        **generated,
+        "adjustment_dates": [
+            {**old_by_date.get(entry["date"], {}), **entry}
+            for entry in generated["adjustment_dates"]
+        ],
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Generate refined oil adjustment calendar JSON.")
     parser.add_argument("year", type=int, nargs="?", default=date.today().year)
@@ -165,12 +209,13 @@ def main() -> None:
     payload = build_calendar_payload(args.year, anchor, today)
 
     output_dir = Path(args.output_dir)
-    output_dir.mkdir(parents=True, exist_ok=True)
     output_path = output_dir / f"{args.year}.json"
-    output_path.write_text(
-        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
-    )
+    if output_path.exists():
+        existing = json.loads(output_path.read_text(encoding="utf-8"))
+        if not isinstance(existing, dict):
+            raise ValueError("existing calendar must be a JSON object")
+        payload = preserve_calendar_metadata(payload, existing)
+    write_json(output_path, payload)
     print(output_path)
 
 
