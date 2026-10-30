@@ -924,6 +924,60 @@
       ]
     },
     {
+      "province_code": "630000",
+      "province_name": "青海省",
+      "sources": [
+        {
+          "name": "青海省发展和改革委员会",
+          "url": "http://fgw.qinghai.gov.cn/xwzx/tzgg/202610/t20261030_92962.html",
+          "notice_id": "qinghai-9a4bc1b3a6076830a44f758c94421273",
+          "title": "我省调整省内成品油最高零售价格",
+          "raw_sha256": "084204f59fe8e6c690fbeb40dab041abeb3a308727459cebf6fc44398baeaf2c",
+          "adapter": "qinghai",
+          "parser_version": "qinghai-v2",
+          "extracted_at": "2026-10-30T16:34:07+08:00",
+          "published_at": "2026-10-30",
+          "adjustment_date": "2026-10-29",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "qinghai-1",
+          "zone_name": "一价区",
+          "items": {
+            "89": 8.31,
+            "92": 8.85,
+            "95": 9.48,
+            "0": 8.5
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "qinghai-2",
+          "zone_name": "二价区",
+          "items": {
+            "89": 8.39,
+            "92": 8.94,
+            "95": 9.58,
+            "0": 8.59
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "qinghai-3",
+          "zone_name": "三价区",
+          "items": {
+            "89": 8.49,
+            "92": 9.04,
+            "95": 9.69,
+            "0": 8.7
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "640000",
       "province_name": "宁夏回族自治区",
       "sources": [
@@ -988,5 +1042,5 @@
       ]
     }
   ],
-  "updated_at": "2026-10-30T05:43:15+08:00"
+  "updated_at": "2026-10-30T16:34:10+08:00"
 }
