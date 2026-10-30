@@ -913,6 +913,73 @@
       ]
     },
     {
+      "province_code": "540000",
+      "province_name": "西藏自治区",
+      "sources": [
+        {
+          "name": "西藏自治区发展和改革委员会",
+          "url": "https://drc.xizang.gov.cn/zwgk_1941/tz/202610/t20261030_564758.html",
+          "notice_id": "xizang-1f8e3f5911d5a1a91a971cd1a642d05a",
+          "title": "西藏自治区成品油销售价格调整通知",
+          "raw_sha256": "7f097c439da8a3df967f3a2b461973a171eca46b153e494396b0d89038eb663c",
+          "adapter": "xizang",
+          "parser_version": "xizang-v2",
+          "extracted_at": "2026-10-31T04:59:32+08:00",
+          "published_at": "2026-10-30",
+          "adjustment_date": "2026-10-29",
+          "confidence": "medium"
+        },
+        {
+          "name": "西藏自治区发展和改革委员会",
+          "url": "https://drc.xizang.gov.cn/fgdt/jggl/202610/t20261030_564757.html",
+          "notice_id": "xizang-d83395e913ecf148e22d7418511fac31",
+          "title": "西藏自治区成品油销售价格调整通知",
+          "raw_sha256": "2b62c2fe505956e2733d5b94df4dc46dba146057c1bc4e2c005cc18684f43b8b",
+          "adapter": "xizang",
+          "parser_version": "xizang-v2",
+          "extracted_at": "2026-10-31T04:59:32+08:00",
+          "published_at": "2026-10-30",
+          "adjustment_date": "2026-10-29",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "xizang-ali",
+          "zone_name": "阿里价区",
+          "items": {
+            "89": 9.55,
+            "92": 10.14,
+            "95": 10.71,
+            "0": 9.52
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "xizang-changdu",
+          "zone_name": "昌都价区",
+          "items": {
+            "89": 9.36,
+            "92": 9.94,
+            "95": 10.49,
+            "0": 9.32
+          },
+          "missing_products": []
+        },
+        {
+          "zone_code": "xizang-lasa",
+          "zone_name": "拉萨价区",
+          "items": {
+            "89": 9.2,
+            "92": 9.75,
+            "95": 10.32,
+            "0": 9.11
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "610000",
       "province_name": "陕西省",
       "sources": [
@@ -1117,5 +1184,5 @@
       ]
     }
   ],
-  "updated_at": "2026-10-30T17:08:16+08:00"
+  "updated_at": "2026-10-31T04:59:32+08:00"
 }
