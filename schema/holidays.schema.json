@@ -1,62 +1,122 @@
-
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/luckkyboy/chinese-oil-price-data/schema/holidays.schema.json",
-  "title": "Holidays",
-  "description": "节假日与调休工作日配置列表",
-  "type": "array",
-  "items": {
-    "type": "object",
-    "additionalProperties": false,
-    "required": ["name", "range", "type"],
-    "properties": {
-      "name": {
-        "type": "string",
-        "minLength": 1,
-        "description": "节日名称，如元旦、春节"
-      },
-      "range": {
-        "type": "array",
-        "items": {
-          "type": "string",
-          "format": "date",
-          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+  "title": "中国法定节假日与调休配置",
+  "description": "中国法定节假日与调休配置",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "holidays",
+    "sources"
+  ],
+  "properties": {
+    "holidays": {
+      "type": "array",
+      "title": "节假日列表",
+      "description": "包含法定节假日及调休工作日",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "range",
+          "type"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "节日名称，例如元旦、春节、国庆节"
+          },
+          "range": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 2,
+            "items": {
+              "type": "string",
+              "format": "date",
+              "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+            },
+            "description": "日期范围，单日为1个日期，连续日期范围为开始和结束日期"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "holiday",
+              "workingday"
+            ],
+            "description": "holiday表示放假，workingday表示调休上班"
+          }
         },
-        "description": "假期为[开始日期, 结束日期]；调休工作日为[日期]"
-      },
-      "type": {
-        "type": "string",
-        "enum": ["holiday", "workingday"],
-        "description": "holiday为放假，workingday为调休上班"
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "holiday"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "range": {
+                  "minItems": 1,
+                  "maxItems": 2
+                }
+              }
+            }
+          },
+          {
+            "if": {
+              "properties": {
+                "type": {
+                  "const": "workingday"
+                }
+              },
+              "required": [
+                "type"
+              ]
+            },
+            "then": {
+              "properties": {
+                "range": {
+                  "minItems": 1,
+                  "maxItems": 1
+                }
+              }
+            }
+          }
+        ]
       }
     },
-    "allOf": [
-      {
-        "if": {
-          "properties": {
-            "type": { "const": "holiday" }
+    "sources": {
+      "type": "array",
+      "title": "数据来源",
+      "description": "节假日安排的官方通知或其他数据来源",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "url"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "description": "数据来源名称或官方通知标题"
           },
-          "required": ["type"]
-        },
-        "then": {
-          "properties": {
-            "range": { "minItems": 1, "maxItems": 2 }
-          }
-        }
-      },
-      {
-        "if": {
-          "properties": {
-            "type": { "const": "workingday" }
-          },
-          "required": ["type"]
-        },
-        "then": {
-          "properties": {
-            "range": { "minItems": 1, "maxItems": 2 }
+          "url": {
+            "type": "string",
+            "format": "uri",
+            "pattern": "^https?://",
+            "description": "数据来源网址，支持HTTP和HTTPS"
           }
         }
       }
-    ]
+    }
   }
 }
