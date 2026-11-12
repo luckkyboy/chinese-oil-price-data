@@ -190,7 +190,12 @@
     },
     {
       "date": "2026-10-29",
-      "round": 21
+      "round": 21,
+      "skip": false,
+      "ndrc_notice": {
+        "title": "2026年10月29日国家再次实施调控，成品油价格适当调整",
+        "url": "https://www.ndrc.gov.cn/xwdt/xwfb/202610/t20261029_1408449.html"
+      }
     },
     {
       "date": "2026-11-12",

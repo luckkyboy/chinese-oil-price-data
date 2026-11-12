@@ -544,7 +544,8 @@
           "name": "云南省发展和改革委员会",
           "base_url": "https://yndrc.yn.gov.cn/",
           "list_urls": [
-            "https://yndrc.yn.gov.cn/html/zhengwugongkai/fadingzhudonggongkaineirong/jiageyushoufei/"
+            "https://yndrc.yn.gov.cn/fgsj/jggb/cpyjg/",
+            "https://yndrc.yn.gov.cn/zwgk/fdzdgknr/jgysf/"
           ],
           "notice_keywords": [
             "成品油价格"
