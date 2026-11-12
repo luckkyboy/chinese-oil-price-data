@@ -1,0 +1,62 @@
+
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/luckkyboy/chinese-oil-price-data/schema/holidays.schema.json",
+  "title": "Holidays",
+  "description": "节假日与调休工作日配置列表",
+  "type": "array",
+  "items": {
+    "type": "object",
+    "additionalProperties": false,
+    "required": ["name", "range", "type"],
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1,
+        "description": "节日名称，如元旦、春节"
+      },
+      "range": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "format": "date",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "description": "假期为[开始日期, 结束日期]；调休工作日为[日期]"
+      },
+      "type": {
+        "type": "string",
+        "enum": ["holiday", "workingday"],
+        "description": "holiday为放假，workingday为调休上班"
+      }
+    },
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "type": { "const": "holiday" }
+          },
+          "required": ["type"]
+        },
+        "then": {
+          "properties": {
+            "range": { "minItems": 1, "maxItems": 2 }
+          }
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "type": { "const": "workingday" }
+          },
+          "required": ["type"]
+        },
+        "then": {
+          "properties": {
+            "range": { "minItems": 1, "maxItems": 2 }
+          }
+        }
+      }
+    ]
+  }
+}
