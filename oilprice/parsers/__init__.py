@@ -62,6 +62,7 @@ PARSER_REVISIONS = {name: 2 for name in PARSER_FUNCTIONS}
 PARSER_REVISIONS["guizhou"] = 3
 PARSER_REVISIONS["shaanxi"] = 3
 PARSER_REVISIONS["sichuan"] = 3
+PARSER_REVISIONS["ningxia"] = 3
 
 
 DATE_PATTERNS = [

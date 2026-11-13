@@ -123,7 +123,7 @@ class NoticeRenderedFallbackTests(unittest.TestCase):
 
 
 class HubeiDiscoveryTests(unittest.TestCase):
-    def test_official_http_notice_url_is_not_rewritten_to_blocked_https(self) -> None:
+    def test_legacy_http_notice_uses_registry_https_origin(self) -> None:
         source_url = "http://fgw.hubei.gov.cn/fbjd/zc/zcwj/gg/202607/notice.shtml"
         payload = {
             "data": [
@@ -153,7 +153,7 @@ class HubeiDiscoveryTests(unittest.TestCase):
             )
 
         self.assertEqual(len(refs), 1)
-        self.assertEqual(refs[0].source_url, source_url)
+        self.assertEqual(refs[0].source_url, source_url.replace("http:", "https:", 1))
 
 
 class BrowserStatusTests(unittest.TestCase):

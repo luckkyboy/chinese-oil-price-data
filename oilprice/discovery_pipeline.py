@@ -15,6 +15,7 @@ from .notices import (
     province_skip_reason,
 )
 from .options import DiscoverOptions
+from .models import NoticeRef
 from .payloads import EnabledSource, NoticePayload, SourceConfig
 from .sources import load_enabled_sources
 
@@ -104,11 +105,18 @@ def run_discover(options: DiscoverOptions) -> str:
                     continue
             else:
                 try:
-                    html = _fetch_list_html(
-                        list_url,
-                        rendered_list_fallback=rendered_list_fallback,
-                        options=options,
-                    )
+                    # Most registries are server-rendered. Avoid waiting for
+                    # their scripts/analytics; keep navigation as the fallback
+                    # for challenges, JS lists, and empty static results.
+                    refs = _discover_static_list_refs(item, list_url, keywords, options)
+                    if refs:
+                        html = None
+                    else:
+                        html = _fetch_list_html(
+                            list_url,
+                            rendered_list_fallback=rendered_list_fallback,
+                            options=options,
+                        )
                 except BrowserDiscoveryError as exc:
                     logger.warning(
                         f"[skip] {item['province_name']}: browser error {exc.cause} for {exc.url}"
@@ -116,7 +124,8 @@ def run_discover(options: DiscoverOptions) -> str:
                     errors.append(_discovery_error_payload(item, source, "browser", exc))
                     continue
                 try:
-                    refs = _parse_list_html(item, html, list_url, keywords)
+                    if html is not None:
+                        refs = _parse_list_html(item, html, list_url, keywords)
                     if not refs and rendered_list_fallback:
                         rendered_html = _fetch_rendered_list_html(list_url, options=options)
                         refs = _parse_list_html(item, rendered_html, list_url, keywords)
@@ -164,6 +173,29 @@ def run_discover(options: DiscoverOptions) -> str:
         },
     )
     return str(options.index_path)
+
+
+def _discover_static_list_refs(
+    item: EnabledSource, list_url: str, keywords: list[str], options: DiscoverOptions,
+) -> list[NoticeRef]:
+    if options.browser_session is None:
+        return []
+    try:
+        html = options.browser_session.fetch_static_text(
+            list_url, timeout_seconds=min(options.timeout, 8),
+        )
+        if not isinstance(html, str) or not html:
+            return []
+        refs = _parse_list_html(item, html, list_url, keywords)
+        if options.adjustment_date:
+            refs = [ref for ref in refs if filter_notices_for_adjustment_date(
+                [{"title": ref.title, "source_url": ref.source_url,
+                  "published_at": ref.published_at}], options.adjustment_date,
+            )]
+        return refs
+    except Exception as exc:
+        logger.debug("[browser] static list failed; navigating %s: %s", list_url, exc)
+        return []
 
 
 def _discovery_error_payload(

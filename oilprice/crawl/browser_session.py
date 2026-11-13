@@ -155,6 +155,19 @@ class BrowserSession:
         )
         return data.decode("utf-8", errors="replace")
 
+    def fetch_static_text(self, source_url: str, *, timeout_seconds: int) -> str:
+        """One short request using browser cookies, without page navigation."""
+        start = time.perf_counter()
+        data = _fetch_bytes_with_context_request(
+            self.context, source_url, timeout_ms=max(1, timeout_seconds) * 1000,
+            referer=None, max_bytes=None, url_validator=None,
+        )
+        logger.info(
+            "[browser] static_list elapsed=%.1fs bytes=%s url=%s",
+            time.perf_counter() - start, len(data or b""), source_url,
+        )
+        return data.decode("utf-8", errors="replace") if data else ""
+
     def fetch_json(
         self,
         source_url: str,

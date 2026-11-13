@@ -236,6 +236,9 @@ def fetch_notice_html_with_browser(
             source_url,
             timeout_seconds=timeout,
             browser_session=browser_session,
+            # Rendering is the useful next attempt for protected notices.
+            # Repeating the same unrendered request can cost 3 x 90 seconds.
+            max_attempts=1 if rendered_fallback else 3,
         )
         if _looks_like_browser_challenge(html):
             raise RuntimeError(f"browser challenge received for {source_url}")

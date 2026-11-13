@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse, urlunparse
 
 from oilprice.adapters.generic import build_notice_id, strip_tags
 from oilprice.crawl.browser_client import BrowserSession
@@ -41,6 +41,12 @@ def discover_from_hubei_qtgk_json(
         if not raw_url:
             continue
         source_url = urljoin(list_url, raw_url)
+        # qtgk.json still publishes legacy HTTP links. Use the registry's
+        # HTTPS origin: HTTP can settle on an interstitial without an article.
+        parsed_url = urlparse(source_url)
+        list_origin = urlparse(list_url)
+        if parsed_url.hostname == list_origin.hostname and list_origin.scheme == "https":
+            source_url = urlunparse(parsed_url._replace(scheme="https"))
         if source_url in seen:
             continue
         seen.add(source_url)

@@ -13,6 +13,8 @@ BLANK_LINE_RE = re.compile(r"\n{3,}")
 def html_to_text(content: bytes) -> str:
     raw = content.decode("utf-8", errors="replace")
     raw = SCRIPT_STYLE_RE.sub("", raw)
+    # Adjacent table cells need a boundary even when the publisher minifies HTML.
+    raw = re.sub(r"</(?:td|th)\s*>", "\n", raw, flags=re.IGNORECASE)
     raw = re.sub(r"</(p|div|br|li|tr|h[1-6])\s*>", "\n", raw, flags=re.IGNORECASE)
     text = TAG_RE.sub("", raw)
     text = unescape(text)

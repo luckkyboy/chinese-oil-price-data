@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import time
 
 
@@ -92,8 +93,8 @@ def capture_settled_html(page, *, timeout_ms: int) -> str:
             page.wait_for_timeout(300)
             continue
         best = content
-        compact = content.replace(" ", "").replace("\n", "").lower()
-        if len(content) > 1000 and "<body></body>" not in compact:
+        body = re.search(r"<body\b[^>]*>(.*?)</body\s*>", content, re.I | re.S)
+        if len(content) > 1000 and body and body.group(1).strip():
             return content
         page.wait_for_timeout(500)
     return best

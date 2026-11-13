@@ -39,6 +39,7 @@ def command_extract(args: argparse.Namespace) -> None:
 
 
 def run_extract(options: ExtractOptions) -> str:
+    run_start = time.perf_counter()
     enabled_sources = load_enabled_sources(options.sources_path)
     validate_requested_province_codes(enabled_sources, options.province_codes)
     pending_codes: set[str] | None = None
@@ -248,8 +249,9 @@ def run_extract(options: ExtractOptions) -> str:
         )
 
     logger.info(
-        "[extract] result=%s provinces_success=%s provinces_failed=%s",
+        "[extract] result=%s provinces_success=%s provinces_failed=%s elapsed=%s",
         "partial" if failures else "complete", len(processed_province_codes), len(failures),
+        _elapsed(run_start),
     )
 
     return str(options.index_path)
