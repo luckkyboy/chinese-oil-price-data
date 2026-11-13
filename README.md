@@ -162,3 +162,7 @@ python -m oilprice.cli price 2026-07-31
 python -m oilprice.cli lookup-price 武汉市 --province hubei --adjustment-date 2026-07-31
 python -m oilprice.cli lookup-price 武汉市 --province hubei --adjustment-date 2026-07-31 --product 92
 ```
+
+## 致谢
+
+感谢 [bastengao/chinese-holidays-data](https://github.com/bastengao/chinese-holidays-data)。本项目 `data/holidays/{year}.json` 中节假日与调休工作日的数据结构借鉴了该项目。
