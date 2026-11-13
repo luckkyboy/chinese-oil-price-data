@@ -32,6 +32,7 @@ PRICE_SUMMARY_PATH_RE = re.compile(
 )
 CALENDAR_PATH_RE = re.compile(r"^data/calendar/(?P<year>[0-9]{4})\.json$")
 REGION_ZONE_PATH_RE = re.compile(r"^data/regions/(?P<slug>[^/]+)\.json$")
+HOLIDAYS_PATH_RE = re.compile(r"^data/holidays/(?P<year>[0-9]{4})\.json$")
 PRODUCT_ORDER = ("89", "92", "95", "0")
 PRODUCT_CODES = frozenset(PRODUCT_ORDER)
 
@@ -416,6 +417,8 @@ def _schema_kind_for_path(relative_path: str) -> str | None:
         return "region_zones"
     if relative_path == "data/sources/provinces.json":
         return "source_sites"
+    if HOLIDAYS_PATH_RE.fullmatch(relative_path):
+        return "holidays"
     return None
 
 
