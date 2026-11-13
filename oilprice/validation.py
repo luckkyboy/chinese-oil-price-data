@@ -21,6 +21,7 @@ SCHEMA_FILES = {
     "region_index": "region-index.schema.json",
     "region_zones": "region-zones.schema.json",
     "source_sites": "source-sites.schema.json",
+    "holidays": "holidays.schema.json",
 }
 
 PRICE_PATH_RE = re.compile(
