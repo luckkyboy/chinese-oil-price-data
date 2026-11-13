@@ -11,7 +11,7 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from oilprice.io import write_json
+from oilprice.io import write_json_batch_atomic
 from oilprice.paths import ROOT
 
 
@@ -222,7 +222,13 @@ def main() -> None:
         if not isinstance(existing, dict):
             raise ValueError("existing calendar must be a JSON object")
         payload = preserve_calendar_metadata(payload, existing)
-    write_json(output_path, payload)
+    latest_path = output_dir / "latest.json"
+    latest = {
+        "year": args.year,
+        "path": f"/data/calendar/{args.year}.json",
+        "updated_at": payload["generated_at"],
+    }
+    write_json_batch_atomic({output_path: payload, latest_path: latest})
     print(output_path)
 
 

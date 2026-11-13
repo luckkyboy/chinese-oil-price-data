@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import unittest
 import tempfile
-from datetime import date
+from datetime import date, datetime
 from pathlib import Path
 from unittest.mock import patch
+from zoneinfo import ZoneInfo
 
 from oilprice.io import read_json, write_json
 from oilprice.ndrc import NdrcNotice
@@ -428,6 +429,54 @@ class RepositoryDecisionTests(unittest.TestCase):
         self.assertEqual(decision.target_date, "2026-10-29")
         self.assertEqual(decision.mode, "force")
         lookup.assert_not_called()
+
+    def test_automatic_decision_ignores_absent_or_invalid_latest_pointer(self) -> None:
+        self.calendar["adjustment_dates"][1]["skip"] = False
+        write_json(self.calendar_path, self.calendar)
+        latest_path = self.root / "data/calendar/latest.json"
+        # An unrelated old calendar must not be read in October either.
+        (self.root / "data/calendar/2025.json").write_text("invalid JSON", encoding="utf-8")
+        for content in (None, "invalid JSON", '{"path":"/data/calendar/2099.json"}'):
+            with self.subTest(content=content):
+                if content is None:
+                    latest_path.unlink(missing_ok=True)
+                else:
+                    latest_path.write_text(content, encoding="utf-8")
+                with patch("oilprice.workflow_decision.find_ndrc_notice") as lookup:
+                    decision = decide_fetch_for_repository(self.root, today_shanghai=date(2026, 10, 30))
+                    lookup.assert_not_called()
+                self.assertEqual(decision.target_date, "2026-10-29")
+                self.assertEqual(decision.mode, "force")
+
+    def test_automatic_year_selection_uses_beijing_clock(self) -> None:
+        calendar = _calendar(("2027-01-08", None), ("2027-01-22", None))
+        calendar["adjustment_dates"][0]["skip"] = False
+        write_json(self.root / "data/calendar/2027.json", calendar)
+        with patch("oilprice.workflow_decision.datetime") as clock:
+            clock.now.return_value = datetime(2027, 1, 8, 0, 30, tzinfo=ZoneInfo("Asia/Shanghai"))
+            decision = decide_fetch_for_repository(self.root)
+            clock.now.assert_called_once_with(ZoneInfo("Asia/Shanghai"))
+        self.assertEqual(decision.target_date, "2027-01-08")
+        self.assertEqual(decision.mode, "force")
+
+    def test_missing_current_year_calendar_fails_without_using_pointer(self) -> None:
+        with patch("oilprice.workflow_decision.find_ndrc_notice") as lookup:
+            with self.assertRaises(FileNotFoundError):
+                decide_fetch_for_repository(self.root, today_shanghai=date(2027, 1, 2))
+            lookup.assert_not_called()
+
+    def test_previous_year_is_read_only_during_january_retry_window(self) -> None:
+        calendar = _calendar(("2026-12-31", None))
+        calendar["adjustment_dates"][0]["skip"] = False
+        write_json(self.calendar_path, calendar)
+        write_json(self.root / "data/calendar/2027.json", _calendar(("2027-01-13", None)))
+        decision = decide_fetch_for_repository(self.root, today_shanghai=date(2027, 1, 5))
+        self.assertEqual(decision.target_date, "2026-12-31")
+        self.assertEqual(decision.mode, "force")
+        self.calendar_path.write_text("invalid JSON", encoding="utf-8")
+        decision = decide_fetch_for_repository(self.root, today_shanghai=date(2027, 1, 6))
+        self.assertEqual(decision.mode, "skip")
+        self.assertEqual(decision.reason, "no_due_adjustment_date")
 
     def test_expired_missing_summary_does_not_query_or_write_calendar(self) -> None:
         before = self.calendar_path.read_bytes()

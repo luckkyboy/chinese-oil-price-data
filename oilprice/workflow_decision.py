@@ -205,18 +205,11 @@ def _load_repository_calendars(
         target = _parse_canonical_date(requested_date, label="workflow_dispatch date")
         paths = [calendar_root / f"{target.year}.json"]
     else:
-        latest = _read_json(calendar_root / "latest.json")
-        raw_path = latest.get("path")
-        if not isinstance(raw_path, str) or not raw_path.strip():
-            raise ValueError("calendar latest path must be a non-empty string")
-        latest_path = _resolve_repo_path(root, raw_path)
-        # The latest pointer may already refer to next year's calendar. Keep
-        # the previous year's final window eligible during the year boundary.
-        paths = [
-            latest_path,
-            calendar_root / f"{through_date.year}.json",
-            calendar_root / f"{through_date.year - 1}.json",
-        ]
+        paths = [calendar_root / f"{through_date.year}.json"]
+        # Only January 1–5 can still fall within the previous year's D+5
+        # retry window. Select these files solely from the Beijing date.
+        if through_date < date(through_date.year, 1, 1) + timedelta(days=_MAX_AUTOMATIC_RETRY_DAYS):
+            paths.append(calendar_root / f"{through_date.year - 1}.json")
 
     loaded: list[tuple[Path, dict[str, object]]] = []
     seen: set[Path] = set()
@@ -226,8 +219,8 @@ def _load_repository_calendars(
             continue
         seen.add(path)
         if not path.exists():
-            # A broken latest pointer is a configuration error; optional
-            # adjacent years and absent manual years have no eligible windows.
+            # Automatic runs require this year's calendar. Previous-year
+            # catch-up and absent manual years have no eligible windows.
             if not requested_date.strip() and path == paths[0]:
                 raise FileNotFoundError(path)
             continue
@@ -354,15 +347,6 @@ def _parse_canonical_date(value: str, *, label: str) -> date:
     if parsed.isoformat() != value:
         raise ValueError(f"{label} must use canonical YYYY-MM-DD format")
     return parsed
-
-
-def _resolve_repo_path(root: Path, raw_path: str) -> Path:
-    candidate = (root / raw_path.lstrip("/\\")).resolve()
-    try:
-        candidate.relative_to(root)
-    except ValueError as exc:
-        raise ValueError(f"calendar path escapes repository root: {raw_path}") from exc
-    return candidate
 
 
 def _read_json(path: Path) -> dict[str, object]:

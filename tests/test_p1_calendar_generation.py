@@ -3,6 +3,7 @@ from __future__ import annotations
 import contextlib
 import copy
 import io
+import os
 import subprocess
 import sys
 import tempfile
@@ -101,6 +102,49 @@ class CalendarGenerationTests(unittest.TestCase):
 
         self.assertEqual(self.output_path.read_bytes(), before)
         self.assertEqual(list(self.output_dir.iterdir()), [self.output_path])
+
+    def test_generation_updates_latest_pointer_in_output_directory(self) -> None:
+        latest_path = self.output_dir / "latest.json"
+        write_json(latest_path, {"year": 2025, "path": "/data/calendar/2025.json",
+                                 "updated_at": "2025-01-01T00:00:00+08:00"})
+        self.run_generator()
+        self.assertEqual(read_json(latest_path), {
+            "year": 2026, "path": "/data/calendar/2026.json",
+            "updated_at": self.generated["generated_at"],
+        })
+        self.assertEqual(read_json(self.output_path), self.generated)
+
+    def test_latest_failure_rolls_back_calendar_and_pointer(self) -> None:
+        latest_path = self.output_dir / "latest.json"
+        write_json(self.output_path, {**self.generated, "generated_at": "old"})
+        write_json(latest_path, {"year": 2025, "path": "/data/calendar/2025.json",
+                                 "updated_at": "2025-01-01T00:00:00+08:00"})
+        before = {path: path.read_bytes() for path in (self.output_path, latest_path)}
+        replace = os.replace
+
+        def fail_latest(source, target):
+            if Path(target) == latest_path:
+                raise OSError("latest publication failed")
+            return replace(source, target)
+
+        with patch("oilprice.io.os.replace", side_effect=fail_latest):
+            with self.assertRaisesRegex(OSError, "latest publication failed"):
+                self.run_generator()
+        self.assertEqual({path: path.read_bytes() for path in before}, before)
+        self.assertEqual(set(self.output_dir.iterdir()), set(before))
+
+    def test_latest_failure_removes_new_calendar(self) -> None:
+        replace = os.replace
+
+        def fail_latest(source, target):
+            if Path(target).name == "latest.json":
+                raise OSError("latest publication failed")
+            return replace(source, target)
+
+        with patch("oilprice.io.os.replace", side_effect=fail_latest):
+            with self.assertRaisesRegex(OSError, "latest publication failed"):
+                self.run_generator()
+        self.assertEqual(list(self.output_dir.iterdir()), [])
 
     def test_direct_script_entry_point_imports_package_from_other_directory(self) -> None:
         script_path = Path(generate_calendar.__file__).resolve()
