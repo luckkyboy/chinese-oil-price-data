@@ -199,7 +199,12 @@
     },
     {
       "date": "2026-11-12",
-      "round": 22
+      "round": 22,
+      "skip": false,
+      "ndrc_notice": {
+        "title": "2026年11月12日国内成品油价格调整",
+        "url": "https://www.ndrc.gov.cn/xwdt/xwfb/202611/t20261112_1408795.html"
+      }
     },
     {
       "date": "2026-11-26",
