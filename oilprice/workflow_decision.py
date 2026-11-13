@@ -15,6 +15,8 @@ from oilprice.ndrc import find_ndrc_notice
 FetchMode = Literal["force", "missing", "skip"]
 _PROVINCE_CODE_PATTERN = re.compile(r"^[0-9]{6}$")
 _MAX_AUTOMATIC_RETRY_DAYS = 5
+ADJUSTMENT_DAY_CRON = "30 9,11,13,15 * * *"
+CATCH_UP_CRON = "0 3,11 * * *"
 
 
 @dataclass(frozen=True)
@@ -91,12 +93,11 @@ def decide_fetch(
     summary = summaries.get(latest_window.text)
     decision = _classify_window(latest_window, summary)
 
-    # Give an incomplete adjustment window five complete calendar days after
-    # the adjustment date for automatic retries. Manual dispatches above keep
+    # Include D+5; automatic retries expire starting D+6. Manual dispatches keep
     # the existing behavior and can still force a later recovery attempt.
     if (
         decision.mode in {"force", "missing"}
-        and through_date >= latest_window.value + timedelta(days=_MAX_AUTOMATIC_RETRY_DAYS)
+        and through_date > latest_window.value + timedelta(days=_MAX_AUTOMATIC_RETRY_DAYS)
     ):
         return FetchDecision(
             target_date=decision.target_date,
@@ -114,13 +115,15 @@ def decide_fetch_for_repository(
     *,
     requested_date: str = "",
     today_shanghai: date | None = None,
+    scheduled_cron: str = "",
 ) -> FetchDecision:
     """Choose a window and cache its confirmed NDRC adjustment decision."""
 
     root = root.resolve()
     if today_shanghai is None:
         today_shanghai = datetime.now(ZoneInfo("Asia/Shanghai")).date()
-    through_date = today_shanghai - timedelta(days=1)
+    # Announcements become available on the adjustment day itself.
+    through_date = today_shanghai
     calendars = _load_repository_calendars(root, through_date, requested_date)
     calendar = {
         "adjustment_dates": [
@@ -148,6 +151,20 @@ def decide_fetch_for_repository(
     )
     if decision.mode == "skip":
         return decision
+
+    if scheduled_cron and not requested_date.strip():
+        if scheduled_cron not in {ADJUSTMENT_DAY_CRON, CATCH_UP_CRON}:
+            raise ValueError(f"unknown workflow schedule: {scheduled_cron}")
+        is_adjustment_day = decision.target_date == today_shanghai.isoformat()
+        expected_cron = ADJUSTMENT_DAY_CRON if is_adjustment_day else CATCH_UP_CRON
+        if scheduled_cron != expected_cron:
+            # Use the event's cron identity rather than the job's actual start
+            # hour: GitHub queues can delay the final 19:00 catch-up run.
+            return FetchDecision(
+                target_date=decision.target_date, mode="skip",
+                reason="outside_fetch_schedule", summary_path=decision.summary_path,
+                provinces_missing=decision.provinces_missing,
+            )
 
     entry = next(
         entry for entry in calendar["adjustment_dates"]

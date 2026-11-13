@@ -10,11 +10,14 @@ defaults:
 
 on:
   schedule:
-    - cron: "30 16,20,0,4 * * *"
+    # UTC -> Beijing: adjustment day at 17:30, 19:30, 21:30, 23:30.
+    - cron: "30 9,11,13,15 * * *"
+    # UTC -> Beijing: catch up on days D+1 through D+5 at 11:00 and 19:00.
+    - cron: "0 3,11 * * *"
   workflow_dispatch:
     inputs:
       date:
-        description: "Optional YYYY-MM-DD. If omitted, catch up the latest incomplete window due by yesterday in Asia/Shanghai."
+        description: "Optional YYYY-MM-DD. If omitted, check the latest window due today in Asia/Shanghai (within 5 days). Explicit dates bypass the automatic retry deadline."
         required: false
         type: string
 
@@ -42,6 +45,7 @@ jobs:
         id: decide
         env:
           DATE_INPUT: ${{ github.event.inputs.date }}
+          SCHEDULE_CRON: ${{ github.event.schedule }}
         run: |
           python - <<'PY'
           import os
@@ -54,6 +58,7 @@ jobs:
           decision = decide_fetch_for_repository(
               Path.cwd(),
               requested_date=os.environ.get("DATE_INPUT", ""),
+              scheduled_cron=os.environ.get("SCHEDULE_CRON", ""),
           )
           outputs = decision.as_outputs()
 
@@ -84,6 +89,7 @@ jobs:
           FETCH_MODE: ${{ steps.decide.outputs.mode || 'failed' }}
           FETCH_REASON: ${{ steps.decide.outputs.reason || 'unknown' }}
           PROVINCES_MISSING: ${{ steps.decide.outputs.provinces_missing || '' }}
+          SCHEDULE_CRON: ${{ github.event.schedule }}
         run: |
           printf '%s\n' "### Daily Oil Price Workflow" >> "$GITHUB_STEP_SUMMARY"
           printf '\n' >> "$GITHUB_STEP_SUMMARY"
@@ -91,6 +97,8 @@ jobs:
           printf '%s\n' "- mode: ${FETCH_MODE}" >> "$GITHUB_STEP_SUMMARY"
           printf '%s\n' "- reason: ${FETCH_REASON}" >> "$GITHUB_STEP_SUMMARY"
           printf '%s\n' "- provinces_missing: ${PROVINCES_MISSING}" >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "- schedule (UTC): ${SCHEDULE_CRON:-manual}" >> "$GITHUB_STEP_SUMMARY"
+          printf '%s\n' "- decision time (Beijing): $(TZ=Asia/Shanghai date '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_STEP_SUMMARY"
 
   fetch:
     needs: decide

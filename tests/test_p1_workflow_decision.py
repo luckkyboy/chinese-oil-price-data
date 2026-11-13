@@ -8,7 +8,9 @@ from unittest.mock import patch
 
 from oilprice.io import read_json, write_json
 from oilprice.ndrc import NdrcNotice
-from oilprice.workflow_decision import decide_fetch, decide_fetch_for_repository
+from oilprice.workflow_decision import (
+    ADJUSTMENT_DAY_CRON, CATCH_UP_CRON, decide_fetch, decide_fetch_for_repository,
+)
 
 
 def _calendar(*entries: tuple[str, str | None]) -> dict[str, object]:
@@ -51,22 +53,22 @@ class WorkflowDecisionTests(unittest.TestCase):
         self.assertEqual(decision.mode, "missing")
         self.assertEqual(decision.provinces_missing, ("210000", "510000"))
 
-    def test_missing_window_stops_after_five_complete_days(self) -> None:
+    def test_missing_window_stops_on_day_six(self) -> None:
         decision = decide_fetch(
             self.calendar,
             {"2026-07-17": _summary("partial", ["510000"])},
-            through_date=date(2026, 7, 22),
+            through_date=date(2026, 7, 23),
         )
 
         self.assertEqual(decision.mode, "skip")
         self.assertEqual(decision.reason, "retry_window_expired")
         self.assertEqual(decision.provinces_missing, ("510000",))
 
-    def test_missing_window_retries_until_five_complete_days_have_elapsed(self) -> None:
+    def test_missing_window_includes_day_five(self) -> None:
         decision = decide_fetch(
             self.calendar,
             {"2026-07-17": _summary("partial", ["510000"])},
-            through_date=date(2026, 7, 21),
+            through_date=date(2026, 7, 22),
         )
 
         self.assertEqual(decision.mode, "missing")
@@ -83,14 +85,14 @@ class WorkflowDecisionTests(unittest.TestCase):
         self.assertEqual(decision.mode, "missing")
         self.assertEqual(decision.provinces_missing, ("510000",))
 
-    def test_all_automatic_fetch_modes_expire_at_day_five(self) -> None:
+    def test_all_automatic_fetch_modes_expire_after_day_five(self) -> None:
         for summary in (
             None,
             _summary("partial", ["510000"]),
             {"status": "invalid"},
         ):
             summaries = {} if summary is None else {"2026-07-17": summary}
-            for days_elapsed, expected_skip in ((4, False), (5, True)):
+            for days_elapsed, expected_skip in ((4, False), (5, False), (6, True)):
                 with self.subTest(summary=summary, days_elapsed=days_elapsed):
                     decision = decide_fetch(
                         self.calendar, summaries,
@@ -434,6 +436,83 @@ class RepositoryDecisionTests(unittest.TestCase):
         self.assertEqual(decision.reason, "retry_window_expired")
         self.assertEqual(self.calendar_path.read_bytes(), before)
         lookup.assert_not_called()
+
+    def test_schedule_phases_from_adjustment_day_through_day_six(self) -> None:
+        calendar = _calendar(("2026-11-12", None))
+        calendar["adjustment_dates"][0]["skip"] = False
+        write_json(self.calendar_path, calendar)
+        write_json(self.root / "data/prices/2026/2026-11-12.summary.json",
+                   _summary("partial", ["420000", "640000"]))
+        with patch("oilprice.workflow_decision.find_ndrc_notice") as lookup:
+            for day in range(12, 19):
+                for cron in (ADJUSTMENT_DAY_CRON, CATCH_UP_CRON):
+                    with self.subTest(day=day, cron=cron):
+                        decision = decide_fetch_for_repository(
+                            self.root, today_shanghai=date(2026, 11, day), scheduled_cron=cron,
+                        )
+                        allowed = (day == 12 and cron == ADJUSTMENT_DAY_CRON) or (
+                            13 <= day <= 17 and cron == CATCH_UP_CRON
+                        )
+                        self.assertEqual(decision.mode, "missing" if allowed else "skip")
+                        self.assertEqual(decision.target_date, "2026-11-12")
+                        self.assertEqual(decision.provinces_missing, ("420000", "640000"))
+                        if day == 18:
+                            self.assertEqual(decision.reason, "retry_window_expired")
+            lookup.assert_not_called()
+
+    def test_adjustment_day_can_start_without_a_summary(self) -> None:
+        with patch("oilprice.workflow_decision.find_ndrc_notice", return_value=NdrcNotice(
+            "国内成品油价格调整", "https://www.ndrc.gov.cn/notice",
+        )) as lookup:
+            decision = decide_fetch_for_repository(
+                self.root, today_shanghai=date(2026, 10, 15), scheduled_cron=ADJUSTMENT_DAY_CRON,
+            )
+        self.assertEqual(decision.target_date, "2026-10-15")
+        self.assertEqual(decision.mode, "force")
+        lookup.assert_called_once_with(date(2026, 10, 15))
+
+    def test_wrong_schedule_does_not_query_or_change_calendar(self) -> None:
+        before = self.calendar_path.read_bytes()
+        with patch("oilprice.workflow_decision.find_ndrc_notice") as lookup:
+            for day, cron in ((15, CATCH_UP_CRON), (16, ADJUSTMENT_DAY_CRON)):
+                decision = decide_fetch_for_repository(
+                    self.root, today_shanghai=date(2026, 10, day), scheduled_cron=cron,
+                )
+                self.assertEqual(decision.reason, "outside_fetch_schedule")
+            lookup.assert_not_called()
+        self.assertEqual(self.calendar_path.read_bytes(), before)
+
+    def test_completed_window_skips_both_schedule_phases(self) -> None:
+        write_json(self.root / "data/prices/2026/2026-10-15.summary.json", _summary("complete"))
+        with patch("oilprice.workflow_decision.find_ndrc_notice") as lookup:
+            for day, cron in ((15, ADJUSTMENT_DAY_CRON), (16, CATCH_UP_CRON)):
+                decision = decide_fetch_for_repository(
+                    self.root, today_shanghai=date(2026, 10, day), scheduled_cron=cron,
+                )
+                self.assertEqual(decision.reason, "already_complete")
+            lookup.assert_not_called()
+
+    def test_fifth_day_retry_works_across_year_boundary(self) -> None:
+        calendar = _calendar(("2026-12-30", None))
+        calendar["adjustment_dates"][0]["skip"] = False
+        write_json(self.calendar_path, calendar)
+        write_json(self.root / "data/calendar/2027.json", _calendar(("2027-01-13", None)))
+        write_json(self.root / "data/calendar/latest.json", {"path": "/data/calendar/2027.json"})
+        with patch("oilprice.workflow_decision.find_ndrc_notice") as lookup:
+            for day, expected in ((4, "force"), (5, "skip")):
+                decision = decide_fetch_for_repository(
+                    self.root, today_shanghai=date(2027, 1, day), scheduled_cron=CATCH_UP_CRON,
+                )
+                self.assertEqual(decision.target_date, "2026-12-30")
+                self.assertEqual(decision.mode, expected)
+            lookup.assert_not_called()
+
+    def test_workflow_crons_match_decision_phases(self) -> None:
+        import re
+        workflow = Path(".github/workflows/daily-fetch.yml").read_text(encoding="utf-8")
+        self.assertEqual(re.findall(r'cron: "([^"]+)"', workflow),
+                         [ADJUSTMENT_DAY_CRON, CATCH_UP_CRON])
+        self.assertIn('scheduled_cron=os.environ.get("SCHEDULE_CRON", "")', workflow)
 
 
 if __name__ == "__main__":
