@@ -27,6 +27,12 @@ GitHub Actions cron 使用UTC，工作流通过 `github.event.schedule` 区分�
 
 重新生成年度日历时，按日期保留已有 `skip`、`ndrc_notice`、`result` 等元数据。如果新的日期计算会删除带有这些信息的旧调价日，脚本会报错并保留原文件，需要先核对日期变化。
 
+年度日历生成脚本读取仓库内的 `data/holidays/{year}.json`，按 `schema/holidays.schema.json` 校验节假日与调休数据，不再下载第三方节假日文件。生成日历的 `sources` 会包含该文件中的来源信息；默认使用上一年日历的最后一个调价日作为计算起点。
+
+```bash
+python script/generate_calendar.py 2027
+```
+
 ## 数据来源
 
 > Big thanks to 国家发改委和各省级发改委持续、公开、规范地发布成品油价格公告，为本项目的数据建设提供了可靠基础。

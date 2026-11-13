@@ -7,6 +7,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from datetime import date
 from pathlib import Path
 from unittest.mock import patch
 
@@ -109,6 +110,75 @@ class CalendarGenerationTests(unittest.TestCase):
         )
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("Generate refined oil adjustment calendar JSON", result.stdout)
+
+
+class LocalHolidayCalendarTests(unittest.TestCase):
+    def setUp(self) -> None:
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.root = Path(temp.name)
+        schema_path = self.root / "schema/holidays.schema.json"
+        schema_path.parent.mkdir(parents=True)
+        schema_path.write_bytes((generate_calendar.ROOT / "schema/holidays.schema.json").read_bytes())
+        self.path = self.root / "data/holidays/2027.json"
+        self.payload = {
+            "holidays": [
+                {"name": "元旦", "range": ["2027-01-01", "2027-01-03"], "type": "holiday"},
+                {"name": "春节", "range": ["2027-01-31"], "type": "workingday"},
+            ],
+            "sources": [{"name": "本地维护的来源", "url": "https://example.gov.cn/2027"}],
+        }
+
+    def load(self):
+        write_json(self.path, self.payload)
+        with patch.object(generate_calendar, "ROOT", self.root):
+            return generate_calendar.load_holiday_calendar(2027)
+
+    def test_local_ranges_working_sunday_and_source_metadata(self) -> None:
+        holidays, working_days, sources = self.load()
+        self.assertEqual(holidays, {date(2027, 1, day) for day in (1, 2, 3)})
+        self.assertEqual(working_days, {date(2027, 1, 31)})
+        self.assertFalse(generate_calendar.is_workday(date(2027, 1, 1), holidays, working_days))
+        self.assertTrue(generate_calendar.is_workday(date(2027, 1, 31), holidays, working_days))
+        self.assertEqual(sources, self.payload["sources"])
+
+    def test_invalid_format_or_types_are_rejected_by_schema(self) -> None:
+        from jsonschema import ValidationError
+        original = copy.deepcopy(self.payload)
+        for bad in (
+            original["holidays"],
+            {**original, "holidays": [{"name": "bad", "range": ["2027-02-30"], "type": "holiday"}]},
+            {**original, "holidays": [{"name": "bad", "range": ["2027-01-30", "2027-01-31"], "type": "workingday"}]},
+            {**original, "holidays": [{"name": "bad", "range": ["2027-01-31"], "type": "unknown"}]},
+        ):
+            with self.subTest(payload=bad):
+                self.payload = bad
+                with self.assertRaises(ValidationError):
+                    self.load()
+
+    def test_reversed_ranges_and_conflicting_days_are_rejected(self) -> None:
+        self.payload["holidays"][0]["range"] = ["2027-01-03", "2027-01-01"]
+        with self.assertRaisesRegex(ValueError, "ends before it starts"):
+            self.load()
+        self.payload["holidays"][0]["range"] = ["2027-01-31"]
+        with self.assertRaisesRegex(ValueError, "both holiday and workingday.*2027-01-31"):
+            self.load()
+
+    def test_missing_local_file_fails_without_remote_fallback(self) -> None:
+        with patch.object(generate_calendar, "ROOT", self.root):
+            with self.assertRaises(FileNotFoundError):
+                generate_calendar.load_holiday_calendar(2027)
+
+    def test_real_2027_generation_uses_previous_calendar_and_local_sources(self) -> None:
+        anchor = generate_calendar.resolve_anchor_previous_adjustment_date(2027, None)
+        self.assertEqual(anchor, "2026-12-24")
+        result = generate_calendar.build_calendar_payload(2027, anchor, date(2026, 11, 13))
+        dates = [entry["date"] for entry in result["adjustment_dates"]]
+        self.assertEqual(dates[:4], ["2027-01-08", "2027-01-22", "2027-02-04", "2027-02-25"])
+        self.assertEqual(dates[-1], "2027-12-28")
+        self.assertEqual(len(dates), 25)
+        local = read_json(generate_calendar.ROOT / "data/holidays/2027.json")
+        self.assertEqual(result["sources"][1:], local["sources"])
 
 
 if __name__ == "__main__":

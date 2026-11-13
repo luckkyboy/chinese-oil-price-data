@@ -6,18 +6,14 @@ import json
 import sys
 from datetime import date, timedelta
 from pathlib import Path
-from urllib.request import urlopen
 
 # Keep the documented direct-script entry point usable without installation.
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from oilprice.io import write_json
+from oilprice.paths import ROOT
 
-
-HOLIDAY_DATA_URL_TEMPLATE = (
-    "https://raw.githubusercontent.com/bastengao/chinese-holidays-data/master/data/{year}.json"
-)
 
 BOOTSTRAP_ANCHORS = {
     2026: "2025-12-22",
@@ -25,11 +21,15 @@ BOOTSTRAP_ANCHORS = {
 
 
 def expand_range(raw_range: list[str]) -> list[date]:
+    if len(raw_range) not in {1, 2}:
+        raise ValueError("holiday range must contain one or two dates")
     if len(raw_range) == 1:
         return [date.fromisoformat(raw_range[0])]
 
     start = date.fromisoformat(raw_range[0])
     end = date.fromisoformat(raw_range[1])
+    if end < start:
+        raise ValueError(f"holiday range ends before it starts: {raw_range}")
     result: list[date] = []
     current = start
     while current <= end:
@@ -38,18 +38,28 @@ def expand_range(raw_range: list[str]) -> list[date]:
     return result
 
 
-def fetch_holiday_calendar(year: int) -> tuple[set[date], set[date], str]:
-    url = HOLIDAY_DATA_URL_TEMPLATE.format(year=year)
-    with urlopen(url, timeout=10) as response:
-        payload = json.loads(response.read().decode("utf-8"))
+def load_holiday_calendar(year: int) -> tuple[set[date], set[date], list[dict[str, str]]]:
+    """Read the repository's holiday/workday configuration without network I/O."""
+    from jsonschema import Draft202012Validator, FormatChecker
+
+    path = ROOT / "data/holidays" / f"{year}.json"
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    schema = json.loads((ROOT / "schema/holidays.schema.json").read_text(encoding="utf-8"))
+    Draft202012Validator(schema, format_checker=FormatChecker()).validate(payload)
 
     holidays: set[date] = set()
     working_days: set[date] = set()
-    for item in payload:
+    for item in payload["holidays"]:
         target_set = working_days if item["type"] == "workingday" else holidays
         target_set.update(expand_range(item["range"]))
 
-    return holidays, working_days, url
+    overlap = holidays & working_days
+    if overlap:
+        raise ValueError(
+            "dates declared as both holiday and workingday: "
+            + ", ".join(day.isoformat() for day in sorted(overlap))
+        )
+    return holidays, working_days, payload["sources"]
 
 
 def is_workday(target_day: date, holidays: set[date], working_days: set[date]) -> bool:
@@ -101,7 +111,7 @@ def resolve_anchor_previous_adjustment_date(year: int, explicit_anchor: str | No
     if bootstrap_anchor:
         return bootstrap_anchor
 
-    previous_path = Path("data/calendar") / f"{year - 1}.json"
+    previous_path = ROOT / "data/calendar" / f"{year - 1}.json"
     if previous_path.exists():
         payload = json.loads(previous_path.read_text(encoding="utf-8"))
         adjustment_dates = payload.get("adjustment_dates", [])
@@ -119,7 +129,7 @@ def build_calendar_payload(
     anchor_previous_adjustment_date: str,
     today: date,
 ) -> dict[str, object]:
-    holidays, working_days, holiday_source_url = fetch_holiday_calendar(year)
+    holidays, working_days, holiday_sources = load_holiday_calendar(year)
     adjustment_dates = derive_adjustment_dates(
         target_year=year,
         anchor_previous_adjustment_date=date.fromisoformat(anchor_previous_adjustment_date),
@@ -151,10 +161,7 @@ def build_calendar_payload(
                 "name": "国家发展改革委关于进一步完善成品油价格形成机制的通知",
                 "url": "https://zfxxgk.ndrc.gov.cn/web/iteminfo.jsp?id=19805",
             },
-            {
-                "name": f"{year} holiday and working-day data",
-                "url": holiday_source_url,
-            },
+            *holiday_sources,
         ],
     }
 

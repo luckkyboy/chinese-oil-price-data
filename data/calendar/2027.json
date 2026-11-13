@@ -1,0 +1,122 @@
+{
+  "year": 2027,
+  "timezone": "Asia/Shanghai",
+  "rule": {
+    "name": "10-working-day refined oil adjustment window",
+    "description": "Domestic refined oil adjustment window dates derived from the 10-working-day NDRC rule and the China holiday/workday calendar."
+  },
+  "generated_at": "2026-11-13T00:00:00+08:00",
+  "anchor_previous_adjustment_date": "2026-12-24",
+  "adjustment_dates": [
+    {
+      "date": "2027-01-08",
+      "round": 1
+    },
+    {
+      "date": "2027-01-22",
+      "round": 2
+    },
+    {
+      "date": "2027-02-04",
+      "round": 3
+    },
+    {
+      "date": "2027-02-25",
+      "round": 4
+    },
+    {
+      "date": "2027-03-11",
+      "round": 5
+    },
+    {
+      "date": "2027-03-25",
+      "round": 6
+    },
+    {
+      "date": "2027-04-09",
+      "round": 7
+    },
+    {
+      "date": "2027-04-23",
+      "round": 8
+    },
+    {
+      "date": "2027-05-11",
+      "round": 9
+    },
+    {
+      "date": "2027-05-25",
+      "round": 10
+    },
+    {
+      "date": "2027-06-08",
+      "round": 11
+    },
+    {
+      "date": "2027-06-23",
+      "round": 12
+    },
+    {
+      "date": "2027-07-07",
+      "round": 13
+    },
+    {
+      "date": "2027-07-21",
+      "round": 14
+    },
+    {
+      "date": "2027-08-04",
+      "round": 15
+    },
+    {
+      "date": "2027-08-18",
+      "round": 16
+    },
+    {
+      "date": "2027-09-01",
+      "round": 17
+    },
+    {
+      "date": "2027-09-16",
+      "round": 18
+    },
+    {
+      "date": "2027-09-29",
+      "round": 19
+    },
+    {
+      "date": "2027-10-19",
+      "round": 20
+    },
+    {
+      "date": "2027-11-02",
+      "round": 21
+    },
+    {
+      "date": "2027-11-16",
+      "round": 22
+    },
+    {
+      "date": "2027-11-30",
+      "round": 23
+    },
+    {
+      "date": "2027-12-14",
+      "round": 24
+    },
+    {
+      "date": "2027-12-28",
+      "round": 25
+    }
+  ],
+  "sources": [
+    {
+      "name": "国家发展改革委关于进一步完善成品油价格形成机制的通知",
+      "url": "https://zfxxgk.ndrc.gov.cn/web/iteminfo.jsp?id=19805"
+    },
+    {
+      "name": "国务院办公厅关于2027年部分节假日安排的通知 国办发明电〔2026〕10号",
+      "url": "https://www.gov.cn/zhengce/content/202611/content_7085101.htm"
+    }
+  ]
+}
