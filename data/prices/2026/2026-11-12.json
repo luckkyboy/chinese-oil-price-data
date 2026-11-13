@@ -540,6 +540,39 @@
       ]
     },
     {
+      "province_code": "420000",
+      "province_name": "湖北省",
+      "sources": [
+        {
+          "name": "湖北省发展和改革委员会",
+          "url": "https://fgw.hubei.gov.cn/fbjd/zc/zcwj/gg/202611/t20261112_6084273.shtml",
+          "notice_id": "hubei-d2f177649cd39e7ed6b1a1af11b9b64a",
+          "title": "2026年11月12日24时起 湖北成品油价格调整",
+          "raw_sha256": "84dbd159d6557ff7a6e09a1e32242c2a3ad87ff57b23d906c3c9460941dcafc4",
+          "adapter": "generic",
+          "parser_version": "generic-v2",
+          "extracted_at": "2026-11-13T13:59:57+08:00",
+          "published_at": "2026-11-12",
+          "adjustment_date": "2026-11-12",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "92": 8.38,
+            "95": 8.97,
+            "0": 8.04
+          },
+          "missing_products": [
+            "89"
+          ]
+        }
+      ]
+    },
+    {
       "province_code": "430000",
       "province_name": "湖南省",
       "sources": [
@@ -1088,6 +1121,38 @@
       ]
     },
     {
+      "province_code": "640000",
+      "province_name": "宁夏回族自治区",
+      "sources": [
+        {
+          "name": "宁夏回族自治区发展和改革委员会",
+          "url": "https://fzggw.nx.gov.cn/tzgg/202611/t20261112_5398222.html",
+          "notice_id": "ningxia-8bffe84a1764268bf0476de116f0b38d",
+          "title": "宁夏成品油价格调整公告（2026年第20号）",
+          "raw_sha256": "a0c6e99361e07fafe9bbf769e9cd6f04ea753b70c4ec7a405f712a5518cdd650",
+          "adapter": "ningxia",
+          "parser_version": "ningxia-v3",
+          "extracted_at": "2026-11-13T14:02:17+08:00",
+          "published_at": "2026-11-12",
+          "adjustment_date": "2026-11-12",
+          "confidence": "medium"
+        }
+      ],
+      "zones": [
+        {
+          "zone_code": "default",
+          "zone_name": "默认价区",
+          "items": {
+            "89": 7.8,
+            "92": 8.26,
+            "95": 8.73,
+            "0": 7.93
+          },
+          "missing_products": []
+        }
+      ]
+    },
+    {
       "province_code": "650000",
       "province_name": "新疆维吾尔自治区",
       "sources": [
@@ -1120,5 +1185,5 @@
       ]
     }
   ],
-  "updated_at": "2026-11-13T12:57:52+08:00"
+  "updated_at": "2026-11-13T14:02:17+08:00"
 }
